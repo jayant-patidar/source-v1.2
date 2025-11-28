@@ -1,0 +1,261 @@
+import { useFormik } from 'formik';
+import * as yup from 'yup';
+import { Box, Button, TextField, Typography, Container, MenuItem, Paper, Alert, FormControlLabel, Switch } from '@mui/material';
+import { useNavigate } from 'react-router-dom';
+import { useJobStore } from '../store/jobStore';
+
+const validationSchema = yup.object({
+  title: yup.string().required('Title is required'),
+  description: yup.string().required('Description is required'),
+  pay: yup.number().required('Pay is required').positive(),
+  type: yup.string().required('Job Type is required'),
+  category: yup.string().required('Category is required'),
+  generalLocation: yup.string().required('General Location is required'),
+  exactLocation: yup.string().required('Exact Location is required'),
+  jobDate: yup.date().required('Job Date is required'),
+  jobTime: yup.string().required('Job Time is required'),
+  expirationDate: yup.date().required('Expiration Date is required'),
+});
+
+const CreateJob = () => {
+  const navigate = useNavigate();
+  const { createJob, isLoading, error } = useJobStore();
+
+  const formik = useFormik({
+    initialValues: {
+      title: '',
+      description: '',
+      pay: '',
+      type: 'fixed',
+      category: '',
+      generalLocation: '',
+      exactLocation: '',
+      jobDate: '',
+      jobTime: '',
+      expirationDate: '',
+      isNegotiable: false,
+      visibility: true,
+      tags: '',
+    },
+    validationSchema: validationSchema,
+    onSubmit: async (values) => {
+      try {
+        const payload = {
+          title: values.title,
+          description: values.description,
+          pay: Number(values.pay),
+          type: values.type,
+          category: values.category,
+          location: {
+            general: values.generalLocation,
+            exact: values.exactLocation
+          },
+          generalLocation: values.generalLocation,
+          exactLocation: values.exactLocation,
+          jobDate: values.jobDate,
+          jobTime: values.jobTime,
+          expirationDate: values.expirationDate,
+          isNegotiable: values.isNegotiable,
+          visibility: values.visibility,
+          tags: values.tags, // Controller handles string splitting
+        };
+        console.log('Submitting Job Payload:', payload);
+        await createJob(payload);
+        navigate('/');
+      } catch (err) {
+        // Error handled in store
+      }
+    },
+  });
+
+  return (
+    <Container maxWidth="md">
+      <Paper elevation={0} sx={{ p: 4, borderRadius: 3, border: '1px solid #e2e8f0' }}>
+        <Typography variant="h4" fontWeight="bold" gutterBottom>
+          Post a Job
+        </Typography>
+        {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
+        <form onSubmit={formik.handleSubmit}>
+          <TextField
+            fullWidth
+            id="title"
+            name="title"
+            label="Job Title"
+            margin="normal"
+            value={formik.values.title}
+            onChange={formik.handleChange}
+            error={formik.touched.title && Boolean(formik.errors.title)}
+            helperText={formik.touched.title && formik.errors.title}
+          />
+          <TextField
+            fullWidth
+            id="description"
+            name="description"
+            label="Description"
+            multiline
+            rows={4}
+            margin="normal"
+            value={formik.values.description}
+            onChange={formik.handleChange}
+            error={formik.touched.description && Boolean(formik.errors.description)}
+            helperText={formik.touched.description && formik.errors.description}
+          />
+          <Box sx={{ display: 'flex', gap: 2 }}>
+            <TextField
+              fullWidth
+              id="pay"
+              name="pay"
+              label="Pay Amount"
+              type="number"
+              margin="normal"
+              value={formik.values.pay}
+              onChange={formik.handleChange}
+              error={formik.touched.pay && Boolean(formik.errors.pay)}
+              helperText={formik.touched.pay && formik.errors.pay}
+            />
+            <TextField
+              fullWidth
+              select
+              id="type"
+              name="type"
+              label="Job Type"
+              margin="normal"
+              value={formik.values.type}
+              onChange={formik.handleChange}
+              error={formik.touched.type && Boolean(formik.errors.type)}
+              helperText={formik.touched.type && formik.errors.type}
+            >
+              <MenuItem value="fixed">Fixed</MenuItem>
+              <MenuItem value="hourly">Hourly</MenuItem>
+              <MenuItem value="negotiable">Negotiable</MenuItem>
+            </TextField>
+          </Box>
+          <TextField
+            fullWidth
+            id="category"
+            name="category"
+            label="Category (e.g. Cleaning, Moving)"
+            margin="normal"
+            value={formik.values.category}
+            onChange={formik.handleChange}
+            error={formik.touched.category && Boolean(formik.errors.category)}
+            helperText={formik.touched.category && formik.errors.category}
+          />
+          <Box sx={{ display: 'flex', gap: 2 }}>
+            <TextField
+                fullWidth
+                id="generalLocation"
+                name="generalLocation"
+                label="General Location (City/Area)"
+                margin="normal"
+                value={formik.values.generalLocation}
+                onChange={formik.handleChange}
+                error={formik.touched.generalLocation && Boolean(formik.errors.generalLocation)}
+                helperText={formik.touched.generalLocation && formik.errors.generalLocation}
+            />
+            <TextField
+                fullWidth
+                id="exactLocation"
+                name="exactLocation"
+                label="Exact Location (Address)"
+                margin="normal"
+                value={formik.values.exactLocation}
+                onChange={formik.handleChange}
+                error={formik.touched.exactLocation && Boolean(formik.errors.exactLocation)}
+                helperText={formik.touched.exactLocation && formik.errors.exactLocation}
+            />
+          </Box>
+          <Box sx={{ display: 'flex', gap: 2 }}>
+            <TextField
+                fullWidth
+                id="jobDate"
+                name="jobDate"
+                label="Job Date"
+                type="date"
+                margin="normal"
+                InputLabelProps={{ shrink: true }}
+                value={formik.values.jobDate}
+                onChange={formik.handleChange}
+                error={formik.touched.jobDate && Boolean(formik.errors.jobDate)}
+                helperText={formik.touched.jobDate && formik.errors.jobDate}
+            />
+            <TextField
+                fullWidth
+                id="jobTime"
+                name="jobTime"
+                label="Job Time"
+                type="time"
+                margin="normal"
+                InputLabelProps={{ shrink: true }}
+                value={formik.values.jobTime}
+                onChange={formik.handleChange}
+                error={formik.touched.jobTime && Boolean(formik.errors.jobTime)}
+                helperText={formik.touched.jobTime && formik.errors.jobTime}
+            />
+          </Box>
+           <TextField
+                fullWidth
+                id="expirationDate"
+                name="expirationDate"
+                label="Expiration Date"
+                type="date"
+                margin="normal"
+                InputLabelProps={{ shrink: true }}
+                value={formik.values.expirationDate}
+                onChange={formik.handleChange}
+                error={formik.touched.expirationDate && Boolean(formik.errors.expirationDate)}
+                helperText={formik.touched.expirationDate && formik.errors.expirationDate}
+            />
+
+            <TextField
+                fullWidth
+                id="tags"
+                name="tags"
+                label="Tags (comma separated)"
+                margin="normal"
+                value={formik.values.tags}
+                onChange={formik.handleChange}
+                placeholder="e.g. urgent, weekend, heavy-lifting"
+            />
+
+            <Box sx={{ mt: 2, display: 'flex', gap: 4 }}>
+                <FormControlLabel
+                    control={
+                    <Switch
+                        checked={formik.values.isNegotiable}
+                        onChange={formik.handleChange}
+                        name="isNegotiable"
+                    />
+                    }
+                    label="Negotiable Pay"
+                />
+                <FormControlLabel
+                    control={
+                    <Switch
+                        checked={formik.values.visibility}
+                        onChange={formik.handleChange}
+                        name="visibility"
+                    />
+                    }
+                    label="Public Visibility"
+                />
+            </Box>
+
+          <Button
+            color="primary"
+            variant="contained"
+            fullWidth
+            type="submit"
+            size="large"
+            sx={{ mt: 3, bgcolor: 'black', '&:hover': { bgcolor: '#333' } }}
+            disabled={isLoading}
+          >
+            {isLoading ? 'Posting...' : 'Post Job'}
+          </Button>
+        </form>
+      </Paper>
+    </Container>
+  );
+};
+
+export default CreateJob;
