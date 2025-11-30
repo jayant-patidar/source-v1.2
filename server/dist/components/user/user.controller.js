@@ -152,11 +152,23 @@ class UserController {
             try {
                 const user = yield this.userService.getUserById(req.user._id);
                 if (user) {
+                    // Handle password update
+                    if (req.body.currentPassword && req.body.newPassword) {
+                        if (yield user.matchPassword(req.body.currentPassword)) {
+                            user.password = req.body.newPassword; // Will be hashed by pre-save hook
+                            yield user.save();
+                        }
+                        else {
+                            res.status(401);
+                            throw new Error('Invalid current password');
+                        }
+                    }
                     // Update fields if present in body
                     const updateData = Object.assign({}, req.body);
-                    // Prevent password update via this route if needed, or handle it separately
                     delete updateData.password;
-                    delete updateData.email; // Usually email update requires verification
+                    delete updateData.currentPassword;
+                    delete updateData.newPassword;
+                    delete updateData.email;
                     const updatedUser = yield this.userService.updateUser(req.user._id, updateData);
                     res.json(updatedUser);
                 }
