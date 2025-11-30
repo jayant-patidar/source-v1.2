@@ -6,7 +6,7 @@ class JobDAL {
     return await newJob.save();
   }
 
-  async getAllJobs(filter: any = {}, sortBy: string = 'newest'): Promise<IJob[]> {
+  async getAllJobs(filter: any = {}, sortBy: string = 'newest', limit?: number): Promise<IJob[]> {
     let sortOptions: any = { createdAt: -1 }; // Default: Newest
 
     if (sortBy === 'oldest') {
@@ -17,10 +17,24 @@ class JobDAL {
       sortOptions = { originalPay: 1 };
     }
 
-    return await Job.find(filter)
+    let query = Job.find(filter)
       .populate('seekerId', 'name email seekerRating providerRating avatar')
       .populate('providerId', 'name email seekerRating providerRating avatar')
       .sort(sortOptions);
+
+    if (limit) {
+      query = query.limit(limit);
+    }
+
+    return await query;
+  }
+
+  async getJobsByPoster(seekerId: string): Promise<IJob[]> {
+    return await Job.find({ seekerId }).sort({ createdAt: -1 }).populate('providerId', 'name');
+  }
+
+  async getJobsByProvider(providerId: string): Promise<IJob[]> {
+    return await Job.find({ providerId }).sort({ createdAt: -1 }).populate('seekerId', 'name');
   }
 
   async getJobById(jobId: string): Promise<IJob | null> {

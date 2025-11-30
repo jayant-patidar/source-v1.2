@@ -41,6 +41,24 @@ class JobController {
     }
   }
 
+  async getJobsByPoster(req: any, res: Response, next: NextFunction) {
+    try {
+      const jobs = await this.jobService.getJobsByPoster(req.user._id);
+      res.status(200).json(jobs);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async getJobsByProvider(req: any, res: Response, next: NextFunction) {
+    try {
+      const jobs = await this.jobService.getJobsByProvider(req.user._id);
+      res.status(200).json(jobs);
+    } catch (error) {
+      next(error);
+    }
+  }
+
   async getJobById(req: Request, res: Response, next: NextFunction) {
     try {
       const job = await this.jobService.getJobById(req.params.id);

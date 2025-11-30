@@ -28,9 +28,13 @@ interface Job {
 
 interface JobState {
   jobs: Job[];
+  recentJobs: Job[];
+  recommendedJobs: Job[];
   isLoading: boolean;
   error: string | null;
   fetchJobs: (filters?: any) => Promise<void>;
+  fetchRecentJobs: () => Promise<void>;
+  fetchRecommendedJobs: () => Promise<void>;
   createJob: (jobData: any) => Promise<void>;
 }
 
@@ -39,6 +43,8 @@ const api = axios.create({ baseURL: API_URL, withCredentials: true });
 
 export const useJobStore = create<JobState>((set) => ({
   jobs: [],
+  recentJobs: [],
+  recommendedJobs: [],
   isLoading: false,
   error: null,
   fetchJobs: async (filters = {}) => {
@@ -52,6 +58,23 @@ export const useJobStore = create<JobState>((set) => ({
       set({ jobs: Array.isArray(data) ? data : [], isLoading: false });
     } catch (error: any) {
       set({ error: error.message, isLoading: false, jobs: [] });
+    }
+  },
+  fetchRecentJobs: async () => {
+    try {
+      const { data } = await api.get('/', { params: { limit: 5, sortBy: 'newest' } });
+      set({ recentJobs: Array.isArray(data) ? data : [] });
+    } catch (error: any) {
+      console.error('Failed to fetch recent jobs:', error);
+    }
+  },
+  fetchRecommendedJobs: async () => {
+    try {
+      // For now, just fetch 5 random/latest jobs. In real app, this would use user preferences.
+      const { data } = await api.get('/', { params: { limit: 5 } });
+      set({ recommendedJobs: Array.isArray(data) ? data : [] });
+    } catch (error: any) {
+      console.error('Failed to fetch recommended jobs:', error);
     }
   },
   createJob: async (jobData) => {

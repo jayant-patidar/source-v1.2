@@ -1,10 +1,13 @@
 import { useEffect, useState } from 'react';
+import { useParams, Link } from 'react-router-dom';
 import { Container, Typography, Box, Paper, Avatar, TextField, Button, Grid, Chip, MenuItem, Alert, CircularProgress, IconButton, Divider, Tabs, Tab } from '@mui/material';
 import axios from 'axios';
 import { useAuthStore } from '../store/authStore';
 import { format } from 'date-fns';
+import WorkIcon from '@mui/icons-material/Work';
+import LockIcon from '@mui/icons-material/Lock';
+import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
 import EditIcon from '@mui/icons-material/Edit';
-import SaveIcon from '@mui/icons-material/Save';
 import CancelIcon from '@mui/icons-material/Cancel';
 import LinkedInIcon from '@mui/icons-material/LinkedIn';
 import GitHubIcon from '@mui/icons-material/GitHub';
@@ -12,7 +15,6 @@ import LanguageIcon from '@mui/icons-material/Language';
 import EmailIcon from '@mui/icons-material/Email';
 import PhoneIcon from '@mui/icons-material/Phone';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
-import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -57,7 +59,13 @@ const Profile = () => {
   const [success, setSuccess] = useAutoDismiss('');
   const [error, setError] = useAutoDismiss('');
   const [tabValue, setTabValue] = useState(0);
-  const [isEditing, setIsEditing] = useState(false);
+  const [editMode, setEditMode] = useState({
+    personal: false,
+    skills: false,
+    portfolio: false,
+    social: false,
+    security: false
+  });
 
   const [formData, setFormData] = useState<any>({
     name: '',
@@ -74,6 +82,7 @@ const Profile = () => {
       minPay: '',
       location: ''
     },
+    portfolio: [],
     socialLinks: {
       linkedin: '',
       github: '',
@@ -81,6 +90,14 @@ const Profile = () => {
     }
   });
   const [skillInput, setSkillInput] = useState('');
+  const [jobTypeInput, setJobTypeInput] = useState('');
+  const [categoryInput, setCategoryInput] = useState('');
+  const [portfolioInput, setPortfolioInput] = useState({ title: '', link: '', description: '' });
+  const [passwordData, setPasswordData] = useState({ currentPassword: '', newPassword: '', confirmPassword: '' });
+
+  const [postedJobs, setPostedJobs] = useState<any[]>([]);
+  const [myOffers, setMyOffers] = useState<any[]>([]);
+  const [workedJobs, setWorkedJobs] = useState<any[]>([]);
 
   const fetchProfile = async () => {
     try {
@@ -102,12 +119,24 @@ const Profile = () => {
           minPay: data.preferences?.minPay || '',
           location: data.preferences?.location || ''
         },
+        portfolio: data.portfolio || [],
         socialLinks: {
           linkedin: data.socialLinks?.linkedin || '',
           github: data.socialLinks?.github || '',
           website: data.socialLinks?.website || ''
         }
       });
+
+      // Fetch Activity Data
+      const postedRes = await axios.get('http://localhost:5000/api/jobs/posted', { withCredentials: true });
+      setPostedJobs(postedRes.data);
+
+      const offersRes = await axios.get('http://localhost:5000/api/negotiations/my-offers', { withCredentials: true });
+      setMyOffers(offersRes.data);
+
+      const workedRes = await axios.get('http://localhost:5000/api/jobs/worked', { withCredentials: true });
+      setWorkedJobs(workedRes.data);
+
     } catch (err: any) {
       setError('Failed to load profile data');
       console.error(err);
@@ -115,6 +144,7 @@ const Profile = () => {
       setLoading(false);
     }
   };
+
 
   useEffect(() => {
     if (authUser) {
@@ -154,18 +184,81 @@ const Profile = () => {
     setFormData({ ...formData, skills: formData.skills.filter((skill: string) => skill !== skillToDelete) });
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleAddArrayItem = (e: React.KeyboardEvent, field: string, inputState: string, setInputState: (val: string) => void, nestedField?: string) => {
+    if (e.key === 'Enter' && inputState.trim()) {
+      e.preventDefault();
+      if (nestedField) {
+        const currentArray = formData[field][nestedField] || [];
+        if (!currentArray.includes(inputState.trim())) {
+           handleNestedChange(field, nestedField, [...currentArray, inputState.trim()]);
+        }
+      } else {
+         if (!formData[field].includes(inputState.trim())) {
+           setFormData({ ...formData, [field]: [...formData[field], inputState.trim()] });
+         }
+      }
+      setInputState('');
+    }
+  };
+
+  const handleDeleteArrayItem = (itemToDelete: string, field: string, nestedField?: string) => {
+      if (nestedField) {
+         const currentArray = formData[field][nestedField] || [];
+         handleNestedChange(field, nestedField, currentArray.filter((item: string) => item !== itemToDelete));
+      } else {
+         setFormData({ ...formData, [field]: formData[field].filter((item: string) => item !== itemToDelete) });
+      }
+  };
+
+  const handleAddPortfolio = () => {
+    if (portfolioInput.title && portfolioInput.link) {
+      setFormData({ ...formData, portfolio: [...formData.portfolio, portfolioInput] });
+      setPortfolioInput({ title: '', link: '', description: '' });
+    }
+  };
+
+  const handleDeletePortfolio = (index: number) => {
+    setFormData({ ...formData, portfolio: formData.portfolio.filter((_: any, i: number) => i !== index) });
+  };
+
+  const handleEditToggle = (section: keyof typeof editMode) => {
+    setEditMode(prev => ({ ...prev, [section]: !prev[section] }));
+  };
+
+  const handleSubmit = async (section: keyof typeof editMode) => {
     setSaving(true);
     setError('');
     setSuccess('');
+
+    if (section === 'security') {
+        if (passwordData.newPassword && passwordData.newPassword !== passwordData.confirmPassword) {
+            setError('New passwords do not match');
+            setSaving(false);
+            return;
+        }
+    }
+
     try {
-      const { data } = await axios.put('http://localhost:5000/api/users/profile', formData, { withCredentials: true });
+      let payload: any = {};
+
+      if (section === 'security') {
+          if (passwordData.currentPassword && passwordData.newPassword) {
+            payload.currentPassword = passwordData.currentPassword;
+            payload.newPassword = passwordData.newPassword;
+          }
+      } else {
+        payload = { ...formData };
+      }
+
+      const { data } = await axios.put('http://localhost:5000/api/users/profile', payload, { withCredentials: true });
       const updatedUser = { ...authUser, ...data };
       localStorage.setItem('user', JSON.stringify(updatedUser));
       
       setSuccess('Profile updated successfully!');
-      setIsEditing(false);
+      setEditMode(prev => ({ ...prev, [section]: false }));
+      if (section === 'security') {
+          setPasswordData({ currentPassword: '', newPassword: '', confirmPassword: '' });
+      }
       fetchProfile();
     } catch (err: any) {
       setError(err.response?.data?.message || 'Failed to update profile');
@@ -218,37 +311,7 @@ const Profile = () => {
             </Box>
             
             <Box sx={{ mb: 3 }}>
-              {!isEditing ? (
-                <Button 
-                  variant="contained" 
-                  startIcon={<EditIcon />} 
-                  onClick={() => setIsEditing(true)}
-                  sx={{ borderRadius: 5, textTransform: 'none', px: 3 }}
-                >
-                  Edit Profile
-                </Button>
-              ) : (
-                <Box sx={{ display: 'flex', gap: 2 }}>
-                   <Button 
-                    variant="outlined" 
-                    color="error" 
-                    startIcon={<CancelIcon />} 
-                    onClick={() => setIsEditing(false)}
-                    sx={{ borderRadius: 5, textTransform: 'none' }}
-                  >
-                    Cancel
-                  </Button>
-                  <Button 
-                    variant="contained" 
-                    startIcon={<SaveIcon />} 
-                    onClick={handleSubmit}
-                    disabled={saving}
-                    sx={{ borderRadius: 5, textTransform: 'none' }}
-                  >
-                    {saving ? 'Saving...' : 'Save'}
-                  </Button>
-                </Box>
-              )}
+              {/* Global edit buttons removed */}
             </Box>
           </Box>
 
@@ -274,19 +337,31 @@ const Profile = () => {
           <Tabs value={tabValue} onChange={handleTabChange} aria-label="profile tabs">
             <Tab label="Personal Info" {...a11yProps(0)} />
             <Tab label="Skills & Preferences" {...a11yProps(1)} />
-            <Tab label="Contact & Social" {...a11yProps(2)} />
+            <Tab label="Portfolio" {...a11yProps(2)} />
+            <Tab label="Contact & Social" {...a11yProps(3)} />
+            <Tab label="Security" {...a11yProps(4)} />
+            <Tab label="My Activity" {...a11yProps(5)} />
           </Tabs>
-        </Box>
-
-        {/* Tab Panels */}
-        <Box component={isEditing ? 'form' : 'div'}>
           {success && <Alert severity="success" sx={{ m: 3 }}>{success}</Alert>}
           {error && <Alert severity="error" sx={{ m: 3 }}>{error}</Alert>}
 
           {/* Personal Info Tab */}
           <CustomTabPanel value={tabValue} index={0}>
-            <Typography variant="h6" fontWeight="bold" gutterBottom>About</Typography>
-            {isEditing ? (
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+              <Typography variant="h6" fontWeight="bold">About</Typography>
+              {!editMode.personal ? (
+                <IconButton onClick={() => handleEditToggle('personal')} color="primary">
+                  <EditIcon />
+                </IconButton>
+              ) : (
+                <Box sx={{ display: 'flex', gap: 1 }}>
+                  <Button variant="outlined" color="error" size="small" onClick={() => handleEditToggle('personal')}>Cancel</Button>
+                  <Button variant="contained" size="small" onClick={() => handleSubmit('personal')} disabled={saving}>Save</Button>
+                </Box>
+              )}
+            </Box>
+
+            {editMode.personal ? (
               <TextField fullWidth multiline rows={4} label="About Me" name="about" value={formData.about} onChange={handleChange} sx={{ mb: 3 }} />
             ) : (
               <Typography variant="body1" color="text.secondary" paragraph>{user.about || 'No bio provided.'}</Typography>
@@ -297,7 +372,7 @@ const Profile = () => {
             <Typography variant="h6" fontWeight="bold" gutterBottom>Details</Typography>
             <Grid container spacing={3}>
               <Grid size={{ xs: 12, sm: 6 }}>
-                {isEditing ? (
+                {editMode.personal ? (
                    <TextField fullWidth label="Name" name="name" value={formData.name} onChange={handleChange} />
                 ) : (
                   <Box>
@@ -307,7 +382,7 @@ const Profile = () => {
                 )}
               </Grid>
               <Grid size={{ xs: 12, sm: 6 }}>
-                 {isEditing ? (
+                 {editMode.personal ? (
                    <TextField fullWidth label="Date of Birth" name="DOB" type="date" InputLabelProps={{ shrink: true }} value={formData.DOB} onChange={handleChange} />
                 ) : (
                   <Box>
@@ -322,8 +397,21 @@ const Profile = () => {
 
           {/* Skills & Preferences Tab */}
           <CustomTabPanel value={tabValue} index={1}>
-            <Typography variant="h6" fontWeight="bold" gutterBottom>Skills</Typography>
-             {isEditing && (
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+              <Typography variant="h6" fontWeight="bold">Skills</Typography>
+              {!editMode.skills ? (
+                <IconButton onClick={() => handleEditToggle('skills')} color="primary">
+                  <EditIcon />
+                </IconButton>
+              ) : (
+                <Box sx={{ display: 'flex', gap: 1 }}>
+                  <Button variant="outlined" color="error" size="small" onClick={() => handleEditToggle('skills')}>Cancel</Button>
+                  <Button variant="contained" size="small" onClick={() => handleSubmit('skills')} disabled={saving}>Save</Button>
+                </Box>
+              )}
+            </Box>
+
+             {editMode.skills && (
                 <TextField 
                   fullWidth 
                   label="Add a skill (Press Enter)" 
@@ -335,16 +423,66 @@ const Profile = () => {
                 />
              )}
             <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, mb: 4 }}>
-              {(isEditing ? formData.skills : user.skills)?.map((skill: string, index: number) => (
+              {(editMode.skills ? formData.skills : user.skills)?.map((skill: string, index: number) => (
                 <Chip 
                   key={index} 
                   label={skill} 
-                  onDelete={isEditing ? () => handleDeleteSkill(skill) : undefined} 
+                  onDelete={editMode.skills ? () => handleDeleteSkill(skill) : undefined} 
                   color="primary" 
                   variant="outlined" 
                 />
               ))}
-              {(!user.skills?.length && !isEditing) && <Typography color="text.secondary">No skills added.</Typography>}
+              {(!user.skills?.length && !editMode.skills) && <Typography color="text.secondary">No skills added.</Typography>}
+            </Box>
+
+            <Typography variant="h6" fontWeight="bold" gutterBottom sx={{ mt: 3 }}>Job Types</Typography>
+             {editMode.skills && (
+                <TextField 
+                  fullWidth 
+                  label="Add job type (e.g. Full-time, Remote) - Press Enter" 
+                  value={jobTypeInput} 
+                  onChange={(e) => setJobTypeInput(e.target.value)} 
+                  onKeyDown={(e) => handleAddArrayItem(e, 'preferences', jobTypeInput, setJobTypeInput, 'jobTypes')} 
+                  helperText="Press Enter to add"
+                  sx={{ mb: 2 }}
+                />
+             )}
+            <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, mb: 4 }}>
+              {(editMode.skills ? formData.preferences.jobTypes : user.preferences?.jobTypes)?.map((type: string, index: number) => (
+                <Chip 
+                  key={index} 
+                  label={type} 
+                  onDelete={editMode.skills ? () => handleDeleteArrayItem(type, 'preferences', 'jobTypes') : undefined} 
+                  color="info" 
+                  variant="outlined" 
+                />
+              ))}
+              {(!user.preferences?.jobTypes?.length && !editMode.skills) && <Typography color="text.secondary">No job types specified.</Typography>}
+            </Box>
+
+            <Typography variant="h6" fontWeight="bold" gutterBottom>Categories</Typography>
+             {editMode.skills && (
+                <TextField 
+                  fullWidth 
+                  label="Add category (e.g. Engineering, Design) - Press Enter" 
+                  value={categoryInput} 
+                  onChange={(e) => setCategoryInput(e.target.value)} 
+                  onKeyDown={(e) => handleAddArrayItem(e, 'preferences', categoryInput, setCategoryInput, 'categories')} 
+                  helperText="Press Enter to add"
+                  sx={{ mb: 2 }}
+                />
+             )}
+            <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, mb: 4 }}>
+              {(editMode.skills ? formData.preferences.categories : user.preferences?.categories)?.map((cat: string, index: number) => (
+                <Chip 
+                  key={index} 
+                  label={cat} 
+                  onDelete={editMode.skills ? () => handleDeleteArrayItem(cat, 'preferences', 'categories') : undefined} 
+                  color="success" 
+                  variant="outlined" 
+                />
+              ))}
+              {(!user.preferences?.categories?.length && !editMode.skills) && <Typography color="text.secondary">No categories specified.</Typography>}
             </Box>
 
             <Divider sx={{ my: 3 }} />
@@ -352,7 +490,7 @@ const Profile = () => {
             <Typography variant="h6" fontWeight="bold" gutterBottom>Job Preferences</Typography>
             <Grid container spacing={3}>
                <Grid size={{ xs: 12, sm: 6 }}>
-                 {isEditing ? (
+                 {editMode.skills ? (
                     <TextField fullWidth label="Min Pay ($/hr)" type="number" value={formData.preferences.minPay} onChange={(e) => handleNestedChange('preferences', 'minPay', e.target.value)} />
                  ) : (
                     <Box>
@@ -362,7 +500,7 @@ const Profile = () => {
                  )}
                </Grid>
                <Grid size={{ xs: 12, sm: 6 }}>
-                 {isEditing ? (
+                 {editMode.skills ? (
                     <TextField fullWidth label="Preferred Location" value={formData.preferences.location} onChange={(e) => handleNestedChange('preferences', 'location', e.target.value)} />
                  ) : (
                     <Box>
@@ -372,7 +510,7 @@ const Profile = () => {
                  )}
                </Grid>
                <Grid size={{ xs: 12, sm: 6 }}>
-                 {isEditing ? (
+                 {editMode.skills ? (
                    <TextField fullWidth label="Availability" name="availability" select value={formData.availability} onChange={handleChange}>
                       <MenuItem value="Full-time">Full-time</MenuItem>
                       <MenuItem value="Part-time">Part-time</MenuItem>
@@ -389,12 +527,86 @@ const Profile = () => {
             </Grid>
           </CustomTabPanel>
 
-          {/* Contact & Social Tab */}
+          {/* Portfolio Tab */}
           <CustomTabPanel value={tabValue} index={2}>
-            <Typography variant="h6" fontWeight="bold" gutterBottom>Contact Information</Typography>
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+              <Typography variant="h6" fontWeight="bold">Portfolio</Typography>
+              {!editMode.portfolio ? (
+                <IconButton onClick={() => handleEditToggle('portfolio')} color="primary">
+                  <EditIcon />
+                </IconButton>
+              ) : (
+                <Box sx={{ display: 'flex', gap: 1 }}>
+                  <Button variant="outlined" color="error" size="small" onClick={() => handleEditToggle('portfolio')}>Cancel</Button>
+                  <Button variant="contained" size="small" onClick={() => handleSubmit('portfolio')} disabled={saving}>Save</Button>
+                </Box>
+              )}
+            </Box>
+            
+            {editMode.portfolio && (
+              <Paper variant="outlined" sx={{ p: 2, mb: 3, bgcolor: 'background.default' }}>
+                <Typography variant="subtitle2" gutterBottom>Add New Item</Typography>
+                <Grid container spacing={2}>
+                  <Grid size={{ xs: 12, sm: 5 }}>
+                    <TextField fullWidth label="Title" value={portfolioInput.title} onChange={(e) => setPortfolioInput({ ...portfolioInput, title: e.target.value })} size="small" />
+                  </Grid>
+                  <Grid size={{ xs: 12, sm: 5 }}>
+                    <TextField fullWidth label="Link" value={portfolioInput.link} onChange={(e) => setPortfolioInput({ ...portfolioInput, link: e.target.value })} size="small" />
+                  </Grid>
+                  <Grid size={{ xs: 12, sm: 2 }}>
+                    <Button variant="contained" onClick={handleAddPortfolio} fullWidth sx={{ height: '100%' }}>Add</Button>
+                  </Grid>
+                  <Grid size={12}>
+                     <TextField fullWidth label="Description" value={portfolioInput.description} onChange={(e) => setPortfolioInput({ ...portfolioInput, description: e.target.value })} size="small" />
+                  </Grid>
+                </Grid>
+              </Paper>
+            )}
+
+            <Grid container spacing={2}>
+              {(editMode.portfolio ? formData.portfolio : user.portfolio)?.map((item: any, index: number) => (
+                <Grid size={{ xs: 12, md: 6 }} key={index}>
+                  <Paper elevation={2} sx={{ p: 2, position: 'relative' }}>
+                    {editMode.portfolio && (
+                      <IconButton size="small" color="error" onClick={() => handleDeletePortfolio(index)} sx={{ position: 'absolute', top: 5, right: 5 }}>
+                        <CancelIcon fontSize="small" />
+                      </IconButton>
+                    )}
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
+                      <WorkIcon color="primary" />
+                      <Typography variant="subtitle1" fontWeight="bold">
+                        <a href={item.link} target="_blank" rel="noopener noreferrer" style={{ textDecoration: 'none', color: 'inherit' }}>
+                          {item.title}
+                        </a>
+                      </Typography>
+                    </Box>
+                    <Typography variant="body2" color="text.secondary">{item.description}</Typography>
+                  </Paper>
+                </Grid>
+              ))}
+              {(!user.portfolio?.length && !editMode.portfolio) && <Typography color="text.secondary">No portfolio items added.</Typography>}
+            </Grid>
+          </CustomTabPanel>
+
+          {/* Contact & Social Tab */}
+          <CustomTabPanel value={tabValue} index={3}>
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+              <Typography variant="h6" fontWeight="bold">Contact Information</Typography>
+              {!editMode.social ? (
+                <IconButton onClick={() => handleEditToggle('social')} color="primary">
+                  <EditIcon />
+                </IconButton>
+              ) : (
+                <Box sx={{ display: 'flex', gap: 1 }}>
+                  <Button variant="outlined" color="error" size="small" onClick={() => handleEditToggle('social')}>Cancel</Button>
+                  <Button variant="contained" size="small" onClick={() => handleSubmit('social')} disabled={saving}>Save</Button>
+                </Box>
+              )}
+            </Box>
+
             <Grid container spacing={3} sx={{ mb: 4 }}>
               <Grid size={{ xs: 12, sm: 6 }}>
-                 {isEditing ? (
+                 {editMode.social ? (
                     <TextField fullWidth label="Email" name="email" value={formData.email} disabled helperText="Email cannot be changed" />
                  ) : (
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
@@ -407,7 +619,7 @@ const Profile = () => {
                  )}
               </Grid>
               <Grid size={{ xs: 12, sm: 6 }}>
-                 {isEditing ? (
+                 {editMode.social ? (
                     <TextField fullWidth label="Phone" name="phone" value={formData.phone} onChange={handleChange} />
                  ) : (
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
@@ -420,7 +632,7 @@ const Profile = () => {
                  )}
               </Grid>
                <Grid size={12}>
-                 {isEditing ? (
+                 {editMode.social ? (
                     <TextField fullWidth label="Address" name="address" value={formData.address} onChange={handleChange} />
                  ) : (
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
@@ -437,7 +649,7 @@ const Profile = () => {
             <Divider sx={{ my: 3 }} />
 
             <Typography variant="h6" fontWeight="bold" gutterBottom>Social Profiles</Typography>
-             {isEditing ? (
+             {editMode.social ? (
                 <Grid container spacing={2}>
                   <Grid size={{ xs: 12, sm: 4 }}>
                     <TextField fullWidth label="LinkedIn URL" value={formData.socialLinks.linkedin} onChange={(e) => handleNestedChange('socialLinks', 'linkedin', e.target.value)} />
@@ -471,6 +683,162 @@ const Profile = () => {
                   )}
                 </Box>
              )}
+          </CustomTabPanel>
+
+          {/* Security Tab */}
+          <CustomTabPanel value={tabValue} index={4}>
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+              <Typography variant="h6" fontWeight="bold">Security Settings</Typography>
+              {!editMode.security ? (
+                <Button variant="outlined" startIcon={<EditIcon />} onClick={() => handleEditToggle('security')}>
+                  Change Password
+                </Button>
+              ) : (
+                <Box sx={{ display: 'flex', gap: 1 }}>
+                  <Button variant="outlined" color="error" size="small" onClick={() => handleEditToggle('security')}>Cancel</Button>
+                  <Button variant="contained" size="small" onClick={() => handleSubmit('security')} disabled={saving}>Save</Button>
+                </Box>
+              )}
+            </Box>
+
+            <Box sx={{ maxWidth: 600, mt: 3 }}>
+              {editMode.security ? (
+                <Grid container spacing={3}>
+                  <Grid size={12}>
+                    <Alert severity="info" sx={{ mb: 2 }}>
+                      To change your password, enter your current password and the new password below.
+                    </Alert>
+                  </Grid>
+                  <Grid size={12}>
+                    <TextField 
+                      fullWidth 
+                      type="password" 
+                      label="Current Password" 
+                      value={passwordData.currentPassword} 
+                      onChange={(e) => setPasswordData({ ...passwordData, currentPassword: e.target.value })} 
+                    />
+                  </Grid>
+                  <Grid size={12}>
+                    <TextField 
+                      fullWidth 
+                      type="password" 
+                      label="New Password" 
+                      value={passwordData.newPassword} 
+                      onChange={(e) => setPasswordData({ ...passwordData, newPassword: e.target.value })} 
+                    />
+                  </Grid>
+                  <Grid size={12}>
+                    <TextField 
+                      fullWidth 
+                      type="password" 
+                      label="Confirm New Password" 
+                      value={passwordData.confirmPassword} 
+                      onChange={(e) => setPasswordData({ ...passwordData, confirmPassword: e.target.value })} 
+                    />
+                  </Grid>
+                </Grid>
+              ) : (
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, color: 'text.secondary' }}>
+                  <LockIcon />
+                  <Typography>Password is secure. Click "Change Password" to update it.</Typography>
+                </Box>
+              )}
+            </Box>
+          </CustomTabPanel>
+
+          {/* My Activity Tab */}
+          <CustomTabPanel value={tabValue} index={5}>
+            <Typography variant="h5" fontWeight="bold" gutterBottom>My Activity</Typography>
+            
+            {/* Seeker Section */}
+            <Box sx={{ mb: 5 }}>
+                <Typography variant="h6" fontWeight="bold" color="primary" gutterBottom sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                    <WorkIcon /> Posted Jobs (Seeker)
+                </Typography>
+                <Divider sx={{ mb: 2 }} />
+                {postedJobs.length === 0 ? (
+                    <Typography color="text.secondary">You haven't posted any jobs yet.</Typography>
+                ) : (
+                    <Grid container spacing={2}>
+                        {postedJobs.map((job) => (
+                            <Grid size={{ xs: 12, md: 6 }} key={job._id}>
+                                <Paper variant="outlined" sx={{ p: 2, borderRadius: 2 }}>
+                                    <Box display="flex" justifyContent="space-between" alignItems="flex-start">
+                                        <Box>
+                                            <Typography variant="subtitle1" fontWeight="bold" component={Link} to={`/jobs/${job._id}`} sx={{ textDecoration: 'none', color: 'inherit', '&:hover': { textDecoration: 'underline' } }}>
+                                                {job.title}
+                                            </Typography>
+                                            <Typography variant="body2" color="text.secondary">
+                                                Posted {format(new Date(job.createdAt), 'MMM d, yyyy')}
+                                            </Typography>
+                                        </Box>
+                                        <Chip 
+                                            label={job.status.toUpperCase()} 
+                                            size="small" 
+                                            color={job.status === 'open' ? 'success' : job.status === 'completed' ? 'primary' : 'default'} 
+                                            sx={{ fontWeight: 'bold' }}
+                                        />
+                                    </Box>
+                                    <Box mt={1} display="flex" gap={1}>
+                                        <Chip label={`${job.negotiations?.length || 0} Offers`} size="small" variant="outlined" />
+                                        <Chip label={`$${job.originalPay}`} size="small" variant="outlined" icon={<AttachMoneyIcon />} />
+                                    </Box>
+                                </Paper>
+                            </Grid>
+                        ))}
+                    </Grid>
+                )}
+            </Box>
+
+            {/* Provider Section */}
+            <Box>
+                <Typography variant="h6" fontWeight="bold" color="secondary" gutterBottom sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                    <WorkIcon /> Work & Offers (Provider)
+                </Typography>
+                <Divider sx={{ mb: 2 }} />
+                
+                <Typography variant="subtitle1" fontWeight="bold" gutterBottom>Active Offers</Typography>
+                {myOffers.length === 0 ? (
+                    <Typography color="text.secondary" sx={{ mb: 3 }}>No active offers sent.</Typography>
+                ) : (
+                    <Grid container spacing={2} sx={{ mb: 4 }}>
+                        {myOffers.map((offer) => (
+                            <Grid size={{ xs: 12, md: 6 }} key={offer._id}>
+                                <Paper variant="outlined" sx={{ p: 2, borderRadius: 2, bgcolor: '#f9fafb' }}>
+                                    <Typography variant="subtitle2" fontWeight="bold" component={Link} to={`/jobs/${offer.job?._id}`} sx={{ textDecoration: 'none', color: 'inherit' }}>
+                                        {offer.job?.title || 'Unknown Job'}
+                                    </Typography>
+                                    <Box display="flex" justifyContent="space-between" mt={1}>
+                                        <Typography variant="body2">Offered: <b>${offer.amount}</b></Typography>
+                                        <Chip 
+                                            label={offer.status.toUpperCase()} 
+                                            size="small" 
+                                            color={offer.status === 'accepted' ? 'success' : offer.status === 'rejected' ? 'error' : 'warning'} 
+                                        />
+                                    </Box>
+                                </Paper>
+                            </Grid>
+                        ))}
+                    </Grid>
+                )}
+
+                <Typography variant="subtitle1" fontWeight="bold" gutterBottom>Work History</Typography>
+                {workedJobs.length === 0 ? (
+                    <Typography color="text.secondary">No completed jobs yet.</Typography>
+                ) : (
+                    <Grid container spacing={2}>
+                        {workedJobs.map((job) => (
+                            <Grid size={{ xs: 12, md: 6 }} key={job._id}>
+                                <Paper variant="outlined" sx={{ p: 2, borderRadius: 2, borderColor: 'success.main' }}>
+                                    <Typography variant="subtitle1" fontWeight="bold">{job.title}</Typography>
+                                    <Typography variant="body2" color="text.secondary">Completed on {format(new Date(job.updatedAt), 'MMM d, yyyy')}</Typography>
+                                    <Chip label="Completed" color="success" size="small" sx={{ mt: 1 }} />
+                                </Paper>
+                            </Grid>
+                        ))}
+                    </Grid>
+                )}
+            </Box>
           </CustomTabPanel>
         </Box>
       </Paper>

@@ -1,11 +1,19 @@
 import { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { Container, Typography, Box, Button, TextField, Paper, Divider, Chip, CircularProgress, Alert, Avatar, IconButton } from '@mui/material';
+import { Container, Typography, Box, Button, TextField, Paper, Divider, Chip, CircularProgress, Alert, Avatar, IconButton, Grid, Dialog, DialogTitle, DialogContent, DialogActions } from '@mui/material';
 import axios from 'axios';
 import { useAuthStore } from '../store/authStore';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
-import { format } from 'date-fns';
+import AccessTimeIcon from '@mui/icons-material/AccessTime';
+import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
+import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
+import CategoryIcon from '@mui/icons-material/Category';
+import SendIcon from '@mui/icons-material/Send';
+import BookmarkBorderIcon from '@mui/icons-material/BookmarkBorder';
+import ShareLocationIcon from '@mui/icons-material/ShareLocation';
+import LoopIcon from '@mui/icons-material/Loop';
+import { format, formatDistanceToNow } from 'date-fns';
 
 const JobDetails = () => {
   const { id } = useParams();
@@ -16,6 +24,8 @@ const JobDetails = () => {
   const [message, setMessage] = useState('');
   const [negotiations, setNegotiations] = useState<any[]>([]);
   const [error, setError] = useState('');
+  const [showOfferForm, setShowOfferForm] = useState(false);
+  const [offerMode, setOfferMode] = useState<'negotiate' | 'interested'>('negotiate');
 
   useEffect(() => {
     const fetchJob = async () => {
@@ -23,7 +33,8 @@ const JobDetails = () => {
         const { data } = await axios.get(`http://localhost:5000/api/jobs/${id}`, { withCredentials: true });
         setJob(data);
         setLoading(false);
-        if (user && data.poster && data.poster._id === user._id) {
+        // Check if user is the poster (seekerId)
+        if (user && data.seekerId && data.seekerId._id === user._id) {
             fetchNegotiations();
         }
       } catch (err) {
@@ -53,6 +64,7 @@ const JobDetails = () => {
           alert('Offer sent!');
           setNegotiationAmount('');
           setMessage('');
+          setShowOfferForm(false);
       } catch (err: any) {
           alert(err.response?.data?.message || 'Failed to send offer');
       }
@@ -72,209 +84,304 @@ const JobDetails = () => {
   if (error) return <Container><Alert severity="error">{error}</Alert></Container>;
   if (!job) return <Container><Typography>Job not found</Typography></Container>;
 
-  const isPoster = user && job.poster && job.poster._id === user._id;
+  // Correctly identify if current user is the poster
+  const isPoster = user && job.seekerId && job.seekerId._id === user._id;
+  const poster = job.seekerId;
 
   return (
     <Container maxWidth="md" sx={{ mt: 4, mb: 8 }}>
-      <Paper elevation={0} sx={{ p: 6, borderRadius: 3, border: '1px solid #e2e8f0' }}>
-        {/* Back Button */}
-        <IconButton component={Link} to="/" sx={{ mb: 2, color: 'black' }}>
-          <ArrowBackIcon />
-        </IconButton>
+      {/* Back Button */}
+      <Box sx={{ mb: 2 }}>
+        <Button component={Link} to="/" startIcon={<ArrowBackIcon />} sx={{ color: 'text.secondary' }}>
+          Back to Jobs
+        </Button>
+      </Box>
 
-        {/* Header */}
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 1 }}>
-          <Typography variant="h4" fontWeight="900" sx={{ fontSize: '2rem', flexGrow: 1, mr: 2 }}>
-            {job.title}
-          </Typography>
-          <Box sx={{ display: 'flex', gap: 1 }}>
-             <Chip 
-              label={`Pay: $${job.pay}`} 
-              sx={{ 
-                bgcolor: '#000000', 
-                color: 'white', 
-                fontWeight: 'bold', 
-                borderRadius: '16px',
-                height: 32
-              }} 
+      <Paper elevation={0} sx={{ p: { xs: 3, md: 5 }, borderRadius: 4, border: '1px solid #e0e0e0' }}>
+        
+        {/* Header Section */}
+        <Box sx={{ mb: 4 }}>
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 2 }}>
+            <Box sx={{ flex: 1 }}>
+                <Typography variant="h3" fontWeight="800" sx={{ fontSize: { xs: '1.75rem', md: '2.5rem' }, lineHeight: 1.2, mb: 1 }}>
+                {job.title}
+                </Typography>
+                <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+                    Posted {formatDistanceToNow(new Date(job.createdAt))} ago
+                </Typography>
+            </Box>
+            
+            {/* Prominent Pay Display */}
+            <Box sx={{ textAlign: 'right', minWidth: 120 }}>
+                <Typography variant="h4" fontWeight="900" color="success.main">
+                    ${job.originalPay}
+                </Typography>
+                <Typography variant="caption" color="text.secondary" fontWeight="bold">
+                    {job.type === 'hourly' ? 'PER HOUR' : 'FIXED PRICE'}
+                </Typography>
+            </Box>
+          </Box>
+
+          {/* Key Info Chips */}
+          <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1.5 }}>
+            <Chip 
+              icon={<CategoryIcon sx={{ fontSize: 18 }} />}
+              label={job.category} 
+              sx={{ bgcolor: '#e3f2fd', color: '#1565c0', fontWeight: '600', fontSize: '0.9rem', py: 0.5 }} 
             />
             <Chip 
-              label={job.payType === 'hourly' ? 'Hourly' : 'One-Time'} 
-              sx={{ 
-                bgcolor: '#e0f2f1', 
-                color: '#00695c', 
-                fontWeight: 'bold', 
-                borderRadius: '16px',
-                height: 32
-              }} 
+              icon={<LocationOnIcon sx={{ fontSize: 18 }} />}
+              label={job.location?.general || 'Remote'} 
+              sx={{ bgcolor: '#f3e5f5', color: '#7b1fa2', fontWeight: '600', fontSize: '0.9rem', py: 0.5 }} 
             />
+             {job.status !== 'open' && (
+               <Chip label={job.status.toUpperCase()} color={job.status === 'completed' ? 'success' : 'default'} sx={{ fontWeight: 'bold' }} />
+            )}
           </Box>
         </Box>
 
-        {/* Category Tag */}
-        <Chip 
-          label={`Category: ${job.category}`} 
-          sx={{ 
-            bgcolor: '#e8eaf6', 
-            color: '#3f51b5', 
-            fontWeight: 'bold', 
-            borderRadius: '8px',
-            mb: 4
-          }} 
-        />
+        <Divider sx={{ my: 4 }} />
 
-        {/* Description */}
-        <Typography variant="body1" paragraph sx={{ mb: 4, color: '#444', fontSize: '1.1rem', lineHeight: 1.6 }}>
-          {job.description}
-        </Typography>
+        {/* Description Section */}
+        <Box sx={{ mb: 5 }}>
+          <Typography variant="h6" fontWeight="bold" gutterBottom>
+            Description
+          </Typography>
+          <Typography variant="body1" sx={{ color: '#374151', lineHeight: 1.8, whiteSpace: 'pre-wrap' }}>
+            {job.description}
+          </Typography>
+        </Box>
 
-        {/* Job Details Grid */}
-        <Box sx={{ mb: 4 }}>
-            <Box sx={{ display: 'flex', alignItems: 'center', mb: 2, gap: 2 }}>
-                <Typography variant="body2" sx={{ minWidth: 100, color: '#666' }}>Date:</Typography>
-                <Typography variant="body1" fontWeight="500">
+        {/* Details Grid */}
+        <Box sx={{ mb: 5, bgcolor: '#f9fafb', p: 3, borderRadius: 3 }}>
+          <Grid container spacing={3}>
+            <Grid item xs={12} sm={6}>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                <CalendarTodayIcon sx={{ color: 'text.secondary' }} />
+                <Box>
+                  <Typography variant="caption" color="text.secondary" display="block">Date</Typography>
+                  <Typography variant="body2" fontWeight="600">
                     {job.jobDate ? format(new Date(job.jobDate), 'MMMM d, yyyy') : 'Flexible'}
-                </Typography>
-            </Box>
-            <Box sx={{ display: 'flex', alignItems: 'center', mb: 2, gap: 2 }}>
-                <Typography variant="body2" sx={{ minWidth: 100, color: '#666' }}>Time:</Typography>
-                <Typography variant="body1" fontWeight="500">{job.jobTime || 'Flexible'}</Typography>
-            </Box>
-             <Box sx={{ display: 'flex', alignItems: 'center', mb: 2, gap: 2 }}>
-                <Typography variant="body2" sx={{ minWidth: 100, color: '#666' }}>Prerequisite:</Typography>
-                <Typography variant="body1" fontWeight="500">None</Typography>
-            </Box>
+                  </Typography>
+                </Box>
+              </Box>
+            </Grid>
+            <Grid item xs={12} sm={6}>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                <AccessTimeIcon sx={{ color: 'text.secondary' }} />
+                <Box>
+                  <Typography variant="caption" color="text.secondary" display="block">Time</Typography>
+                  <Typography variant="body2" fontWeight="600">
+                    {job.jobTime || 'Flexible'}
+                  </Typography>
+                </Box>
+              </Box>
+            </Grid>
+            <Grid item xs={12}>
+               <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                <LocationOnIcon sx={{ color: 'text.secondary' }} />
+                <Box>
+                  <Typography variant="caption" color="text.secondary" display="block">Location</Typography>
+                  <Typography variant="body2" fontWeight="600">
+                    {job.location?.general || 'Remote'}
+                  </Typography>
+                  <Typography variant="caption" color="text.secondary" sx={{ fontStyle: 'italic' }}>
+                    * Exact location provided upon acceptance
+                  </Typography>
+                </Box>
+              </Box>
+            </Grid>
+          </Grid>
         </Box>
 
-        {/* Location */}
-        <Box sx={{ display: 'flex', alignItems: 'center', color: '#555', mb: 6 }}>
-            <LocationOnIcon sx={{ mr: 1, color: '#3f51b5' }} />
-            <Typography variant="body1">{job.location?.address || job.location?.general || 'Location not specified'}</Typography>
-        </Box>
+        {/* Action Buttons & Interested Button */}
+        {!isPoster && user && (
+            <Box sx={{ mb: 5 }}>
+                {/* Actions Icons Row */}
+                <Box sx={{ display: 'flex', justifyContent: 'space-around', mb: 3 }}>
+                    <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', cursor: 'pointer', opacity: 0.7, '&:hover': { opacity: 1 } }} onClick={() => { setOfferMode('negotiate'); setNegotiationAmount(''); setShowOfferForm(true); }}>
+                        <LoopIcon sx={{ fontSize: 28, color: 'black' }} />
+                        <Typography variant="caption" sx={{ fontSize: '0.8rem', mt: 0.5, fontWeight: 'bold' }}>Negotiate</Typography>
+                    </Box>
+                    <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', cursor: 'pointer', opacity: 0.7, '&:hover': { opacity: 1 } }} onClick={() => alert('Requesting exact location...')}>
+                        <ShareLocationIcon sx={{ fontSize: 28, color: 'black' }} />
+                        <Typography variant="caption" sx={{ fontSize: '0.8rem', mt: 0.5, fontWeight: 'bold' }}>Locate</Typography>
+                    </Box>
+                    <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', cursor: 'pointer', opacity: 0.7, '&:hover': { opacity: 1 } }} onClick={() => alert('Share functionality coming soon!')}>
+                        <SendIcon sx={{ fontSize: 28, color: 'black' }} />
+                        <Typography variant="caption" sx={{ fontSize: '0.8rem', mt: 0.5, fontWeight: 'bold' }}>Share</Typography>
+                    </Box>
+                    <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', cursor: 'pointer', opacity: 0.7, '&:hover': { opacity: 1 } }} onClick={() => alert('Saved to your list!')}>
+                        <BookmarkBorderIcon sx={{ fontSize: 28, color: 'black' }} />
+                        <Typography variant="caption" sx={{ fontSize: '0.8rem', mt: 0.5, fontWeight: 'bold' }}>Save</Typography>
+                    </Box>
+                </Box>
 
-        {/* Action Bar */}
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 6, p: 2, bgcolor: '#fafafa', borderRadius: 2 }}>
-             <Box sx={{ display: 'flex', gap: 6, px: 4 }}>
-                <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', cursor: 'pointer', opacity: 0.7, '&:hover': { opacity: 1 } }}>
-                  <Typography variant="h5">↻</Typography>
-                  <Typography variant="caption">Negotiate</Typography>
-                </Box>
-                <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', cursor: 'pointer', opacity: 0.7, '&:hover': { opacity: 1 } }}>
-                  <Typography variant="h5">⌖</Typography>
-                  <Typography variant="caption">Locate</Typography>
-                </Box>
-                <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', cursor: 'pointer', opacity: 0.7, '&:hover': { opacity: 1 } }}>
-                   <Typography variant="h5">➤</Typography>
-                  <Typography variant="caption">Share</Typography>
-                </Box>
-                <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', cursor: 'pointer', opacity: 0.7, '&:hover': { opacity: 1 } }}>
-                   <Typography variant="h5">🔖</Typography>
-                  <Typography variant="caption">Save</Typography>
-                </Box>
-            </Box>
-
-            <Button 
-                variant="contained" 
-                fullWidth
-                sx={{ 
-                  bgcolor: '#000000', 
-                  color: 'white', 
-                  fontWeight: 'bold',
-                  py: 1.5,
-                  borderRadius: 1,
-                  maxWidth: 400,
-                  '&:hover': { bgcolor: '#333' }
-                }}
-            >
-                INTERESTED
-            </Button>
-        </Box>
-
-        <Divider sx={{ mb: 4 }} />
-
-        {/* Job Poster Section */}
-        <Typography variant="h6" gutterBottom>Job Poster:</Typography>
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 3 }}>
-            <Avatar 
-                src={job.poster?.avatar} 
-                alt={job.poster?.name}
-                sx={{ width: 80, height: 80, border: '1px solid #eee' }}
-            >
-                {job.poster?.name?.charAt(0).toUpperCase()}
-            </Avatar>
-            <Box>
-                <Typography variant="h6" fontWeight="bold" component={Link} to={`/profile/${job.poster?._id}`} sx={{ textDecoration: 'none', color: 'inherit', '&:hover': { textDecoration: 'underline' } }}>
-                    {job.poster?.name}
-                </Typography>
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mt: 0.5 }}>
-                    <Typography variant="body2" color="text.secondary">Seeker Rating: {job.poster?.seekerRating || 'N/A'} ★</Typography>
-                </Box>
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                    <Typography variant="body2" color="text.secondary">Provider Rating: {job.poster?.providerRating || 'N/A'} ★</Typography>
-                </Box>
-                 <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mt: 1 }}>
-                    User Since: {job.poster?.createdAt ? format(new Date(job.poster.createdAt), 'MMMM d, yyyy') : 'Recently'}
-                </Typography>
-            </Box>
-        </Box>
-
-        {/* Negotiation Section (Existing Logic kept for functionality) */}
-        {isPoster && (
-             <Box sx={{ mt: 6, p: 3, bgcolor: '#f8f9fa', borderRadius: 2 }}>
-                <Typography variant="h6" gutterBottom fontWeight="bold">Offers & Negotiations</Typography>
-                {negotiations.length === 0 ? <Typography color="text.secondary">No offers received yet.</Typography> : (
-                    negotiations.map((neg) => (
-                        <Paper key={neg._id} variant="outlined" sx={{ p: 2, mb: 2, bgcolor: 'white' }}>
-                            <Box display="flex" justifyContent="space-between" alignItems="center">
-                                <Box>
-                                    <Typography variant="subtitle1" fontWeight="bold">{neg.seeker?.name} offered ${neg.amount}</Typography>
-                                    <Typography variant="body2" color="text.secondary">{neg.message}</Typography>
-                                </Box>
-                                <Box>
-                                    {neg.status === 'pending' && (
-                                        <Button variant="contained" size="small" onClick={() => handleAccept(neg._id)} sx={{ bgcolor: 'black' }}>Accept</Button>
-                                    )}
-                                    <Chip label={neg.status} size="small" sx={{ ml: 1 }} color={neg.status === 'accepted' ? 'success' : 'default'} />
-                                </Box>
-                            </Box>
-                        </Paper>
-                    ))
-                )}
+                {/* Interested Button */}
+                <Button 
+                    fullWidth
+                    variant="contained" 
+                    size="large"
+                    onClick={() => { setOfferMode('interested'); setNegotiationAmount(job.originalPay); setShowOfferForm(true); }}
+                    sx={{ 
+                        bgcolor: 'black', 
+                        color: 'white', 
+                        fontWeight: 'bold', 
+                        py: 1.5,
+                        borderRadius: 2,
+                        fontSize: '1.1rem',
+                        boxShadow: '0 4px 12px rgba(0,0,0,0.2)',
+                        '&:hover': { bgcolor: '#333', transform: 'translateY(-2px)' },
+                        transition: 'all 0.2s'
+                    }}
+                >
+                    INTERESTED
+                </Button>
             </Box>
         )}
 
-        {!isPoster && user && (
-             <Box sx={{ mt: 6 }}>
-                <Typography variant="h6" gutterBottom fontWeight="bold">Make an Offer</Typography>
-                <Box component="form" sx={{ display: 'flex', flexDirection: 'column', gap: 2, maxWidth: 500 }}>
+        <Divider sx={{ my: 4 }} />
+
+        {/* Seeker Details (Bottom) */}
+        <Box sx={{ mb: 4 }}>
+             <Typography variant="h6" fontWeight="bold" gutterBottom>
+                About the Seeker
+            </Typography>
+            <Paper variant="outlined" sx={{ p: 3, borderRadius: 3, display: 'flex', alignItems: 'center', gap: 3, flexWrap: 'wrap' }}>
+                <Avatar 
+                    src={poster?.avatar} 
+                    alt={poster?.name}
+                    sx={{ width: 72, height: 72, border: '2px solid #fff', boxShadow: '0 2px 8px rgba(0,0,0,0.1)' }}
+                >
+                    {poster?.name?.charAt(0).toUpperCase()}
+                </Avatar>
+                <Box sx={{ flexGrow: 1 }}>
+                    <Typography variant="h6" fontWeight="bold" component={Link} to={`/profile/${poster?._id}`} sx={{ textDecoration: 'none', color: 'inherit', '&:hover': { textDecoration: 'underline' } }}>
+                        {poster?.name}
+                    </Typography>
+                    <Box sx={{ display: 'flex', gap: 3, mt: 1 }}>
+                        <Box>
+                            <Typography variant="caption" color="text.secondary" display="block">Seeker Rating</Typography>
+                            <Typography variant="body2" fontWeight="bold">★ {poster?.seekerRating?.toFixed(1) || 'N/A'}</Typography>
+                        </Box>
+                        <Box>
+                            <Typography variant="caption" color="text.secondary" display="block">Provider Rating</Typography>
+                            <Typography variant="body2" fontWeight="bold">★ {poster?.providerRating?.toFixed(1) || 'N/A'}</Typography>
+                        </Box>
+                         <Box>
+                            <Typography variant="caption" color="text.secondary" display="block">Member Since</Typography>
+                            <Typography variant="body2" fontWeight="bold">{poster?.createdAt ? format(new Date(poster.createdAt), 'MMM yyyy') : 'N/A'}</Typography>
+                        </Box>
+                    </Box>
+                </Box>
+                <Button component={Link} to={`/profile/${poster?._id}`} variant="outlined" size="small" sx={{ borderRadius: 2 }}>
+                    View Profile
+                </Button>
+            </Paper>
+        </Box>
+
+        {/* Offer Modal */}
+        <Dialog open={showOfferForm} onClose={() => setShowOfferForm(false)} maxWidth="sm" fullWidth>
+            <DialogTitle sx={{ fontWeight: 'bold' }}>
+                {offerMode === 'interested' ? 'Express Interest' : 'Make an Offer'}
+            </DialogTitle>
+            <DialogContent>
+                <Typography variant="body2" color="text.secondary" gutterBottom>
+                    {offerMode === 'interested' 
+                        ? `Let ${poster?.name} know you're interested in this job at the listed pay.` 
+                        : `Send a proposal to ${poster?.name} with your requested pay.`}
+                </Typography>
+                
+                {offerMode === 'negotiate' ? (
                     <TextField 
+                        autoFocus
+                        margin="dense"
                         label="Offer Amount ($)" 
                         type="number" 
                         value={negotiationAmount} 
                         onChange={(e) => setNegotiationAmount(e.target.value)} 
                         fullWidth
-                        size="small"
+                        variant="outlined"
+                        required
+                        sx={{ mb: 2, mt: 1 }}
                     />
-                    <TextField 
-                        label="Message (Optional)" 
-                        multiline 
-                        rows={3} 
-                        value={message} 
-                        onChange={(e) => setMessage(e.target.value)} 
-                        fullWidth
-                        size="small"
-                    />
-                    <Button 
-                        variant="contained" 
-                        onClick={handleNegotiate} 
-                        disabled={!negotiationAmount}
-                        sx={{ bgcolor: 'black', color: 'white', '&:hover': { bgcolor: '#333' } }}
-                    >
-                        Send Offer
-                    </Button>
-                </Box>
+                ) : (
+                    <Box sx={{ my: 2, p: 2, bgcolor: '#f5f5f5', borderRadius: 1 }}>
+                        <Typography variant="subtitle2" fontWeight="bold">
+                            Proposing to work for: <span style={{ color: '#2e7d32' }}>${job?.originalPay}</span>
+                        </Typography>
+                    </Box>
+                )}
+
+                <TextField 
+                    margin="dense"
+                    label="Message (Optional)" 
+                    multiline 
+                    rows={4} 
+                    value={message} 
+                    onChange={(e) => setMessage(e.target.value)} 
+                    fullWidth
+                    variant="outlined"
+                    placeholder={offerMode === 'interested' ? "I'm available to start immediately..." : "Hi, I can help you with this..."}
+                />
+            </DialogContent>
+            <DialogActions sx={{ px: 3, pb: 3 }}>
+                <Button onClick={() => setShowOfferForm(false)} sx={{ color: 'text.secondary' }}>Cancel</Button>
+                <Button 
+                    variant="contained" 
+                    onClick={handleNegotiate} 
+                    disabled={!negotiationAmount}
+                    sx={{ bgcolor: 'black', color: 'white', '&:hover': { bgcolor: '#333' } }}
+                >
+                    {offerMode === 'interested' ? 'Send Interest' : 'Send Offer'}
+                </Button>
+            </DialogActions>
+        </Dialog>
+
+        {/* Poster View: Negotiations */}
+        {isPoster && (
+             <Box sx={{ mt: 6 }}>
+                <Typography variant="h6" gutterBottom fontWeight="bold">Received Offers</Typography>
+                <Divider sx={{ mb: 3 }} />
+                {negotiations.length === 0 ? (
+                    <Paper variant="outlined" sx={{ p: 4, textAlign: 'center', borderRadius: 2, bgcolor: '#f9fafb', borderStyle: 'dashed' }}>
+                        <Typography color="text.secondary">No offers received yet.</Typography>
+                    </Paper>
+                ) : (
+                    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                        {negotiations.map((neg) => (
+                            <Paper key={neg._id} elevation={0} sx={{ p: 3, border: '1px solid #e0e0e0', borderRadius: 2 }}>
+                                <Box display="flex" justifyContent="space-between" alignItems="flex-start">
+                                    <Box>
+                                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
+                                            <Typography variant="subtitle1" fontWeight="bold">{neg.provider?.name}</Typography>
+                                            <Chip label={`$${neg.amount}`} size="small" color="primary" variant="outlined" sx={{ fontWeight: 'bold' }} />
+                                        </Box>
+                                        <Typography variant="body2" color="text.secondary" sx={{ bgcolor: '#f5f5f5', p: 1.5, borderRadius: 1, display: 'inline-block' }}>
+                                            "{neg.message || 'No message'}"
+                                        </Typography>
+                                    </Box>
+                                    <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 1 }}>
+                                        <Chip 
+                                            label={neg.status.toUpperCase()} 
+                                            size="small" 
+                                            color={neg.status === 'accepted' ? 'success' : neg.status === 'rejected' ? 'error' : 'default'} 
+                                            sx={{ fontWeight: 'bold' }}
+                                        />
+                                        {neg.status === 'pending' && (
+                                            <Button variant="contained" size="small" onClick={() => handleAccept(neg._id)} sx={{ bgcolor: 'black', minWidth: 100 }}>
+                                                Accept
+                                            </Button>
+                                        )}
+                                    </Box>
+                                </Box>
+                            </Paper>
+                        ))}
+                    </Box>
+                )}
             </Box>
         )}
+
       </Paper>
     </Container>
   );

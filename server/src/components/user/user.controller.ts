@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import UserService from './user.service';
 import generateToken from '../../utils/generateToken';
 import jwt from 'jsonwebtoken';
+import bcrypt from 'bcryptjs';
 
 class UserController {
   private userService: UserService;
@@ -133,11 +134,24 @@ class UserController {
       const user = await this.userService.getUserById(req.user._id);
 
       if (user) {
+        // Handle password update
+        if (req.body.currentPassword && req.body.newPassword) {
+          if (await user.matchPassword(req.body.currentPassword)) {
+            const salt = await bcrypt.genSalt(10);
+            const hashedPassword = await bcrypt.hash(req.body.newPassword, salt);
+            await this.userService.updateUser(req.user._id, { password: hashedPassword });
+          } else {
+            res.status(401);
+            throw new Error('Invalid current password');
+          }
+        }
+
         // Update fields if present in body
         const updateData = { ...req.body };
-        // Prevent password update via this route if needed, or handle it separately
         delete updateData.password; 
-        delete updateData.email; // Usually email update requires verification
+        delete updateData.currentPassword;
+        delete updateData.newPassword;
+        delete updateData.email; 
 
         const updatedUser = await this.userService.updateUser(req.user._id, updateData);
         

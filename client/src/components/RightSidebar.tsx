@@ -1,18 +1,15 @@
+import { useEffect } from 'react';
 import { Card, CardContent, Typography, Box, Divider, Chip, CircularProgress } from '@mui/material';
 import { Link } from 'react-router-dom';
 import { useJobStore } from '../store/jobStore';
 
 const RightSidebar = () => {
-  const { jobs, isLoading } = useJobStore();
+  const { recentJobs, recommendedJobs, fetchRecentJobs, fetchRecommendedJobs } = useJobStore();
 
-  // Mock logic for "Recommended" vs "Recent" since we just have one list for now.
-  // In a real app, these would be separate API calls or filtered lists.
-  const recommendedJobs = jobs ? jobs.slice(0, 3) : [];
-  const recentJobs = jobs ? jobs.slice(0, 5) : [];
-
-  if (isLoading) {
-    return <Box display="flex" justifyContent="center" p={2}><CircularProgress size={24} /></Box>;
-  }
+  useEffect(() => {
+    fetchRecentJobs();
+    fetchRecommendedJobs();
+  }, [fetchRecentJobs, fetchRecommendedJobs]);
 
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>

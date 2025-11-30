@@ -1,0 +1,195 @@
+APPLICATION FEATURES & USER STORIES
+===================================
+
+This document outlines the comprehensive list of tasks, features, and user stories for the application.
+The application is designed for a single universal user type who can act as both a Seeker and a Provider.
+
+LEGEND:
+[COMPLETED]   - Feature is fully implemented
+[IN PROGRESS] - Feature is partially implemented or in development
+[PLANNED]     - Feature is planned for future development
+
+--------------------------------------------------------------------------------
+
+UNIVERSAL USER JOURNEY (Everyone is both Seeker & Provider)
+(This replaces separate onboarding for seeker/provider)
+
+A. Onboarding & Account Setup (COMMON)
+  Register Account (Email/Password) [COMPLETED]
+  Login (JWT Authentication) [COMPLETED]
+  Email/Phone Verification [PLANNED]
+  Complete Basic Profile [COMPLETED]
+      Name, Bio, Location [COMPLETED]
+      Profile photo (Avatar URL) [COMPLETED]
+      Skills & Preferences [COMPLETED]
+      Contact & Social Links [COMPLETED]
+      ID verification (optional but boosts trust) [PLANNED]
+  Set Default Role Preferences [PLANNED]
+      - User chooses what they usually do (Seeker / Provider / Both)
+      - Note: They can switch at any time
+  Add Payment Method (optional but encouraged) [PLANNED]
+  Set Service Area / Location Preferences [PLANNED]
+
+--------------------------------------------------------------------------------
+
+SECTION 1 — USER JOURNEY AS SERVICE SEEKER
+(Every user can act as a seeker at any time)
+
+B. Explore & Browse Posts
+  Browse Job/Service Feed [COMPLETED]
+      - Mixture of service listings & job requests posted by users.
+      "Recommended for You" Feed [COMPLETED]
+      "Recent Jobs" Feed [COMPLETED]
+  Filters for Discovery [IN PROGRESS]
+      Category [COMPLETED]
+      Search (Title/Description) [COMPLETED]
+      Price range [PLANNED]
+      Distance [PLANNED]
+      Ratings [PLANNED]
+      Availability [PLANNED]
+  Map View / Location View [PLANNED]
+      - Locate provider jobs or candidates on map
+      - See exact location when allowed
+  View Post Details [COMPLETED]
+      Description, Pay, Date/Time [COMPLETED]
+      Seeker Details (Rating, Member Since) [COMPLETED]
+      Location (General vs Exact privacy) [COMPLETED]
+  Save a Post (UI Implemented, Mock Functionality) [IN PROGRESS]
+  Share a Post (UI Implemented, Mock Functionality) [IN PROGRESS]
+  Report a Post [PLANNED]
+      - Wrong info, fraud, inappropriate, etc.
+
+C. Create & Manage Job Request
+  Create a Job Post [COMPLETED]
+      Category [COMPLETED]
+      Description & Title [COMPLETED]
+      Budget (Hourly/Fixed) [COMPLETED]
+      Date/time [COMPLETED]
+      Location (General & Exact) [COMPLETED]
+      Photos [PLANNED]
+  Edit or Update Job Post [PLANNED]
+  Pause or Resume Post Visibility [PLANNED]
+  Delete Job Post [PLANNED]
+  View Posted Jobs (My Activity -> Posted Jobs) [COMPLETED]
+
+D. Interactions With Providers
+  Receive Interests from Providers (View Offers on Job Details) [COMPLETED]
+  View Providers Who Showed Interest [COMPLETED]
+  Negotiate with Providers [IN PROGRESS]
+      Receive Offer Amount & Message [COMPLETED]
+      Accept Offer [COMPLETED]
+      Counter-offer [PLANNED]
+      Chat History [PLANNED]
+  Choose & Confirm a Provider (Accept Offer) [COMPLETED]
+  Cancel Engagement Before Service [PLANNED]
+  Track Provider (live/approx) Before Arrival [PLANNED]
+
+E. Payments & Service Management
+  Select Payment Option [PLANNED]
+  Pay Deposit or Full Payment (depending on model) [PLANNED]
+  Receive Invoice [PLANNED]
+
+F. During the Service
+  Chat with Provider [PLANNED]
+  Receive Status Updates [PLANNED]
+      - On the way
+      - Started
+      - In progress
+      - Completed
+
+G. Completion & Ratings
+  Approve Completion [PLANNED]
+  Release Payment [PLANNED]
+  Rate Provider [PLANNED]
+  Write Review [PLANNED]
+  Provider Can Respond to Negative Reviews [PLANNED]
+  View Own Seeker Rating Summary [PLANNED]
+
+H. Support
+  Raise a Dispute [PLANNED]
+  Request Refund [PLANNED]
+
+--------------------------------------------------------------------------------
+
+SECTION 2 — USER JOURNEY AS SERVICE PROVIDER
+
+J. Browse Available Job Requests
+  Browse Job Requests Feed [COMPLETED]
+  Apply Filters [IN PROGRESS]
+      Category [COMPLETED]
+      Budget [PLANNED]
+      Distance [PLANNED]
+      Date [PLANNED]
+  Open Job Details [COMPLETED]
+  Locate Job on Map (UI Implemented, Mock Functionality) [IN PROGRESS]
+  Save or Bookmark Job (UI Implemented, Mock Functionality) [IN PROGRESS]
+  Share Job (UI Implemented, Mock Functionality) [IN PROGRESS]
+
+K. Interact With Seekers
+  Show Interest in a Job (Express Interest Modal) [COMPLETED]
+  Negotiate Price with Seeker (Make Offer Modal) [COMPLETED]
+  Chat with Seeker (Message included in Offer) [IN PROGRESS]
+  Receive Confirmation from Seeker (Job Status: Assigned) [COMPLETED]
+  Accept or Decline Job Assignment [PLANNED]
+
+L. Pre-Service Management
+  View Job Timeline & Requirements [PLANNED]
+  Mark “On the Way” [PLANNED]
+  Mark “Arrived” [PLANNED]
+
+M. During the Service
+  Start Service Timer (if used) [PLANNED]
+  Send Progress Updates [PLANNED]
+  Mark as Completed [PLANNED]
+
+N. Payments & Earnings
+  View Expected Earnings per Job [PLANNED]
+  Receive Payment After Completion [PLANNED]
+  Wallet Balance Summary [PLANNED]
+  Withdraw Earnings to Bank/UPI [PLANNED]
+  View Earnings History [PLANNED]
+  View Work History (My Activity -> Work History) [COMPLETED]
+
+O. Ratings & Community Reputation
+  Rate Seeker After Job [PLANNED]
+  Add Feedback for Seeker [PLANNED]
+  View Provider Rating (Basic Display) [COMPLETED]
+  View Seeker Rating (Basic Display) [COMPLETED]
+  Respond to Negative Feedback [PLANNED]
+      - Justify comment
+      - Add clarification
+
+P. Provider Profile Management
+  Update Service Areas / Radius [PLANNED]
+  Update Pricing [PLANNED]
+  Set Availability Calendar [PLANNED]
+  Add or Remove Service Categories [PLANNED]
+  Manage Certifications / Portfolio [PLANNED]
+  View Active Offers (My Activity -> Active Offers) [COMPLETED]
+
+--------------------------------------------------------------------------------
+
+SECTION 3 — COMMON USER ACTIONS (Both Roles)
+
+General Features
+  Universal Chat System (Real-time) [PLANNED]
+  Push Notifications [PLANNED]
+  Dark Mode / Light Mode [PLANNED]
+  Block or Mute Users [PLANNED]
+  View Activity History [COMPLETED]
+      Jobs as seeker (Posted Jobs) [COMPLETED]
+      Jobs as provider (Work History) [COMPLETED]
+  Profile Verification Levels [PLANNED]
+      - ID verified
+      - Address verified
+  In-app Support / Help Center [PLANNED]
+
+--------------------------------------------------------------------------------
+
+SECTION 4 — ADMIN/PLATFORM TASKS
+
+  Flagged Content Review [PLANNED]
+  User Ban/Restriction Tools [PLANNED]
+  Dispute Resolution Dashboard [PLANNED]
+  Payment & Transaction Monitoring [PLANNED]
+  Analytics Dashboard [PLANNED]

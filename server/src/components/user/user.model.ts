@@ -1,4 +1,5 @@
 import mongoose, { Schema, Document } from 'mongoose';
+import bcrypt from 'bcryptjs';
 
 export interface IUser extends Document {
   name: string;
@@ -68,8 +69,16 @@ const UserSchema: Schema = new Schema(
   { timestamps: true }
 );
 
+// Pre-save hook to hash password
+UserSchema.pre('save', async function () {
+  if (!this.isModified('password')) {
+    return;
+  }
+  const salt = await bcrypt.genSalt(10);
+  this.password = await bcrypt.hash(this.password as string, salt);
+});
+
 // Method to check password match (keeping existing logic)
-import bcrypt from 'bcryptjs';
 UserSchema.methods.matchPassword = async function (enteredPassword: string) {
   return await bcrypt.compare(enteredPassword, this.password as string);
 };

@@ -36,6 +36,7 @@ interface User {
 interface AuthState {
   user: User | null;
   isLoading: boolean;
+  isCheckingAuth: boolean;
   error: string | null;
   login: (userData: any) => Promise<void>;
   register: (userData: any) => Promise<void>;
@@ -75,15 +76,16 @@ api.interceptors.response.use(
 
 export const useAuthStore = create<AuthState>((set) => ({
   user: null,
-  isLoading: true,
+  isLoading: false,
+  isCheckingAuth: false,
   error: null,
 
   checkAuth: async () => {
     try {
       const { data } = await api.get('/profile');
-      set({ user: data, isLoading: false });
+      set({ user: data, isCheckingAuth: false });
     } catch (error) {
-      set({ user: null, isLoading: false });
+      set({ user: null, isCheckingAuth: false });
     }
   },
 

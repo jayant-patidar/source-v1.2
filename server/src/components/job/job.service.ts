@@ -70,7 +70,15 @@ class JobService {
       }
     }
 
-    return await this.jobDAL.getAllJobs(filter, query.sortBy);
+    return await this.jobDAL.getAllJobs(filter, query.sortBy, query.limit ? Number(query.limit) : undefined);
+  }
+
+  async getJobsByPoster(seekerId: string): Promise<IJob[]> {
+    return await this.jobDAL.getJobsByPoster(seekerId);
+  }
+
+  async getJobsByProvider(providerId: string): Promise<IJob[]> {
+    return await this.jobDAL.getJobsByProvider(providerId);
   }
 
   async getJobById(jobId: string): Promise<IJob | null> {

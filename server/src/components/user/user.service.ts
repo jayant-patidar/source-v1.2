@@ -16,12 +16,6 @@ class UserService {
       throw new Error('User already exists');
     }
 
-    // Hash password
-    if (userData.password) {
-      const salt = await bcrypt.genSalt(10);
-      userData.password = await bcrypt.hash(userData.password, salt);
-    }
-
     return await this.userDAL.createUser(userData);
   }
 

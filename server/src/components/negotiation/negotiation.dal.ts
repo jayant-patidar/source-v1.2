@@ -12,6 +12,12 @@ class NegotiationDAL {
       .sort({ createdAt: -1 });
   }
 
+  async getNegotiationsByProvider(providerId: string): Promise<INegotiation[]> {
+    return await Negotiation.find({ provider: providerId })
+      .populate('job', 'title status originalPay')
+      .sort({ createdAt: -1 });
+  }
+
   async getNegotiationById(id: string): Promise<INegotiation | null> {
     return await Negotiation.findById(id);
   }

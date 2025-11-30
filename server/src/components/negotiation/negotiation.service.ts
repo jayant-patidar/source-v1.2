@@ -30,12 +30,12 @@ class NegotiationService {
     }
 
     // Negotiation model mapping:
-    // - seeker: The applicant/worker making the offer
-    // - provider: The job poster who will accept/reject
+    // - seeker: The job poster (Service Seeker)
+    // - provider: The applicant/worker (Service Provider)
     return await this.negotiationDAL.createNegotiation({
       job: data.jobId,
-      seeker: userId,
-      provider: job.seekerId,
+      seeker: job.seekerId, // Poster
+      provider: userId,     // Applicant
       amount: data.amount,
       message: data.message
     } as any);
@@ -45,17 +45,18 @@ class NegotiationService {
     return await this.negotiationDAL.getNegotiationsByJobId(jobId);
   }
 
+  async getNegotiationsByProvider(providerId: string): Promise<INegotiation[]> {
+    return await this.negotiationDAL.getNegotiationsByProvider(providerId);
+  }
+
   async updateNegotiationStatus(id: string, status: 'accepted' | 'rejected', userId: string): Promise<INegotiation | null> {
     const negotiation = await this.negotiationDAL.getNegotiationById(id);
     if (!negotiation) {
       throw new Error('Negotiation not found');
     }
 
-    // Only the provider (Job Poster) can accept/reject?
-    // In original code: if (negotiation.provider.toString() !== req.user._id.toString())
-    // negotiation.provider was set to job.poster.
-    // So yes, only the job poster can accept.
-    if (negotiation.provider.toString() !== userId) {
+    // Only the Seeker (Job Poster) can accept/reject
+    if (negotiation.seeker.toString() !== userId) {
       throw new Error('Not authorized');
     }
 
@@ -65,7 +66,7 @@ class NegotiationService {
         // Update Job status
         await this.jobDAL.updateJob((negotiation.job as any).toString(), { 
             status: 'accepted',
-            providerId: negotiation.seeker // Assign the applicant as the provider
+            providerId: negotiation.provider // Assign the applicant (Provider)
         } as any);
     }
 
