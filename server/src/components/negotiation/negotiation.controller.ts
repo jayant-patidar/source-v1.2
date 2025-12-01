@@ -35,6 +35,15 @@ class NegotiationController {
     }
   }
 
+  async getNegotiationsReceived(req: any, res: Response, next: NextFunction) {
+    try {
+      const negotiations = await this.negotiationService.getNegotiationsBySeeker(req.user._id);
+      res.json(negotiations);
+    } catch (error) {
+      next(error);
+    }
+  }
+
   async updateNegotiationStatus(req: any, res: Response, next: NextFunction) {
     try {
       const { status } = req.body;

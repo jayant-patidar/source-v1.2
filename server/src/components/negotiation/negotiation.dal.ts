@@ -15,6 +15,14 @@ class NegotiationDAL {
   async getNegotiationsByProvider(providerId: string): Promise<INegotiation[]> {
     return await Negotiation.find({ provider: providerId })
       .populate('job', 'title status originalPay')
+      .populate('seeker', 'name avatar')
+      .sort({ createdAt: -1 });
+  }
+
+  async getNegotiationsBySeeker(seekerId: string): Promise<INegotiation[]> {
+    return await Negotiation.find({ seeker: seekerId })
+      .populate('job', 'title status originalPay')
+      .populate('provider', 'name avatar providerRating')
       .sort({ createdAt: -1 });
   }
 

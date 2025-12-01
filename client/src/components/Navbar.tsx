@@ -87,9 +87,9 @@ const Navbar = () => {
               <Typography variant="caption" sx={{ fontSize: '0.7rem', mt: 0.5, fontWeight: 500 }}>JOBS</Typography>
             </Box>
 
-            <Box sx={{ width: 90, display: 'flex', flexDirection: 'column', alignItems: 'center', color: 'white', cursor: 'pointer', opacity: 0.7, '&:hover': { opacity: 1 } }}>
+            <Box component={RouterLink} to="/activity" sx={{ width: 90, display: 'flex', flexDirection: 'column', alignItems: 'center', color: 'white', textDecoration: 'none', opacity: 0.7, '&:hover': { opacity: 1 } }}>
               <MessageIcon sx={{ fontSize: 28 }} />
-              <Typography variant="caption" sx={{ fontSize: '0.7rem', mt: 0.5, fontWeight: 500 }}>MESSAGES</Typography>
+              <Typography variant="caption" sx={{ fontSize: '0.7rem', mt: 0.5, fontWeight: 500 }}>ACTIVITY</Typography>
             </Box>
 
             <Box sx={{ width: 90, display: 'flex', flexDirection: 'column', alignItems: 'center', color: 'white', cursor: 'pointer', opacity: 0.7, '&:hover': { opacity: 1 } }}>

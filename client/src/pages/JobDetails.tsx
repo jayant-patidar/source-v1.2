@@ -1,20 +1,19 @@
 import { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { Container, Typography, Box, Button, TextField, Paper, Divider, Chip, CircularProgress, Alert, Avatar, IconButton, Grid, Dialog, DialogTitle, DialogContent, DialogActions } from '@mui/material';
+import { Container, Typography, Box, Button, TextField, Paper, Divider, Chip, CircularProgress, Alert, Avatar, IconButton, Grid, Dialog, DialogTitle, DialogContent, DialogActions, Snackbar } from '@mui/material';
 import axios from 'axios';
 import { useAuthStore } from '../store/authStore';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
-import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
 import CategoryIcon from '@mui/icons-material/Category';
 import SendIcon from '@mui/icons-material/Send';
 import BookmarkBorderIcon from '@mui/icons-material/BookmarkBorder';
+import BookmarkIcon from '@mui/icons-material/Bookmark';
 import ShareLocationIcon from '@mui/icons-material/ShareLocation';
 import LoopIcon from '@mui/icons-material/Loop';
 import { format, formatDistanceToNow } from 'date-fns';
-
 const JobDetails = () => {
   const { id } = useParams();
   const { user } = useAuthStore();
@@ -26,6 +25,18 @@ const JobDetails = () => {
   const [error, setError] = useState('');
   const [showOfferForm, setShowOfferForm] = useState(false);
   const [offerMode, setOfferMode] = useState<'negotiate' | 'interested'>('negotiate');
+  const [isSaved, setIsSaved] = useState(false);
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+
+  const handleSave = async () => {
+      try {
+          await axios.post(`http://localhost:5000/api/users/saved/${id}`, {}, { withCredentials: true });
+          setIsSaved(!isSaved);
+          setSnackbarOpen(true);
+      } catch (error) {
+          console.error('Error toggling save:', error);
+      }
+  };
 
   useEffect(() => {
     const fetchJob = async () => {
@@ -211,9 +222,9 @@ const JobDetails = () => {
                         <SendIcon sx={{ fontSize: 28, color: 'black' }} />
                         <Typography variant="caption" sx={{ fontSize: '0.8rem', mt: 0.5, fontWeight: 'bold' }}>Share</Typography>
                     </Box>
-                    <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', cursor: 'pointer', opacity: 0.7, '&:hover': { opacity: 1 } }} onClick={() => alert('Saved to your list!')}>
-                        <BookmarkBorderIcon sx={{ fontSize: 28, color: 'black' }} />
-                        <Typography variant="caption" sx={{ fontSize: '0.8rem', mt: 0.5, fontWeight: 'bold' }}>Save</Typography>
+                    <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', cursor: 'pointer', opacity: isSaved ? 1 : 0.7, '&:hover': { opacity: 1 } }} onClick={handleSave}>
+                        {isSaved ? <BookmarkIcon sx={{ fontSize: 28, color: 'black' }} /> : <BookmarkBorderIcon sx={{ fontSize: 28, color: 'black' }} />}
+                        <Typography variant="caption" sx={{ fontSize: '0.8rem', mt: 0.5, fontWeight: 'bold' }}>{isSaved ? 'Saved' : 'Save'}</Typography>
                     </Box>
                 </Box>
 
@@ -337,6 +348,12 @@ const JobDetails = () => {
                 </Button>
             </DialogActions>
         </Dialog>
+        <Snackbar
+            open={snackbarOpen}
+            autoHideDuration={3000}
+            onClose={() => setSnackbarOpen(false)}
+            message={isSaved ? "Job Saved" : "Job Unsaved"}
+        />
 
         {/* Poster View: Negotiations */}
         {isPoster && (

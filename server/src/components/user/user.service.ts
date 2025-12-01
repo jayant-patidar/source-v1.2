@@ -38,6 +38,18 @@ class UserService {
   async updateUser(userId: string, updateData: Partial<IUser>): Promise<IUser | null> {
     return await this.userDAL.updateUser(userId, updateData);
   }
+
+  async getPublicUserById(userId: string): Promise<IUser | null> {
+    return await this.userDAL.getPublicUserById(userId);
+  }
+
+  async toggleSavedJob(userId: string, jobId: string): Promise<IUser | null> {
+    return await this.userDAL.toggleSavedJob(userId, jobId);
+  }
+
+  async getSavedJobs(userId: string): Promise<any> {
+    return await this.userDAL.getSavedJobs(userId);
+  }
 }
 
 export default UserService;

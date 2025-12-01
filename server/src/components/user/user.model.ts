@@ -29,6 +29,7 @@ export interface IUser extends Document {
     github?: string;
     website?: string;
   };
+  savedJobs?: string[];
   availability?: string;
   createdAt: Date;
   updatedAt: Date;
@@ -64,6 +65,7 @@ const UserSchema: Schema = new Schema(
       github: { type: String },
       website: { type: String }
     },
+    savedJobs: [{ type: Schema.Types.ObjectId, ref: 'Job' }],
     availability: { type: String }
   },
   { timestamps: true }

@@ -49,6 +49,10 @@ class NegotiationService {
     return await this.negotiationDAL.getNegotiationsByProvider(providerId);
   }
 
+  async getNegotiationsBySeeker(seekerId: string): Promise<INegotiation[]> {
+    return await this.negotiationDAL.getNegotiationsBySeeker(seekerId);
+  }
+
   async updateNegotiationStatus(id: string, status: 'accepted' | 'rejected', userId: string): Promise<INegotiation | null> {
     const negotiation = await this.negotiationDAL.getNegotiationById(id);
     if (!negotiation) {

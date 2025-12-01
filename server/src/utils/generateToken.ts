@@ -4,7 +4,7 @@ import { Types } from 'mongoose';
 
 const generateToken = (res: Response, userId: Types.ObjectId | string) => {
   const accessToken = jwt.sign({ userId }, process.env.JWT_SECRET || 'secret', {
-    expiresIn: '15m',
+    expiresIn: '1d',
   });
 
   const refreshToken = jwt.sign({ userId }, process.env.JWT_REFRESH_SECRET || 'refresh_secret', {
@@ -15,7 +15,7 @@ const generateToken = (res: Response, userId: Types.ObjectId | string) => {
     httpOnly: true,
     secure: process.env.NODE_ENV !== 'development',
     sameSite: 'strict',
-    maxAge: 15 * 60 * 1000, // 15 minutes
+    maxAge: 24 * 60 * 60 * 1000, // 1 day
   });
 
   res.cookie('refresh_token', refreshToken, {

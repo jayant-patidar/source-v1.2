@@ -4,9 +4,10 @@ import { protect } from '../../middleware/auth.middleware';
 
 const router = express.Router();
 
-router.post('/', protect, negotiationController.createNegotiation.bind(negotiationController));
-router.get('/my-offers', protect, negotiationController.getNegotiationsByUser.bind(negotiationController));
-router.get('/:jobId', protect, negotiationController.getNegotiations.bind(negotiationController));
-router.put('/:id', protect, negotiationController.updateNegotiationStatus.bind(negotiationController));
+router.post('/', protect, (req, res, next) => negotiationController.createNegotiation(req, res, next));
+router.get('/my-offers', protect, (req, res, next) => negotiationController.getNegotiationsByUser(req, res, next));
+router.get('/received', protect, (req, res, next) => negotiationController.getNegotiationsReceived(req, res, next));
+router.get('/:jobId', protect, (req, res, next) => negotiationController.getNegotiations(req, res, next));
+router.put('/:id', protect, (req, res, next) => negotiationController.updateNegotiationStatus(req, res, next));
 
 export default router;

@@ -9,6 +9,7 @@ class ReviewDAL {
   async getReviewsByRevieweeId(revieweeId: string): Promise<IReview[]> {
     return await Review.find({ reviewee: revieweeId })
       .populate('reviewer', 'name')
+      .populate('job', 'title')
       .sort({ createdAt: -1 });
   }
 

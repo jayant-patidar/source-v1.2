@@ -115,6 +115,37 @@ class UserController {
     }
   }
 
+  async getPublicUserById(req: Request, res: Response, next: NextFunction) {
+    try {
+      const user = await this.userService.getPublicUserById(req.params.id);
+      if (user) {
+        res.status(200).json(user);
+      } else {
+        res.status(404).json({ error: 'User not found.' });
+      }
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async toggleSavedJob(req: any, res: Response, next: NextFunction) {
+    try {
+      const user = await this.userService.toggleSavedJob(req.user._id, req.params.jobId);
+      res.json(user?.savedJobs);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async getSavedJobs(req: any, res: Response, next: NextFunction) {
+    try {
+      const savedJobs = await this.userService.getSavedJobs(req.user._id);
+      res.json(savedJobs);
+    } catch (error) {
+      next(error);
+    }
+  }
+
   async getUserProfile(req: any, res: Response, next: NextFunction) {
       try {
         const user = await this.userService.getUserByIdWithoutPassword(req.user._id);

@@ -1,25 +1,40 @@
-import { Card, CardContent, Typography, Button, Box, Chip, Avatar, IconButton, Divider, Dialog, DialogTitle, DialogContent, DialogActions, TextField } from '@mui/material';
+import { Card, CardContent, Typography, Button, Box, Chip, Avatar, IconButton, Divider, Dialog, DialogTitle, DialogContent, DialogActions, TextField, Snackbar } from '@mui/material';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import { Menu, MenuItem, ListItemIcon, ListItemText } from '@mui/material';
 import ReportProblemIcon from '@mui/icons-material/ReportProblem';
 import NotInterestedIcon from '@mui/icons-material/NotInterested';
-import { Link } from 'react-router-dom';
-import { format } from 'date-fns';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import LoopIcon from '@mui/icons-material/Loop';
 import ShareLocationIcon from '@mui/icons-material/ShareLocation';
 import SendIcon from '@mui/icons-material/Send';
 import BookmarkBorderIcon from '@mui/icons-material/BookmarkBorder';
+import BookmarkIcon from '@mui/icons-material/Bookmark';
+import { Link } from 'react-router-dom';
+import { format } from 'date-fns';
 import { useState } from 'react';
 import axios from 'axios';
 
 const JobCard = ({ job }: { job: any }) => {
   const [open, setOpen] = useState(false);
-  const [offerAmount, setOfferAmount] = useState(job.originalPay?.toString() || '');
+  const [offerAmount, setOfferAmount] = useState('');
   const [message, setMessage] = useState('');
+  const [offerMode, setOfferMode] = useState<'negotiate' | 'interested'>('negotiate');
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const [isSaved, setIsSaved] = useState(false); // Initial state should be checked from user profile
   const menuOpen = Boolean(anchorEl);
+
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+
+  const handleSave = async () => {
+    try {
+      await axios.post(`http://localhost:5000/api/users/saved/${job._id}`, {}, { withCredentials: true });
+      setIsSaved(!isSaved);
+      setSnackbarOpen(true);
+    } catch (error) {
+      console.error('Error toggling save:', error);
+    }
+  };
 
   const handleMenuClick = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
@@ -35,7 +50,6 @@ const JobCard = ({ job }: { job: any }) => {
     // Implement actual logic here (e.g., API call)
   };
 
-  const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
 
   const handleSend = async () => {
@@ -162,21 +176,24 @@ const JobCard = ({ job }: { job: any }) => {
 
           {/* Actions Icons Row */}
           <Box sx={{ display: 'flex', justifyContent: 'space-around', mb: 2 }}>
-              <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', cursor: 'pointer', opacity: 0.7, '&:hover': { opacity: 1 } }}>
+              <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', cursor: 'pointer', opacity: 0.7, '&:hover': { opacity: 1 } }} onClick={() => { setOfferMode('negotiate'); setOfferAmount(''); setOpen(true); }}>
                  <LoopIcon sx={{ fontSize: 24, color: 'black' }} />
                  <Typography variant="caption" sx={{ fontSize: '0.7rem', mt: 0.5 }}>Negotiate</Typography>
               </Box>
-              <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', cursor: 'pointer', opacity: 0.7, '&:hover': { opacity: 1 } }}>
+              <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', cursor: 'pointer', opacity: 0.7, '&:hover': { opacity: 1 } }} onClick={() => alert('Requesting exact location...')}>
                  <ShareLocationIcon sx={{ fontSize: 24, color: 'black' }} />
                  <Typography variant="caption" sx={{ fontSize: '0.7rem', mt: 0.5 }}>Locate</Typography>
               </Box>
-              <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', cursor: 'pointer', opacity: 0.7, '&:hover': { opacity: 1 } }}>
+              <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', cursor: 'pointer', opacity: 0.7, '&:hover': { opacity: 1 } }} onClick={() => alert('Share functionality coming soon!')}>
                  <SendIcon sx={{ fontSize: 24, color: 'black' }} />
                  <Typography variant="caption" sx={{ fontSize: '0.7rem', mt: 0.5 }}>Share</Typography>
               </Box>
-              <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', cursor: 'pointer', opacity: 0.7, '&:hover': { opacity: 1 } }}>
-                 <BookmarkBorderIcon sx={{ fontSize: 24, color: 'black' }} />
-                 <Typography variant="caption" sx={{ fontSize: '0.7rem', mt: 0.5 }}>Save</Typography>
+              <Box 
+                sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', cursor: 'pointer', opacity: isSaved ? 1 : 0.7, '&:hover': { opacity: 1 } }} 
+                onClick={handleSave}
+              >
+                 {isSaved ? <BookmarkIcon sx={{ fontSize: 24, color: 'black' }} /> : <BookmarkBorderIcon sx={{ fontSize: 24, color: 'black' }} />}
+                 <Typography variant="caption" sx={{ fontSize: '0.7rem', mt: 0.5 }}>{isSaved ? 'Saved' : 'Save'}</Typography>
               </Box>
           </Box>
 
@@ -184,7 +201,7 @@ const JobCard = ({ job }: { job: any }) => {
           <Button 
               fullWidth
               variant="contained" 
-              onClick={handleOpen}
+              onClick={() => { setOfferMode('interested'); setOfferAmount(job.originalPay); setOpen(true); }}
               sx={{ 
                 bgcolor: '#000000', 
                 color: 'white', 
@@ -202,24 +219,37 @@ const JobCard = ({ job }: { job: any }) => {
       </Card>
 
       {/* Interested Modal */}
+      {/* Offer Modal */}
       <Dialog open={open} onClose={handleClose} maxWidth="sm" fullWidth>
-        <DialogTitle sx={{ fontWeight: 'bold' }}>Express Interest</DialogTitle>
+        <DialogTitle sx={{ fontWeight: 'bold' }}>
+            {offerMode === 'interested' ? 'Express Interest' : 'Make an Offer'}
+        </DialogTitle>
         <DialogContent>
           <Typography variant="body2" color="text.secondary" gutterBottom>
-            Send a notification to {job.seekerId?.name || 'the poster'} about this job.
+            {offerMode === 'interested' 
+                ? `Let ${job.seekerId?.name || 'the poster'} know you're interested in this job at the listed pay.` 
+                : `Send a proposal to ${job.seekerId?.name || 'the poster'} with your requested pay.`}
           </Typography>
           
-          <TextField
-            autoFocus
-            margin="dense"
-            label="Your Offer ($)"
-            type="number"
-            fullWidth
-            variant="outlined"
-            value={offerAmount}
-            onChange={(e) => setOfferAmount(e.target.value)}
-            sx={{ mb: 2, mt: 2 }}
-          />
+          {offerMode === 'negotiate' ? (
+              <TextField
+                autoFocus
+                margin="dense"
+                label="Offer Amount ($)"
+                type="number"
+                fullWidth
+                variant="outlined"
+                value={offerAmount}
+                onChange={(e) => setOfferAmount(e.target.value)}
+                sx={{ mb: 2, mt: 2 }}
+              />
+          ) : (
+              <Box sx={{ my: 2, p: 2, bgcolor: '#f5f5f5', borderRadius: 1 }}>
+                  <Typography variant="subtitle2" fontWeight="bold">
+                      Proposing to work for: <span style={{ color: '#2e7d32' }}>${job.originalPay}</span>
+                  </Typography>
+              </Box>
+          )}
           
           <TextField
             margin="dense"
@@ -230,7 +260,7 @@ const JobCard = ({ job }: { job: any }) => {
             variant="outlined"
             value={message}
             onChange={(e) => setMessage(e.target.value)}
-            placeholder="Hi, I'm interested in this job..."
+            placeholder={offerMode === 'interested' ? "I'm available to start immediately..." : "Hi, I can help you with this..."}
           />
         </DialogContent>
         <DialogActions sx={{ px: 3, pb: 3 }}>
@@ -238,12 +268,19 @@ const JobCard = ({ job }: { job: any }) => {
           <Button 
             onClick={handleSend} 
             variant="contained" 
+            disabled={!offerAmount}
             sx={{ bgcolor: 'black', color: 'white', '&:hover': { bgcolor: '#333' } }}
           >
-            Send Notification
+            {offerMode === 'interested' ? 'Send Interest' : 'Send Offer'}
           </Button>
         </DialogActions>
       </Dialog>
+      <Snackbar
+        open={snackbarOpen}
+        autoHideDuration={3000}
+        onClose={() => setSnackbarOpen(false)}
+        message={isSaved ? "Job Saved" : "Job Unsaved"}
+      />
     </>
   );
 };
