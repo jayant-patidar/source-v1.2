@@ -74,7 +74,17 @@ class JobService {
                     filter.createdAt = { $gte: pastDate };
                 }
             }
-            return yield this.jobDAL.getAllJobs(filter, query.sortBy);
+            return yield this.jobDAL.getAllJobs(filter, query.sortBy, query.limit ? Number(query.limit) : undefined);
+        });
+    }
+    getJobsByPoster(seekerId) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield this.jobDAL.getJobsByPoster(seekerId);
+        });
+    }
+    getJobsByProvider(providerId) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield this.jobDAL.getJobsByProvider(providerId);
         });
     }
     getJobById(jobId) {

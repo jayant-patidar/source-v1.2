@@ -6,7 +6,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const generateToken = (res, userId) => {
     const accessToken = jsonwebtoken_1.default.sign({ userId }, process.env.JWT_SECRET || 'secret', {
-        expiresIn: '15m',
+        expiresIn: '1d',
     });
     const refreshToken = jsonwebtoken_1.default.sign({ userId }, process.env.JWT_REFRESH_SECRET || 'refresh_secret', {
         expiresIn: '7d',
@@ -15,7 +15,7 @@ const generateToken = (res, userId) => {
         httpOnly: true,
         secure: process.env.NODE_ENV !== 'development',
         sameSite: 'strict',
-        maxAge: 15 * 60 * 1000, // 15 minutes
+        maxAge: 24 * 60 * 60 * 1000, // 1 day
     });
     res.cookie('refresh_token', refreshToken, {
         httpOnly: true,

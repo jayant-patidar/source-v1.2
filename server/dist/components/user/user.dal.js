@@ -45,5 +45,38 @@ class UserDAL {
             return yield user_model_1.default.findByIdAndUpdate(userId, updateData, { new: true }).select('-password');
         });
     }
+    getPublicUserById(userId) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield user_model_1.default.findById(userId).select('name avatar seekerRating providerRating about skills preferences portfolio socialLinks createdAt');
+        });
+    }
+    toggleSavedJob(userId, jobId) {
+        return __awaiter(this, void 0, void 0, function* () {
+            var _a, _b, _c;
+            const user = yield user_model_1.default.findById(userId);
+            if (!user)
+                return null;
+            const isSaved = (_a = user.savedJobs) === null || _a === void 0 ? void 0 : _a.includes(jobId);
+            if (isSaved) {
+                user.savedJobs = (_b = user.savedJobs) === null || _b === void 0 ? void 0 : _b.filter((id) => id.toString() !== jobId);
+            }
+            else {
+                (_c = user.savedJobs) === null || _c === void 0 ? void 0 : _c.push(jobId);
+            }
+            return yield user.save();
+        });
+    }
+    getSavedJobs(userId) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const user = yield user_model_1.default.findById(userId).populate({
+                path: 'savedJobs',
+                populate: {
+                    path: 'seekerId',
+                    select: 'name avatar seekerRating'
+                }
+            });
+            return (user === null || user === void 0 ? void 0 : user.savedJobs) || [];
+        });
+    }
 }
 exports.default = UserDAL;

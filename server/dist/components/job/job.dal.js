@@ -21,7 +21,7 @@ class JobDAL {
         });
     }
     getAllJobs() {
-        return __awaiter(this, arguments, void 0, function* (filter = {}, sortBy = 'newest') {
+        return __awaiter(this, arguments, void 0, function* (filter = {}, sortBy = 'newest', limit) {
             let sortOptions = { createdAt: -1 }; // Default: Newest
             if (sortBy === 'oldest') {
                 sortOptions = { createdAt: 1 };
@@ -32,10 +32,24 @@ class JobDAL {
             else if (sortBy === 'payLow') {
                 sortOptions = { originalPay: 1 };
             }
-            return yield job_model_1.default.find(filter)
+            let query = job_model_1.default.find(filter)
                 .populate('seekerId', 'name email seekerRating providerRating avatar')
                 .populate('providerId', 'name email seekerRating providerRating avatar')
                 .sort(sortOptions);
+            if (limit) {
+                query = query.limit(limit);
+            }
+            return yield query;
+        });
+    }
+    getJobsByPoster(seekerId) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield job_model_1.default.find({ seekerId }).sort({ createdAt: -1 }).populate('providerId', 'name');
+        });
+    }
+    getJobsByProvider(providerId) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield job_model_1.default.find({ providerId }).sort({ createdAt: -1 }).populate('seekerId', 'name');
         });
     }
     getJobById(jobId) {

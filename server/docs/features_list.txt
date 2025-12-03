@@ -122,7 +122,7 @@ J. Browse Available Job Requests
       Date [PLANNED]
   Open Job Details [COMPLETED]
   Locate Job on Map (UI Implemented, Mock Functionality) [IN PROGRESS]
-  Save or Bookmark Job (UI Implemented, Mock Functionality) [IN PROGRESS]
+  Save or Bookmark Job (UI Implemented, Mock Functionality) [Completed]
   Share Job (UI Implemented, Mock Functionality) [IN PROGRESS]
 
 K. Interact With Seekers

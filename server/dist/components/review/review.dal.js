@@ -24,6 +24,7 @@ class ReviewDAL {
         return __awaiter(this, void 0, void 0, function* () {
             return yield review_model_1.default.find({ reviewee: revieweeId })
                 .populate('reviewer', 'name')
+                .populate('job', 'title')
                 .sort({ createdAt: -1 });
         });
     }

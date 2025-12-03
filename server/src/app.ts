@@ -10,13 +10,11 @@ import userRoutes from './components/user/user.routes';
 import jobRoutes from './components/job/job.routes';
 import negotiationRoutes from './components/negotiation/negotiation.routes';
 import reviewRoutes from './components/review/review.routes';
+import notificationRoutes from './components/notification/notification.routes';
 
 dotenv.config();
 
 const app = express();
-
-// Force restart 2
-
 
 connectDB();
 
@@ -38,6 +36,7 @@ app.use('/api/users', userRoutes);
 app.use('/api/jobs', jobRoutes);
 app.use('/api/negotiations', negotiationRoutes);
 app.use('/api/reviews', reviewRoutes);
+app.use('/api/notifications', notificationRoutes);
 
 // Error Handler
 app.use(errorHandler);

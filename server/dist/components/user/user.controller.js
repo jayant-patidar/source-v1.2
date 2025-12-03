@@ -15,6 +15,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const user_service_1 = __importDefault(require("./user.service"));
 const generateToken_1 = __importDefault(require("../../utils/generateToken"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
+const bcryptjs_1 = __importDefault(require("bcryptjs"));
 class UserController {
     constructor() {
         this.userService = new user_service_1.default();
@@ -130,6 +131,44 @@ class UserController {
             }
         });
     }
+    getPublicUserById(req, res, next) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const user = yield this.userService.getPublicUserById(req.params.id);
+                if (user) {
+                    res.status(200).json(user);
+                }
+                else {
+                    res.status(404).json({ error: 'User not found.' });
+                }
+            }
+            catch (error) {
+                next(error);
+            }
+        });
+    }
+    toggleSavedJob(req, res, next) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const user = yield this.userService.toggleSavedJob(req.user._id, req.params.jobId);
+                res.json(user === null || user === void 0 ? void 0 : user.savedJobs);
+            }
+            catch (error) {
+                next(error);
+            }
+        });
+    }
+    getSavedJobs(req, res, next) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const savedJobs = yield this.userService.getSavedJobs(req.user._id);
+                res.json(savedJobs);
+            }
+            catch (error) {
+                next(error);
+            }
+        });
+    }
     getUserProfile(req, res, next) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
@@ -155,8 +194,9 @@ class UserController {
                     // Handle password update
                     if (req.body.currentPassword && req.body.newPassword) {
                         if (yield user.matchPassword(req.body.currentPassword)) {
-                            user.password = req.body.newPassword; // Will be hashed by pre-save hook
-                            yield user.save();
+                            const salt = yield bcryptjs_1.default.genSalt(10);
+                            const hashedPassword = yield bcryptjs_1.default.hash(req.body.newPassword, salt);
+                            yield this.userService.updateUser(req.user._id, { password: hashedPassword });
                         }
                         else {
                             res.status(401);

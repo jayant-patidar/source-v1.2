@@ -15,9 +15,9 @@ const user_routes_1 = __importDefault(require("./components/user/user.routes"));
 const job_routes_1 = __importDefault(require("./components/job/job.routes"));
 const negotiation_routes_1 = __importDefault(require("./components/negotiation/negotiation.routes"));
 const review_routes_1 = __importDefault(require("./components/review/review.routes"));
+const notification_routes_1 = __importDefault(require("./components/notification/notification.routes"));
 dotenv_1.default.config();
 const app = (0, express_1.default)();
-// Force restart 2
 (0, db_1.default)();
 app.use(express_1.default.json());
 app.use(express_1.default.urlencoded({ extended: true }));
@@ -35,6 +35,7 @@ app.use('/api/users', user_routes_1.default);
 app.use('/api/jobs', job_routes_1.default);
 app.use('/api/negotiations', negotiation_routes_1.default);
 app.use('/api/reviews', review_routes_1.default);
+app.use('/api/notifications', notification_routes_1.default);
 // Error Handler
 app.use(error_middleware_1.errorHandler);
 const PORT = process.env.PORT || 5000;

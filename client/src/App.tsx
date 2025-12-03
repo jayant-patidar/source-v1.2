@@ -31,8 +31,8 @@ function App() {
     <Layout>
       <Routes>
         <Route path="/" element={<Home />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
+        <Route path="/login" element={!user ? <Login /> : <Navigate to="/" />} />
+        <Route path="/register" element={!user ? <Register /> : <Navigate to="/" />} />
         <Route path="/post-job" element={<CreateJob />} />
         <Route path="/jobs/:id" element={<JobDetails />} />
         <Route path="/profile" element={user ? <Profile /> : <Navigate to="/login" />} />

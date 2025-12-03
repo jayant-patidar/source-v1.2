@@ -91,6 +91,15 @@ const JobDetails = () => {
       }
   };
 
+  const handleReject = async (negotiationId: string) => {
+      try {
+          await axios.put(`http://localhost:5000/api/negotiations/${negotiationId}`, { status: 'rejected' }, { withCredentials: true });
+          fetchNegotiations();
+      } catch (err) {
+          alert('Failed to reject');
+      }
+  };
+
   if (loading) return <Box display="flex" justifyContent="center" mt={4}><CircularProgress /></Box>;
   if (error) return <Container><Alert severity="error">{error}</Alert></Container>;
   if (!job) return <Container><Typography>Job not found</Typography></Container>;
@@ -386,9 +395,14 @@ const JobDetails = () => {
                                             sx={{ fontWeight: 'bold' }}
                                         />
                                         {neg.status === 'pending' && (
-                                            <Button variant="contained" size="small" onClick={() => handleAccept(neg._id)} sx={{ bgcolor: 'black', minWidth: 100 }}>
-                                                Accept
-                                            </Button>
+                                            <Box sx={{ display: 'flex', gap: 1 }}>
+                                                <Button variant="contained" size="small" color="success" onClick={() => handleAccept(neg._id)} sx={{ minWidth: 80 }}>
+                                                    Accept
+                                                </Button>
+                                                <Button variant="outlined" size="small" color="error" onClick={() => handleReject(neg._id)} sx={{ minWidth: 80 }}>
+                                                    Reject
+                                                </Button>
+                                            </Box>
                                         )}
                                     </Box>
                                 </Box>

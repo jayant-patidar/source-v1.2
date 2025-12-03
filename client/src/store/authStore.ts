@@ -77,7 +77,7 @@ api.interceptors.response.use(
 export const useAuthStore = create<AuthState>((set) => ({
   user: null,
   isLoading: false,
-  isCheckingAuth: false,
+  isCheckingAuth: true,
   error: null,
 
   checkAuth: async () => {

@@ -14,7 +14,9 @@ router.post('/logout', user_controller_1.default.logoutUser.bind(user_controller
 router.post('/refresh', user_controller_1.default.refreshToken.bind(user_controller_1.default));
 router.get('/profile', auth_middleware_1.protect, user_controller_1.default.getUserProfile.bind(user_controller_1.default));
 router.put('/profile', auth_middleware_1.protect, user_controller_1.default.updateUserProfile.bind(user_controller_1.default));
+router.post('/saved/:jobId', auth_middleware_1.protect, user_controller_1.default.toggleSavedJob.bind(user_controller_1.default));
+router.get('/saved', auth_middleware_1.protect, user_controller_1.default.getSavedJobs.bind(user_controller_1.default));
 // User Management Routes
 router.get('/', auth_middleware_1.protect, user_controller_1.default.getAllUsers.bind(user_controller_1.default));
-router.get('/:id', auth_middleware_1.protect, user_controller_1.default.getUserById.bind(user_controller_1.default));
+router.get('/:id', auth_middleware_1.protect, user_controller_1.default.getPublicUserById.bind(user_controller_1.default));
 exports.default = router;

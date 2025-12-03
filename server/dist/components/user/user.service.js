@@ -13,7 +13,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const user_dal_1 = __importDefault(require("./user.dal"));
-const bcryptjs_1 = __importDefault(require("bcryptjs"));
 class UserService {
     constructor() {
         this.userDAL = new user_dal_1.default();
@@ -24,11 +23,6 @@ class UserService {
             const userExists = yield this.userDAL.getUserByEmail(userData.email);
             if (userExists) {
                 throw new Error('User already exists');
-            }
-            // Hash password
-            if (userData.password) {
-                const salt = yield bcryptjs_1.default.genSalt(10);
-                userData.password = yield bcryptjs_1.default.hash(userData.password, salt);
             }
             return yield this.userDAL.createUser(userData);
         });
@@ -56,6 +50,21 @@ class UserService {
     updateUser(userId, updateData) {
         return __awaiter(this, void 0, void 0, function* () {
             return yield this.userDAL.updateUser(userId, updateData);
+        });
+    }
+    getPublicUserById(userId) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield this.userDAL.getPublicUserById(userId);
+        });
+    }
+    toggleSavedJob(userId, jobId) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield this.userDAL.toggleSavedJob(userId, jobId);
+        });
+    }
+    getSavedJobs(userId) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield this.userDAL.getSavedJobs(userId);
         });
     }
 }

@@ -8,6 +8,7 @@ export interface IJob extends Document {
   jobDate: Date;
   jobTime: string;
   originalPay: number;
+  currentPay?: number;
   updatedPay: { pay: number; updatedAt: Date }[];
   location: {
     general: string;
@@ -41,6 +42,7 @@ const JobSchema: Schema = new Schema(
     jobDate: { type: Date, required: true },
     jobTime: { type: String, required: true },
     originalPay: { type: Number, required: true },
+    currentPay: { type: Number, required: false },
     updatedPay: [
       {
         pay: { type: Number, required: true },

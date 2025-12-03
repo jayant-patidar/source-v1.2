@@ -46,6 +46,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const mongoose_1 = __importStar(require("mongoose"));
+const bcryptjs_1 = __importDefault(require("bcryptjs"));
 const UserSchema = new mongoose_1.Schema({
     name: { type: String, required: true },
     email: { type: String, required: true, unique: true },
@@ -74,10 +75,20 @@ const UserSchema = new mongoose_1.Schema({
         github: { type: String },
         website: { type: String }
     },
+    savedJobs: [{ type: mongoose_1.Schema.Types.ObjectId, ref: 'Job' }],
     availability: { type: String }
 }, { timestamps: true });
+// Pre-save hook to hash password
+UserSchema.pre('save', function () {
+    return __awaiter(this, void 0, void 0, function* () {
+        if (!this.isModified('password')) {
+            return;
+        }
+        const salt = yield bcryptjs_1.default.genSalt(10);
+        this.password = yield bcryptjs_1.default.hash(this.password, salt);
+    });
+});
 // Method to check password match (keeping existing logic)
-const bcryptjs_1 = __importDefault(require("bcryptjs"));
 UserSchema.methods.matchPassword = function (enteredPassword) {
     return __awaiter(this, void 0, void 0, function* () {
         return yield bcryptjs_1.default.compare(enteredPassword, this.password);

@@ -8,6 +8,7 @@ import WorkIcon from '@mui/icons-material/Work';
 import MessageIcon from '@mui/icons-material/Message';
 import NotificationsIcon from '@mui/icons-material/Notifications';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
+import NotificationMenu from './NotificationMenu';
 
 const Navbar = () => {
   const { user, logout } = useAuthStore();
@@ -92,9 +93,9 @@ const Navbar = () => {
               <Typography variant="caption" sx={{ fontSize: '0.7rem', mt: 0.5, fontWeight: 500 }}>ACTIVITY</Typography>
             </Box>
 
-            <Box sx={{ width: 90, display: 'flex', flexDirection: 'column', alignItems: 'center', color: 'white', cursor: 'pointer', opacity: 0.7, '&:hover': { opacity: 1 } }}>
-              <NotificationsIcon sx={{ fontSize: 28 }} />
-              <Typography variant="caption" sx={{ fontSize: '0.7rem', mt: 0.5, fontWeight: 500 }}>NOTIFICATIONS</Typography>
+            <Box sx={{ width: 90, display: 'flex', flexDirection: 'column', alignItems: 'center', color: 'white', cursor: 'pointer', opacity: 0.9, '&:hover': { opacity: 1 } }}>
+               <NotificationMenu />
+               <Typography variant="caption" sx={{ fontSize: '0.7rem', mt: 0.5, fontWeight: 500 }}>ALERTS</Typography>
             </Box>
             
             {user ? (

@@ -49,6 +49,28 @@ class JobController {
             }
         });
     }
+    getJobsByPoster(req, res, next) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const jobs = yield this.jobService.getJobsByPoster(req.user._id);
+                res.status(200).json(jobs);
+            }
+            catch (error) {
+                next(error);
+            }
+        });
+    }
+    getJobsByProvider(req, res, next) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const jobs = yield this.jobService.getJobsByProvider(req.user._id);
+                res.status(200).json(jobs);
+            }
+            catch (error) {
+                next(error);
+            }
+        });
+    }
     getJobById(req, res, next) {
         return __awaiter(this, void 0, void 0, function* () {
             try {

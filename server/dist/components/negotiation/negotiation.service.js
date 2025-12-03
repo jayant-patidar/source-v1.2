@@ -36,12 +36,12 @@ class NegotiationService {
                 throw new Error('Cannot negotiate on your own job');
             }
             // Negotiation model mapping:
-            // - seeker: The applicant/worker making the offer
-            // - provider: The job poster who will accept/reject
+            // - seeker: The job poster (Service Seeker)
+            // - provider: The applicant/worker (Service Provider)
             return yield this.negotiationDAL.createNegotiation({
                 job: data.jobId,
-                seeker: userId,
-                provider: job.seekerId,
+                seeker: job.seekerId, // Poster
+                provider: userId, // Applicant
                 amount: data.amount,
                 message: data.message
             });
@@ -52,17 +52,24 @@ class NegotiationService {
             return yield this.negotiationDAL.getNegotiationsByJobId(jobId);
         });
     }
+    getNegotiationsByProvider(providerId) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield this.negotiationDAL.getNegotiationsByProvider(providerId);
+        });
+    }
+    getNegotiationsBySeeker(seekerId) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield this.negotiationDAL.getNegotiationsBySeeker(seekerId);
+        });
+    }
     updateNegotiationStatus(id, status, userId) {
         return __awaiter(this, void 0, void 0, function* () {
             const negotiation = yield this.negotiationDAL.getNegotiationById(id);
             if (!negotiation) {
                 throw new Error('Negotiation not found');
             }
-            // Only the provider (Job Poster) can accept/reject?
-            // In original code: if (negotiation.provider.toString() !== req.user._id.toString())
-            // negotiation.provider was set to job.poster.
-            // So yes, only the job poster can accept.
-            if (negotiation.provider.toString() !== userId) {
+            // Only the Seeker (Job Poster) can accept/reject
+            if (negotiation.seeker.toString() !== userId) {
                 throw new Error('Not authorized');
             }
             const updatedNegotiation = yield this.negotiationDAL.updateNegotiation(id, { status });
@@ -70,7 +77,7 @@ class NegotiationService {
                 // Update Job status
                 yield this.jobDAL.updateJob(negotiation.job.toString(), {
                     status: 'accepted',
-                    providerId: negotiation.seeker // Assign the applicant as the provider
+                    providerId: negotiation.provider // Assign the applicant (Provider)
                 });
             }
             return updatedNegotiation;

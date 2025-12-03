@@ -27,6 +27,22 @@ class NegotiationDAL {
                 .sort({ createdAt: -1 });
         });
     }
+    getNegotiationsByProvider(providerId) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield negotiation_model_1.default.find({ provider: providerId })
+                .populate('job', 'title status originalPay')
+                .populate('seeker', 'name avatar')
+                .sort({ createdAt: -1 });
+        });
+    }
+    getNegotiationsBySeeker(seekerId) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield negotiation_model_1.default.find({ seeker: seekerId })
+                .populate('job', 'title status originalPay')
+                .populate('provider', 'name avatar providerRating')
+                .sort({ createdAt: -1 });
+        });
+    }
     getNegotiationById(id) {
         return __awaiter(this, void 0, void 0, function* () {
             return yield negotiation_model_1.default.findById(id);

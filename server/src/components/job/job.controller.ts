@@ -14,6 +14,7 @@ class JobController {
         ...req.body,
         seekerId: req.user._id, // Authenticated user is the seeker (poster)
         originalPay: req.body.pay, // Mapping simple pay to originalPay
+        currentPay: req.body.pay, // Initialize currentPay
         location: {
             general: req.body.generalLocation || req.body.location?.general,
             exact: req.body.exactLocation || req.body.location?.exact
@@ -74,7 +75,29 @@ class JobController {
 
   async updateJob(req: Request, res: Response, next: NextFunction) {
       try {
-          const updatedJob = await this.jobService.updateJob(req.params.id, req.body);
+          const jobId = req.params.id;
+          const updateData = { ...req.body };
+
+          // Handle Pay Update Logic
+          if (updateData.pay) {
+              const existingJob = await this.jobService.getJobById(jobId);
+              if (existingJob) {
+                  const newPay = Number(updateData.pay);
+                  // Only update if pay is different
+                  if (newPay !== existingJob.currentPay && newPay !== existingJob.originalPay) {
+                      // Add old pay to history
+                      const oldPay = existingJob.currentPay || existingJob.originalPay;
+                      updateData.updatedPay = [
+                          ...(existingJob.updatedPay || []),
+                          { pay: oldPay, updatedAt: new Date() }
+                      ];
+                      updateData.currentPay = newPay;
+                  }
+                  delete updateData.pay; // Remove 'pay' to avoid confusion/overwriting
+              }
+          }
+
+          const updatedJob = await this.jobService.updateJob(jobId, updateData);
           if (updatedJob) {
               res.status(200).json(updatedJob);
           } else {

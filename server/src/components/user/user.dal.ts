@@ -34,13 +34,13 @@ class UserDAL {
     const user = await User.findById(userId);
     if (!user) return null;
 
-    const isSaved = user.savedJobs?.includes(jobId as any);
+    const isSaved = user.savedJobs?.some((id) => id.toString() === jobId);
+
     if (isSaved) {
-      user.savedJobs = user.savedJobs?.filter((id) => id.toString() !== jobId);
+      return await User.findByIdAndUpdate(userId, { $pull: { savedJobs: jobId } }, { new: true });
     } else {
-      user.savedJobs?.push(jobId as any);
+      return await User.findByIdAndUpdate(userId, { $addToSet: { savedJobs: jobId } }, { new: true });
     }
-    return await user.save();
   }
 
   async getSavedJobs(userId: string): Promise<any> {
