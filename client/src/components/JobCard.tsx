@@ -128,16 +128,34 @@ const JobCard = ({ job }: { job: any }) => {
             </Link>
             
             <Box sx={{ display: 'flex', gap: 1, alignItems: 'center', ml: 2 }}>
-              <Chip 
-                label={`$${job.originalPay}`} 
-                size="small"
-                sx={{ 
-                  bgcolor: '#000000', 
-                  color: 'white', 
-                  fontWeight: 'bold', 
-                  borderRadius: '8px',
-                }} 
-              />
+              {job.currentPay && job.currentPay !== job.originalPay ? (
+                <>
+                  <Typography variant="caption" sx={{ textDecoration: 'line-through', color: 'text.secondary', fontWeight: 'bold' }}>
+                    ${job.originalPay}
+                  </Typography>
+                  <Chip 
+                    label={`$${job.currentPay}`} 
+                    size="small"
+                    sx={{ 
+                      bgcolor: '#2e7d32', // Green for updated pay
+                      color: 'white', 
+                      fontWeight: 'bold', 
+                      borderRadius: '8px',
+                    }} 
+                  />
+                </>
+              ) : (
+                <Chip 
+                  label={`$${job.originalPay}`} 
+                  size="small"
+                  sx={{ 
+                    bgcolor: '#2e7d32', 
+                    color: 'white', 
+                    fontWeight: 'bold', 
+                    borderRadius: '8px',
+                  }} 
+                />
+              )}
               <Chip 
                 label={job.type === 'hourly' ? 'Hourly' : 'One-Time'} 
                 size="small"

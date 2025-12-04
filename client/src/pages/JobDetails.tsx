@@ -133,9 +133,20 @@ const JobDetails = () => {
             
             {/* Prominent Pay Display */}
             <Box sx={{ textAlign: 'right', minWidth: 120 }}>
-                <Typography variant="h4" fontWeight="900" color="success.main">
-                    ${job.originalPay}
-                </Typography>
+                {job.currentPay && job.currentPay !== job.originalPay ? (
+                    <>
+                        <Typography variant="h5" sx={{ textDecoration: 'line-through', color: 'text.secondary', mb: 0.5 }}>
+                            ${job.originalPay}
+                        </Typography>
+                        <Typography variant="h4" fontWeight="900" color="success.main">
+                            ${job.currentPay}
+                        </Typography>
+                    </>
+                ) : (
+                    <Typography variant="h4" fontWeight="900" color="success.main">
+                        ${job.originalPay}
+                    </Typography>
+                )}
                 <Typography variant="caption" color="text.secondary" fontWeight="bold">
                     {job.type === 'hourly' ? 'PER HOUR' : 'FIXED PRICE'}
                 </Typography>

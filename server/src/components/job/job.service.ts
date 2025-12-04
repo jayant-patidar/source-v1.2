@@ -14,7 +14,10 @@ class JobService {
   }
 
   async getAllJobs(query: any): Promise<IJob[]> {
-    const filter: any = {};
+    const filter: any = {
+      visibility: true,
+      status: 'open' // Also ensuring only open jobs are shown in the feed
+    };
 
     // Keyword Search (Title or Description)
     if (query.keyword) {

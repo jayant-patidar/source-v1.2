@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { IconButton, Badge, Menu, MenuItem, Typography, Box, Divider, List, ListItem, ListItemText, ListItemAvatar, Avatar } from '@mui/material';
+import { Badge, Menu, Typography, Box, Divider, List, ListItemButton, ListItemText, ListItemAvatar, Avatar } from '@mui/material';
 import NotificationsIcon from '@mui/icons-material/Notifications';
 import axios from 'axios';
 import { formatDistanceToNow } from 'date-fns';
@@ -85,11 +85,11 @@ const NotificationMenu = () => {
 
   return (
     <>
-      <IconButton color="inherit" onClick={handleOpen}>
+      <Box onClick={handleOpen} sx={{ cursor: 'pointer', display: 'flex' }}>
         <Badge badgeContent={unreadCount} color="error">
-          <NotificationsIcon />
+          <NotificationsIcon sx={{ fontSize: 28 }} />
         </Badge>
-      </IconButton>
+      </Box>
       <Menu
         anchorEl={anchorEl}
         open={Boolean(anchorEl)}
@@ -122,9 +122,8 @@ const NotificationMenu = () => {
             <List sx={{ p: 0 }}>
                 {notifications.map((notification) => (
                     <div key={notification._id}>
-                        <ListItem 
+                        <ListItemButton 
                             alignItems="flex-start" 
-                            button 
                             onClick={() => handleNotificationClick(notification)}
                             sx={{ bgcolor: notification.isRead ? 'transparent' : 'action.hover' }}
                         >
@@ -145,7 +144,7 @@ const NotificationMenu = () => {
                                     </Typography>
                                 }
                             />
-                        </ListItem>
+                        </ListItemButton>
                         <Divider component="li" />
                     </div>
                 ))}

@@ -78,7 +78,7 @@ const Navbar = () => {
 
           {/* Navigation Items */}
           <Box sx={{ display: { xs: 'none', md: 'flex' }, gap: 2, alignItems: 'center' }}>
-            <Box component={RouterLink} to="/" sx={{ width: 90, display: 'flex', flexDirection: 'column', alignItems: 'center', color: 'white', textDecoration: 'none', opacity: 0.9, '&:hover': { opacity: 1 } }}>
+            <Box component={RouterLink} to="/" sx={{ width: 90, display: 'flex', flexDirection: 'column', alignItems: 'center', color: 'white', textDecoration: 'none', opacity: 0.7, '&:hover': { opacity: 1 } }}>
               <HomeIcon sx={{ fontSize: 28 }} />
               <Typography variant="caption" sx={{ fontSize: '0.7rem', mt: 0.5, fontWeight: 500 }}>HOME</Typography>
             </Box>
@@ -93,7 +93,7 @@ const Navbar = () => {
               <Typography variant="caption" sx={{ fontSize: '0.7rem', mt: 0.5, fontWeight: 500 }}>ACTIVITY</Typography>
             </Box>
 
-            <Box sx={{ width: 90, display: 'flex', flexDirection: 'column', alignItems: 'center', color: 'white', cursor: 'pointer', opacity: 0.9, '&:hover': { opacity: 1 } }}>
+            <Box sx={{ width: 90, display: 'flex', flexDirection: 'column', alignItems: 'center', color: 'white', cursor: 'pointer', opacity: 0.7, '&:hover': { opacity: 1 } }}>
                <NotificationMenu />
                <Typography variant="caption" sx={{ fontSize: '0.7rem', mt: 0.5, fontWeight: 500 }}>ALERTS</Typography>
             </Box>
