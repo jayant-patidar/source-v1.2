@@ -5,6 +5,10 @@ import ReceivedOffersView from './activity/ReceivedOffersView';
 import SentOffersView from './activity/SentOffersView';
 import SavedJobsView from './activity/SavedJobsView';
 import PostedJobsView from './activity/PostedJobsView';
+import UpcomingJobsView from './activity/UpcomingJobsView';
+import CompletedJobsView from './activity/CompletedJobsView';
+import SeekerAssignedJobsView from './activity/SeekerAssignedJobsView';
+import SeekerOngoingJobsView from './activity/SeekerOngoingJobsView';
 
 const ActivityPage = () => {
   const [currentView, setCurrentView] = useState('received-offers');
@@ -26,13 +30,14 @@ const ActivityPage = () => {
         return <SavedJobsView />;
       case 'posted-jobs':
         return <PostedJobsView />;
-      case 'active-jobs':
-        return (
-            <Box sx={{ textAlign: 'center', py: 8 }}>
-                <Typography variant="h6" color="text.secondary">Coming Soon</Typography>
-                <Typography variant="body2" color="text.secondary">This feature is under development.</Typography>
-            </Box>
-        );
+      case 'upcoming-jobs':
+        return <UpcomingJobsView />;
+      case 'completed-jobs':
+        return <CompletedJobsView />;
+      case 'assigned-jobs':
+        return <SeekerAssignedJobsView />;
+      case 'ongoing-jobs':
+        return <SeekerOngoingJobsView />;
       default:
         return <ReceivedOffersView />;
     }

@@ -243,6 +243,7 @@ const PostedJobsView = () => {
                         <Button 
                             component={Link} 
                             to={`/jobs/${job._id}`}
+                            state={{ job }}
                             variant="outlined" 
                             size="small"
                             startIcon={<VisibilityIcon />}

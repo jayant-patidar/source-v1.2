@@ -174,6 +174,28 @@ const JobCard = ({ job }: { job: any }) => {
             {job.description}
           </Typography>
 
+          {job.requirements && job.requirements.length > 0 && (
+            <Box sx={{ mb: 2, display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+                <Typography variant="caption" color="text.secondary" sx={{ mr: 1, fontWeight: 'bold' }}>
+                    Requires:
+                </Typography>
+                {job.requirements.slice(0, 3).map((req: string, index: number) => (
+                    <Chip
+                        key={index}
+                        label={req}
+                        size="small"
+                        variant="outlined"
+                        sx={{ height: 20, fontSize: '0.7rem' }}
+                    />
+                ))}
+                {job.requirements.length > 3 && (
+                    <Typography variant="caption" color="text.secondary">
+                        +{job.requirements.length - 3} more
+                    </Typography>
+                )}
+            </Box>
+          )}
+
           {/* Details: Date, Location */}
           <Box sx={{ display: 'flex', gap: 3, mb: 3, color: '#757575' }}>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>

@@ -25,7 +25,8 @@ const EditJobDialog: React.FC<EditJobDialogProps> = ({ open, onClose, job, onSav
     description: '',
     location: { general: '', exact: '' },
     category: '',
-    tags: [] as string[]
+    tags: [] as string[],
+    requirements: [] as string[]
   });
   const [loading, setLoading] = useState(false);
 
@@ -39,7 +40,8 @@ const EditJobDialog: React.FC<EditJobDialogProps> = ({ open, onClose, job, onSav
             exact: job.location?.exact || ''
         },
         category: job.category || '',
-        tags: job.tags || []
+        tags: job.tags || [],
+        requirements: job.requirements || []
       });
     }
   }, [job]);
@@ -137,6 +139,27 @@ const EditJobDialog: React.FC<EditJobDialogProps> = ({ open, onClose, job, onSav
                 {...params}
                 label="Tags"
                 placeholder="Add tags"
+              />
+            )}
+          />
+          <Autocomplete
+            multiple
+            freeSolo
+            options={[]}
+            value={formData.requirements}
+            onChange={(_, newValue) => {
+                setFormData(prev => ({ ...prev, requirements: newValue }));
+            }}
+            renderTags={(value: readonly string[], getTagProps) =>
+              value.map((option: string, index: number) => (
+                <Chip variant="outlined" label={option} {...getTagProps({ index })} />
+              ))
+            }
+            renderInput={(params) => (
+              <TextField
+                {...params}
+                label="Requirements"
+                placeholder="Add requirements (e.g. Truck, Shovel)"
               />
             )}
           />

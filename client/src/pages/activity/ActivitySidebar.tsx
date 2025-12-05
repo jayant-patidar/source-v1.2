@@ -8,12 +8,15 @@ import {
   Divider,
   Paper
 } from '@mui/material';
+import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import AssignmentIndIcon from '@mui/icons-material/AssignmentInd';
+import LoopIcon from '@mui/icons-material/Loop';
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import CallReceivedIcon from '@mui/icons-material/CallReceived';
 import SendIcon from '@mui/icons-material/Send';
 import BookmarkIcon from '@mui/icons-material/Bookmark';
 import WorkIcon from '@mui/icons-material/Work';
-import AssignmentIcon from '@mui/icons-material/Assignment';
 
 interface ActivitySidebarProps {
   currentView: string;
@@ -33,14 +36,17 @@ const ActivitySidebar = ({ currentView, onViewChange }: ActivitySidebarProps) =>
       title: 'My Requests (Seeker)',
       items: [
         { id: 'received-offers', label: 'Received Offers', icon: <CallReceivedIcon /> },
-        { id: 'posted-jobs', label: 'Posted Jobs', icon: <WorkIcon /> }, // Placeholder
+        { id: 'posted-jobs', label: 'Posted Jobs', icon: <WorkIcon /> },
+        { id: 'assigned-jobs', label: 'Assigned Jobs', icon: <AssignmentIndIcon /> },
+        { id: 'ongoing-jobs', label: 'Ongoing Jobs', icon: <LoopIcon /> },
       ]
     },
     {
       title: 'My Work (Provider)',
       items: [
         { id: 'sent-offers', label: 'Sent Offers', icon: <SendIcon /> },
-        { id: 'active-jobs', label: 'Active Jobs', icon: <AssignmentIcon /> }, // Placeholder
+        { id: 'upcoming-jobs', label: 'Upcoming Jobs', icon: <CalendarTodayIcon /> },
+        { id: 'completed-jobs', label: 'Completed Jobs', icon: <CheckCircleIcon /> },
       ]
     },
     {

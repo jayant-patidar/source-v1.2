@@ -21,7 +21,8 @@ class JobController {
         },
         updatedPay: [], // Initialize empty array
         // Ensure tags is an array if it comes as string
-        tags: Array.isArray(req.body.tags) ? req.body.tags : (req.body.tags ? req.body.tags.split(',').map((t: string) => t.trim()) : [])
+        tags: Array.isArray(req.body.tags) ? req.body.tags : (req.body.tags ? req.body.tags.split(',').map((t: string) => t.trim()) : []),
+        requirements: Array.isArray(req.body.requirements) ? req.body.requirements : (req.body.requirements ? req.body.requirements.split(',').map((r: string) => r.trim()) : [])
       };
       console.log('Received Job Body:', req.body);
       console.log('Constructed Job Data:', jobData);
@@ -64,6 +65,7 @@ class JobController {
     try {
       const job = await this.jobService.getJobById(req.params.id);
       if (job) {
+        console.log('getJobById returning:', JSON.stringify(job));
         res.status(200).json(job);
       } else {
         res.status(404).json({ error: 'Job not found' });
@@ -77,6 +79,10 @@ class JobController {
       try {
           const jobId = req.params.id;
           const updateData = { ...req.body };
+
+          if (updateData.requirements && typeof updateData.requirements === 'string') {
+              updateData.requirements = updateData.requirements.split(',').map((r: string) => r.trim());
+          }
 
           // Handle Pay Update Logic
           if (updateData.pay) {

@@ -47,9 +47,6 @@ B. Explore & Browse Posts
       Distance [PLANNED]
       Ratings [PLANNED]
       Availability [PLANNED]
-  Map View / Location View [PLANNED]
-      - Locate provider jobs or candidates on map
-      - See exact location when allowed
   View Post Details [COMPLETED]
       Description, Pay, Date/Time [COMPLETED]
       Seeker Details (Rating, Member Since) [COMPLETED]
@@ -128,9 +125,9 @@ J. Browse Available Job Requests
 K. Interact With Seekers
   Show Interest in a Job (Express Interest Modal) [COMPLETED]
   Negotiate Price with Seeker (Make Offer Modal) [COMPLETED]
-  Chat with Seeker (Message included in Offer) [IN PROGRESS]
+  Chat with Seeker (Message included in Offer) [PLANNED]
   Receive Confirmation from Seeker (Job Status: Assigned) [COMPLETED]
-  Accept or Decline Job Assignment [PLANNED]
+  Accept or Decline Job Assignment [COMPLETED]
 
 L. Pre-Service Management
   View Job Timeline & Requirements [PLANNED]

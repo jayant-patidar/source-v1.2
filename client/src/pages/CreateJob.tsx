@@ -1,6 +1,6 @@
 import { useFormik } from 'formik';
 import * as yup from 'yup';
-import { Box, Button, TextField, Typography, Container, MenuItem, Paper, Alert, FormControlLabel, Switch } from '@mui/material';
+import { Box, Button, TextField, Typography, Container, MenuItem, Paper, Alert, FormControlLabel, Switch, Autocomplete, Chip } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import { useJobStore } from '../store/jobStore';
 
@@ -15,6 +15,7 @@ const validationSchema = yup.object({
   jobDate: yup.date().required('Job Date is required'),
   jobTime: yup.string().required('Job Time is required'),
   expirationDate: yup.date().required('Expiration Date is required'),
+  requirements: yup.array().of(yup.string()),
 });
 
 const CreateJob = () => {
@@ -36,6 +37,7 @@ const CreateJob = () => {
       isNegotiable: false,
       visibility: true,
       tags: '',
+      requirements: [] as string[],
     },
     validationSchema: validationSchema,
     onSubmit: async (values) => {
@@ -58,6 +60,7 @@ const CreateJob = () => {
           isNegotiable: values.isNegotiable,
           visibility: values.visibility,
           tags: values.tags, // Controller handles string splitting
+          requirements: values.requirements,
         };
         console.log('Submitting Job Payload:', payload);
         await createJob(payload);
@@ -216,6 +219,35 @@ const CreateJob = () => {
                 value={formik.values.tags}
                 onChange={formik.handleChange}
                 placeholder="e.g. urgent, weekend, heavy-lifting"
+            />
+
+            <Autocomplete
+                multiple
+                freeSolo
+                id="requirements"
+                options={[]}
+                value={formik.values.requirements}
+                onChange={(_, newValue) => {
+                    formik.setFieldValue('requirements', newValue);
+                }}
+                renderTags={(value: readonly string[], getTagProps) =>
+                    value.map((option: string, index: number) => (
+                        <Chip variant="outlined" label={option} {...getTagProps({ index })} />
+                    ))
+                }
+                renderInput={(params) => (
+                    <TextField
+                        {...params}
+                        label="Requirements"
+                        placeholder="Type and press Enter"
+                        margin="normal"
+                        onKeyDown={(e) => {
+                            if (e.key === 'Enter') {
+                                e.preventDefault();
+                            }
+                        }}
+                    />
+                )}
             />
 
             <Box sx={{ mt: 2, display: 'flex', gap: 4 }}>

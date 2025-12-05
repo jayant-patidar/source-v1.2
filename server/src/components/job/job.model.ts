@@ -18,9 +18,10 @@ export interface IJob extends Document {
   isNegotiable: boolean;
   expirationDate: Date;
   category: string;
-  status: 'open' | 'accepted' | 'completed' | 'canceled';
+  status: 'open' | 'accepted' | 'in_progress' | 'completed' | 'canceled';
   type?: string;
   tags?: string[];
+  requirements?: string[];
   createdAt: Date;
   updatedAt: Date;
 }
@@ -63,10 +64,11 @@ const JobSchema: Schema = new Schema(
     status: {
       type: String,
       default: 'open',
-      enum: ['open', 'accepted', 'completed', 'canceled'],
+      enum: ['open', 'accepted', 'in_progress', 'completed', 'canceled'],
     },
     type: { type: String, required: false },
     tags: { type: [String], required: false },
+    requirements: { type: [String], required: false },
   },
   { timestamps: true }
 );

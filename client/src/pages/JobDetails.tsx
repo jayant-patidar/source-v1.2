@@ -14,6 +14,38 @@ import BookmarkIcon from '@mui/icons-material/Bookmark';
 import ShareLocationIcon from '@mui/icons-material/ShareLocation';
 import LoopIcon from '@mui/icons-material/Loop';
 import { format, formatDistanceToNow } from 'date-fns';
+
+interface Job {
+  _id: string;
+  title: string;
+  description: string;
+  originalPay: number;
+  currentPay?: number;
+  type: string;
+  category: string;
+  location: {
+    general: string;
+    exact: string;
+  };
+  jobDate: string;
+  jobTime: string;
+  createdAt: string;
+  status: string;
+  requirements?: string[];
+  seekerId: {
+    _id: string;
+    name: string;
+    avatar?: string;
+    seekerRating?: number;
+    providerRating?: number;
+    createdAt?: string;
+  };
+  providerId?: {
+    _id: string;
+    name: string;
+  };
+}
+
 const JobDetails = () => {
   const { id } = useParams();
   const { user } = useAuthStore();
@@ -42,6 +74,7 @@ const JobDetails = () => {
     const fetchJob = async () => {
       try {
         const { data } = await axios.get(`http://localhost:5000/api/jobs/${id}`, { withCredentials: true });
+        console.log('JobDetails API Fetch Result:', data);
         setJob(data);
         setLoading(false);
         // Check if user is the poster (seekerId)
@@ -107,6 +140,7 @@ const JobDetails = () => {
   // Correctly identify if current user is the poster
   const isPoster = user && job.seekerId && job.seekerId._id === user._id;
   const poster = job.seekerId;
+  console.log('JobDetails Render - Job:', job);
 
   return (
     <Container maxWidth="md" sx={{ mt: 4, mb: 8 }}>
@@ -182,6 +216,24 @@ const JobDetails = () => {
             {job.description}
           </Typography>
         </Box>
+
+        {job.requirements && job.requirements.length > 0 && (
+            <Box sx={{ mb: 5 }}>
+                <Typography variant="h6" fontWeight="bold" gutterBottom>
+                    Requirements
+                </Typography>
+                <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
+                    {job.requirements.map((req: string, index: number) => (
+                        <Chip
+                            key={index}
+                            label={req}
+                            variant="outlined"
+                            sx={{ borderColor: '#bdbdbd', fontWeight: '500' }}
+                        />
+                    ))}
+                </Box>
+            </Box>
+        )}
 
         {/* Details Grid */}
         <Box sx={{ mb: 5, bgcolor: '#f9fafb', p: 3, borderRadius: 3 }}>
