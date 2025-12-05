@@ -24,7 +24,7 @@ const UpcomingJobsView = () => {
   useEffect(() => {
     const fetchJobs = async () => {
       try {
-        const { data } = await axios.get('http://localhost:5000/api/jobs/provider', { withCredentials: true });
+        const { data } = await axios.get('http://localhost:5000/api/jobs/worked', { withCredentials: true });
         // Filter for accepted jobs (upcoming)
         const upcoming = data.filter((job: Job) => job.status === 'accepted');
         setJobs(upcoming);

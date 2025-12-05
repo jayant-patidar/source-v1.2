@@ -9,6 +9,7 @@ class NegotiationDAL {
   async getNegotiationsByJobId(jobId: string): Promise<INegotiation[]> {
     return await Negotiation.find({ job: jobId })
       .populate('seeker', 'name rating')
+      .populate('provider', 'name avatar providerRating')
       .sort({ createdAt: -1 });
   }
 

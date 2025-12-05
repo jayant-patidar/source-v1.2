@@ -20,7 +20,7 @@ const SeekerAssignedJobsView = () => {
   useEffect(() => {
     const fetchJobs = async () => {
       try {
-        const { data } = await axios.get('http://localhost:5000/api/jobs/poster', { withCredentials: true });
+        const { data } = await axios.get('http://localhost:5000/api/jobs/posted', { withCredentials: true });
         console.log('SeekerAssignedJobsView - All Posted Jobs:', data);
         const assigned = data.filter((job: Job) => job.status === 'accepted');
         console.log('SeekerAssignedJobsView - Filtered Assigned Jobs:', assigned);
