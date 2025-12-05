@@ -70,10 +70,9 @@ class NegotiationController {
           const job = await Job.findById(negotiation.job);
           
           if (status === 'accepted' && job) {
-              // Update Job Status
-              job.status = 'accepted'; // or 'assigned'
-              job.providerId = negotiation.provider as any;
-              await job.save();
+              // Job is already updated in service
+              // Just create notification
+
 
               // Notify Provider
               await Notification.create({

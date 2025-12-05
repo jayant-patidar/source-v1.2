@@ -1,3 +1,4 @@
+import mongoose from 'mongoose';
 import NegotiationDAL from './negotiation.dal';
 import { INegotiation } from './negotiation.model';
 import JobDAL from '../job/job.dal';
@@ -67,11 +68,14 @@ class NegotiationService {
     const updatedNegotiation = await this.negotiationDAL.updateNegotiation(id, { status });
 
     if (status === 'accepted') {
+        console.log('Negotiation accepted. Updating Job:', negotiation.job);
+        console.log('Assigning Provider:', negotiation.provider);
         // Update Job status
-        await this.jobDAL.updateJob((negotiation.job as any).toString(), { 
+        const updatedJob = await this.jobDAL.updateJob((negotiation.job as any).toString(), { 
             status: 'accepted',
-            providerId: negotiation.provider // Assign the applicant (Provider)
+            providerId: new mongoose.Types.ObjectId(negotiation.provider.toString()) // Assign the applicant (Provider)
         } as any);
+        console.log('Job Updated Result:', updatedJob);
     }
 
     return updatedNegotiation;

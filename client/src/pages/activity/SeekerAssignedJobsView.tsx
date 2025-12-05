@@ -21,7 +21,9 @@ const SeekerAssignedJobsView = () => {
     const fetchJobs = async () => {
       try {
         const { data } = await axios.get('http://localhost:5000/api/jobs/poster', { withCredentials: true });
+        console.log('SeekerAssignedJobsView - All Posted Jobs:', data);
         const assigned = data.filter((job: Job) => job.status === 'accepted');
+        console.log('SeekerAssignedJobsView - Filtered Assigned Jobs:', assigned);
         setJobs(assigned);
       } catch (error) {
         console.error('Failed to fetch jobs', error);
