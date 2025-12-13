@@ -12,6 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+const mongoose_1 = __importDefault(require("mongoose"));
 const negotiation_dal_1 = __importDefault(require("./negotiation.dal"));
 const job_dal_1 = __importDefault(require("../job/job.dal"));
 class NegotiationService {
@@ -74,11 +75,14 @@ class NegotiationService {
             }
             const updatedNegotiation = yield this.negotiationDAL.updateNegotiation(id, { status });
             if (status === 'accepted') {
+                console.log('Negotiation accepted. Updating Job:', negotiation.job);
+                console.log('Assigning Provider:', negotiation.provider);
                 // Update Job status
-                yield this.jobDAL.updateJob(negotiation.job.toString(), {
+                const updatedJob = yield this.jobDAL.updateJob(negotiation.job.toString(), {
                     status: 'accepted',
-                    providerId: negotiation.provider // Assign the applicant (Provider)
+                    providerId: new mongoose_1.default.Types.ObjectId(negotiation.provider.toString()) // Assign the applicant (Provider)
                 });
+                console.log('Job Updated Result:', updatedJob);
             }
             return updatedNegotiation;
         });

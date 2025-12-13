@@ -25,7 +25,10 @@ class JobService {
     }
     getAllJobs(query) {
         return __awaiter(this, void 0, void 0, function* () {
-            const filter = {};
+            const filter = {
+                visibility: true,
+                status: 'open' // Also ensuring only open jobs are shown in the feed
+            };
             // Keyword Search (Title or Description)
             if (query.keyword) {
                 filter.$or = [

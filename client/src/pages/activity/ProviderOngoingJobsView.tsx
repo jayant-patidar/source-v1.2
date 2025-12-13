@@ -7,7 +7,6 @@ import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import PauseIcon from '@mui/icons-material/Pause';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
-import CancelIcon from '@mui/icons-material/Cancel';
 import { useToastStore } from '../../store/toastStore';
 
 interface Job {
@@ -19,11 +18,11 @@ interface Job {
   jobTime: string;
   location: { general: string };
   status: 'in_progress' | 'paused' | 'pending_completion';
-  providerId?: { name: string; avatar?: string };
+  seekerId: { name: string; avatar?: string };
   startTime?: string;
 }
 
-const SeekerOngoingJobsView = () => {
+const ProviderOngoingJobsView = () => {
   const [jobs, setJobs] = useState<Job[]>([]);
   const [loading, setLoading] = useState(true);
   const { showToast } = useToastStore();
@@ -33,7 +32,7 @@ const SeekerOngoingJobsView = () => {
 
   const fetchJobs = async () => {
     try {
-      const { data } = await axios.get('http://localhost:5000/api/jobs/posted', { withCredentials: true });
+      const { data } = await axios.get('http://localhost:5000/api/jobs/worked', { withCredentials: true });
       // Filter for ongoing or paused jobs
       const ongoing = data.filter((job: Job) => ['in_progress', 'paused', 'pending_completion'].includes(job.status));
       setJobs(ongoing);
@@ -58,15 +57,12 @@ const SeekerOngoingJobsView = () => {
       if (!selectedJob || !actionType) return;
       
       let newStatus = '';
-      if (actionType === 'complete') newStatus = 'completed';
+      if (actionType === 'complete') newStatus = 'pending_completion';
       if (actionType === 'pause') newStatus = 'paused';
       if (actionType === 'resume') newStatus = 'in_progress';
       if (actionType === 'cancel') newStatus = 'canceled';
 
       try {
-          // For now, assuming generic update endpoint works or we need to add specific ones.
-          // Plan 4 said "PUT /api/jobs/:id/status" but we only have generic update in routes. 
-          // Let's try generic update first.
           await axios.put(`http://localhost:5000/api/jobs/${selectedJob._id}`, { status: newStatus }, { withCredentials: true });
           showToast(`Job ${actionType}d successfully!`, 'success');
           fetchJobs();
@@ -86,8 +82,8 @@ const SeekerOngoingJobsView = () => {
 
   return (
     <Box>
-      <Typography variant="h5" fontWeight="bold" gutterBottom>Ongoing Jobs</Typography>
-      <Typography variant="body2" color="text.secondary" mb={3}>Jobs currently in progress. Manage them here.</Typography>
+      <Typography variant="h5" fontWeight="bold" gutterBottom>Ongoing Jobs (Provider)</Typography>
+      <Typography variant="body2" color="text.secondary" mb={3}>Jobs you are currently working on.</Typography>
 
       {jobs.length === 0 ? (
         <Paper sx={{ p: 4, textAlign: 'center', bgcolor: '#f9fafb' }} elevation={0}>
@@ -103,13 +99,13 @@ const SeekerOngoingJobsView = () => {
                           <Typography variant="h6" fontWeight="bold">{job.title}</Typography>
                           <Chip 
                             label={job.status === 'paused' ? 'PAUSED' : (job.status === 'pending_completion' ? 'PENDING APPROVAL' : 'IN PROGRESS')} 
-                            color={job.status === 'paused' ? 'warning' : (job.status === 'pending_completion' ? 'warning' : 'success')} 
+                            color={job.status === 'paused' ? 'warning' : (job.status === 'pending_completion' ? 'default' : 'success')} 
                             size="small" 
                             sx={{ fontWeight: 'bold' }}
                           />
                       </Box>
                       <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
-                          Provider: {job.providerId?.name || 'Assigned'}
+                          Client: {job.seekerId?.name}
                       </Typography>
                       <Box display="flex" gap={2} mt={1}>
                         <Box display="flex" alignItems="center" gap={0.5}>
@@ -133,15 +129,7 @@ const SeekerOngoingJobsView = () => {
                       </Typography>
                       
                       <Stack direction="row" spacing={1} mt={2}>
-                          <Button 
-                            variant="outlined" 
-                            color="error" 
-                            size="small"
-                            startIcon={<CancelIcon />}
-                            onClick={() => handleActionClick(job, 'cancel')}
-                          >
-                            Cancel
-                          </Button>
+                          {/* Providers might not be able to cancel in progress easily, but keeping for now */}
                           <Button 
                             variant="outlined" 
                             color={job.status === 'paused' ? 'info' : 'warning'} 
@@ -158,8 +146,11 @@ const SeekerOngoingJobsView = () => {
                             startIcon={<CheckCircleIcon />}
                             onClick={() => handleActionClick(job, 'complete')}
                           >
-                            {job.status === 'pending_completion' ? 'Approve Completion' : 'Complete'}
+                            Complete
                           </Button>
+                          {job.status === 'pending_completion' && (
+                              <Chip label="Waiting for Approval" size="small" color="default" sx={{ ml: 1 }} />
+                          )}
                       </Stack>
                   </Box>
               </Box>
@@ -168,7 +159,6 @@ const SeekerOngoingJobsView = () => {
         </Stack>
       )}
 
-      {/* Confirmation Dialog */}
       <Dialog open={openDialog} onClose={handleCloseDialog}>
         <DialogTitle sx={{ textTransform: 'capitalize' }}>
             {actionType} Job?
@@ -176,13 +166,11 @@ const SeekerOngoingJobsView = () => {
         <DialogContent>
             <DialogContentText>
                 Are you sure you want to {actionType} this job?
-                {actionType === 'complete' && " This will mark the job as finished and process payment."}
-                {actionType === 'cancel' && " This action cannot be undone."}
             </DialogContentText>
         </DialogContent>
         <DialogActions>
             <Button onClick={handleCloseDialog}>No</Button>
-            <Button onClick={handleConfirmAction} autoFocus variant="contained" color={actionType === 'cancel' ? 'error' : 'primary'}>
+            <Button onClick={handleConfirmAction} autoFocus variant="contained" color="primary">
                 Yes, {actionType}
             </Button>
         </DialogActions>
@@ -191,4 +179,4 @@ const SeekerOngoingJobsView = () => {
   );
 };
 
-export default SeekerOngoingJobsView;
+export default ProviderOngoingJobsView;

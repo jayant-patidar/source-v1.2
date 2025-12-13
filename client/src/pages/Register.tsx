@@ -1,9 +1,10 @@
 import { useEffect } from 'react';
 import { useFormik } from 'formik';
 import * as yup from 'yup';
-import { Box, Button, TextField, Typography, Container, Alert, Paper } from '@mui/material';
+import { Box, Button, TextField, Typography, Container, Paper } from '@mui/material';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../store/authStore';
+import { useToastStore } from '../store/toastStore';
 
 const validationSchema = yup.object({
   name: yup.string().required('Name is required'),
@@ -20,15 +21,17 @@ const validationSchema = yup.object({
 const Register = () => {
   const navigate = useNavigate();
   const { register, isLoading, error, clearError } = useAuthStore();
+  const { showToast } = useToastStore();
 
   useEffect(() => {
     if (error) {
+      showToast(error, 'error');
       const timer = setTimeout(() => {
         clearError();
       }, 5000);
       return () => clearTimeout(timer);
     }
-  }, [error, clearError]);
+  }, [error, clearError, showToast]);
 
   const formik = useFormik({
     initialValues: {
@@ -51,6 +54,7 @@ const Register = () => {
           phone: values.phone,
           address: values.address,
         });
+        showToast('Registration Successful!', 'success');
         navigate('/');
       } catch (err) {
         // Error handled in store
@@ -68,7 +72,7 @@ const Register = () => {
           Join the community marketplace
         </Typography>
 
-        {error && <Alert severity="error" sx={{ mb: 3 }}>{error}</Alert>}
+        {/* Removed inline Alert */}
 
         <form onSubmit={formik.handleSubmit}>
           <TextField

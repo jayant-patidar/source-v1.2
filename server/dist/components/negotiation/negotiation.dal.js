@@ -24,6 +24,7 @@ class NegotiationDAL {
         return __awaiter(this, void 0, void 0, function* () {
             return yield negotiation_model_1.default.find({ job: jobId })
                 .populate('seeker', 'name rating')
+                .populate('provider', 'name avatar providerRating')
                 .sort({ createdAt: -1 });
         });
     }

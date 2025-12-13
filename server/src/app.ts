@@ -8,6 +8,7 @@ import logger from './utils/logger';
 import { errorHandler } from './middleware/error.middleware';
 import userRoutes from './components/user/user.routes';
 import jobRoutes from './components/job/job.routes';
+import transactionRoutes from './components/transaction/transaction.routes';
 import negotiationRoutes from './components/negotiation/negotiation.routes';
 import reviewRoutes from './components/review/review.routes';
 import notificationRoutes from './components/notification/notification.routes';
@@ -34,6 +35,7 @@ app.get('/', (req, res) => {
 // Use new component routes
 app.use('/api/users', userRoutes);
 app.use('/api/jobs', jobRoutes);
+app.use('/api/transactions', transactionRoutes);
 app.use('/api/negotiations', negotiationRoutes);
 app.use('/api/reviews', reviewRoutes);
 app.use('/api/notifications', notificationRoutes);

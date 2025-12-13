@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import { Container, Typography, Box, Paper, Avatar, Chip, CircularProgress, Alert, Grid, Button, Divider, Tabs, Tab, Rating } from '@mui/material';
 import axios from 'axios';
 import { format } from 'date-fns';
@@ -140,7 +140,7 @@ const PublicProfile = () => {
                 <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
                     {profileUser.skills && profileUser.skills.length > 0 ? (
                         profileUser.skills.map((skill: string, index: number) => (
-                            <Chip key={index} label={skill} color="primary" variant="soft" sx={{ bgcolor: '#e3f2fd', color: '#1565c0', fontWeight: 600 }} />
+                            <Chip key={index} label={skill} color="primary" variant="filled" sx={{ bgcolor: '#e3f2fd', color: '#1565c0', fontWeight: 600 }} />
                         ))
                     ) : (
                         <Typography color="text.secondary">No skills listed.</Typography>
@@ -152,7 +152,7 @@ const PublicProfile = () => {
             <Paper elevation={0} sx={{ p: 3, borderRadius: 3, border: '1px solid #e0e0e0' }}>
                 <Typography variant="h6" fontWeight="bold" gutterBottom>Preferences</Typography>
                 <Grid container spacing={3}>
-                    <Grid item xs={12} sm={4}>
+                    <Grid size={{ xs: 12, sm: 4 }}>
                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
                             <AttachMoneyIcon color="action" />
                             <Box>
@@ -163,7 +163,7 @@ const PublicProfile = () => {
                             </Box>
                         </Box>
                     </Grid>
-                    <Grid item xs={12} sm={4}>
+                    <Grid size={{ xs: 12, sm: 4 }}>
                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
                             <LocationOnIcon color="action" />
                             <Box>
@@ -174,7 +174,7 @@ const PublicProfile = () => {
                             </Box>
                         </Box>
                     </Grid>
-                    <Grid item xs={12} sm={4}>
+                    <Grid size={{ xs: 12, sm: 4 }}>
                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
                             <CalendarTodayIcon color="action" />
                             <Box>
@@ -194,7 +194,7 @@ const PublicProfile = () => {
                 <Grid container spacing={2}>
                     {profileUser.portfolio && profileUser.portfolio.length > 0 ? (
                         profileUser.portfolio.map((item: any, index: number) => (
-                            <Grid item xs={12} sm={6} md={4} key={index}>
+                            <Grid size={{ xs: 12, sm: 6, md: 4 }} key={index}>
                                 <Paper variant="outlined" sx={{ p: 2, height: '100%', transition: 'transform 0.2s', '&:hover': { transform: 'translateY(-4px)', boxShadow: 2 } }}>
                                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
                                         <WorkIcon color="primary" fontSize="small" />
@@ -211,7 +211,7 @@ const PublicProfile = () => {
                             </Grid>
                         ))
                     ) : (
-                        <Grid item xs={12}>
+                        <Grid size={{ xs: 12 }}>
                             <Typography color="text.secondary">No portfolio items.</Typography>
                         </Grid>
                     )}

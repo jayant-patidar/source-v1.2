@@ -1,9 +1,10 @@
 import { useEffect } from 'react';
 import { useFormik } from 'formik';
 import * as yup from 'yup';
-import { Box, Button, TextField, Typography, Container, Alert, Paper } from '@mui/material';
+import { Box, Button, TextField, Typography, Container, Paper } from '@mui/material';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../store/authStore';
+import { useToastStore } from '../store/toastStore';
 
 const validationSchema = yup.object({
   email: yup.string().email('Enter a valid email').required('Email is required'),
@@ -13,15 +14,17 @@ const validationSchema = yup.object({
 const Login = () => {
   const navigate = useNavigate();
   const { login, isLoading, error, clearError } = useAuthStore();
+  const { showToast } = useToastStore();
 
   useEffect(() => {
     if (error) {
+      showToast(error, 'error');
       const timer = setTimeout(() => {
         clearError();
       }, 5000);
       return () => clearTimeout(timer);
     }
-  }, [error, clearError]);
+  }, [error, clearError, showToast]);
 
   const formik = useFormik({
     initialValues: {
@@ -32,6 +35,7 @@ const Login = () => {
     onSubmit: async (values) => {
       try {
         await login(values);
+        showToast('Login Successful!', 'success');
         navigate('/');
       } catch (err) {
         // Error handled in store
@@ -49,7 +53,7 @@ const Login = () => {
           Login to access your account
         </Typography>
         
-        {error && <Alert severity="error" sx={{ mb: 3 }}>{error}</Alert>}
+        {/* Removed inline Alert */}
         
         <form onSubmit={formik.handleSubmit}>
           <TextField

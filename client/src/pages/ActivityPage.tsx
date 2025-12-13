@@ -9,6 +9,8 @@ import UpcomingJobsView from './activity/UpcomingJobsView';
 import CompletedJobsView from './activity/CompletedJobsView';
 import SeekerAssignedJobsView from './activity/SeekerAssignedJobsView';
 import SeekerOngoingJobsView from './activity/SeekerOngoingJobsView';
+import ProviderOngoingJobsView from './activity/ProviderOngoingJobsView';
+import RejectedOffersView from './activity/RejectedOffersView';
 
 const ActivityPage = () => {
   const [currentView, setCurrentView] = useState('received-offers');
@@ -24,6 +26,8 @@ const ActivityPage = () => {
         );
       case 'received-offers':
         return <ReceivedOffersView />;
+      case 'rejected-offers':
+        return <RejectedOffersView />;
       case 'sent-offers':
         return <SentOffersView />;
       case 'saved-jobs':
@@ -33,11 +37,15 @@ const ActivityPage = () => {
       case 'upcoming-jobs':
         return <UpcomingJobsView />;
       case 'completed-jobs':
-        return <CompletedJobsView />;
+        return <CompletedJobsView role="provider" />;
+      case 'seeker-completed-jobs':
+        return <CompletedJobsView role="seeker" />;
       case 'assigned-jobs':
         return <SeekerAssignedJobsView />;
-      case 'ongoing-jobs':
+      case 'seeker-ongoing':
         return <SeekerOngoingJobsView />;
+      case 'provider-ongoing':
+        return <ProviderOngoingJobsView />;
       default:
         return <ReceivedOffersView />;
     }

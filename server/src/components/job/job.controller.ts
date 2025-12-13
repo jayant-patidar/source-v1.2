@@ -126,6 +126,38 @@ class JobController {
           next(error);
       }
   }
+  async startJob(req: any, res: Response, next: NextFunction) {
+    try {
+      const jobId = req.params.id;
+      const job = await this.jobService.getJobById(jobId);
+
+      if (!job) {
+        return res.status(404).json({ error: 'Job not found' });
+      }
+
+      // Check if user is seeker or provider
+      const isSeeker = job.seekerId.toString() === req.user._id.toString() || (job.seekerId as any)._id?.toString() === req.user._id.toString();
+      const isProvider = job.providerId?.toString() === req.user._id.toString() || (job.providerId as any)?._id?.toString() === req.user._id.toString();
+
+      if (!isSeeker && !isProvider) {
+        return res.status(403).json({ error: 'Not authorized to start this job' });
+      }
+
+      if (job.status !== 'accepted') {
+        return res.status(400).json({ error: 'Job must be accepted to start' });
+      }
+
+      // Update status and startTime
+      const updatedJob = await this.jobService.updateJob(jobId, {
+        status: 'in_progress',
+        startTime: new Date()
+      });
+
+      res.status(200).json(updatedJob);
+    } catch (error) {
+      next(error);
+    }
+  }
 }
 
 export default new JobController();

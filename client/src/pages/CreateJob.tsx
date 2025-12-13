@@ -1,8 +1,9 @@
 import { useFormik } from 'formik';
 import * as yup from 'yup';
-import { Box, Button, TextField, Typography, Container, MenuItem, Paper, Alert, FormControlLabel, Switch, Autocomplete, Chip } from '@mui/material';
+import { Box, Button, TextField, Typography, Container, MenuItem, Paper, FormControlLabel, Switch, Autocomplete, Chip } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import { useJobStore } from '../store/jobStore';
+import { useToastStore } from '../store/toastStore';
 
 const validationSchema = yup.object({
   title: yup.string().required('Title is required'),
@@ -20,7 +21,8 @@ const validationSchema = yup.object({
 
 const CreateJob = () => {
   const navigate = useNavigate();
-  const { createJob, isLoading, error } = useJobStore();
+  const { createJob, isLoading } = useJobStore();
+  const { showToast } = useToastStore();
 
   const formik = useFormik({
     initialValues: {
@@ -64,9 +66,10 @@ const CreateJob = () => {
         };
         console.log('Submitting Job Payload:', payload);
         await createJob(payload);
+        showToast('Job Posted Successfully!', 'success');
         navigate('/');
       } catch (err) {
-        // Error handled in store
+        showToast('Failed to post job. Please try again.', 'error');
       }
     },
   });
@@ -77,7 +80,6 @@ const CreateJob = () => {
         <Typography variant="h4" fontWeight="bold" gutterBottom>
           Post a Job
         </Typography>
-        {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
         <form onSubmit={formik.handleSubmit}>
           <TextField
             fullWidth

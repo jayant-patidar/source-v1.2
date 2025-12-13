@@ -13,6 +13,7 @@ const logger_1 = __importDefault(require("./utils/logger"));
 const error_middleware_1 = require("./middleware/error.middleware");
 const user_routes_1 = __importDefault(require("./components/user/user.routes"));
 const job_routes_1 = __importDefault(require("./components/job/job.routes"));
+const transaction_routes_1 = __importDefault(require("./components/transaction/transaction.routes"));
 const negotiation_routes_1 = __importDefault(require("./components/negotiation/negotiation.routes"));
 const review_routes_1 = __importDefault(require("./components/review/review.routes"));
 const notification_routes_1 = __importDefault(require("./components/notification/notification.routes"));
@@ -33,6 +34,7 @@ app.get('/', (req, res) => {
 // Use new component routes
 app.use('/api/users', user_routes_1.default);
 app.use('/api/jobs', job_routes_1.default);
+app.use('/api/transactions', transaction_routes_1.default);
 app.use('/api/negotiations', negotiation_routes_1.default);
 app.use('/api/reviews', review_routes_1.default);
 app.use('/api/notifications', notification_routes_1.default);

@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { Container, Typography, Box, Button, TextField, Paper, Divider, Chip, CircularProgress, Alert, Avatar, IconButton, Grid, Dialog, DialogTitle, DialogContent, DialogActions, Snackbar } from '@mui/material';
+import { Container, Typography, Box, Button, TextField, Paper, Divider, Chip, CircularProgress, Avatar, Dialog, DialogTitle, DialogContent, DialogActions, Grid, Alert } from '@mui/material';
 import axios from 'axios';
 import { useAuthStore } from '../store/authStore';
+import { useToastStore } from '../store/toastStore';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
@@ -15,40 +16,12 @@ import ShareLocationIcon from '@mui/icons-material/ShareLocation';
 import LoopIcon from '@mui/icons-material/Loop';
 import { format, formatDistanceToNow } from 'date-fns';
 
-interface Job {
-  _id: string;
-  title: string;
-  description: string;
-  originalPay: number;
-  currentPay?: number;
-  type: string;
-  category: string;
-  location: {
-    general: string;
-    exact: string;
-  };
-  jobDate: string;
-  jobTime: string;
-  createdAt: string;
-  status: string;
-  requirements?: string[];
-  seekerId: {
-    _id: string;
-    name: string;
-    avatar?: string;
-    seekerRating?: number;
-    providerRating?: number;
-    createdAt?: string;
-  };
-  providerId?: {
-    _id: string;
-    name: string;
-  };
-}
+// Job interface removed as it was unused
 
 const JobDetails = () => {
   const { id } = useParams();
   const { user } = useAuthStore();
+  const { showToast } = useToastStore();
   const [job, setJob] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [negotiationAmount, setNegotiationAmount] = useState('');
@@ -58,15 +31,15 @@ const JobDetails = () => {
   const [showOfferForm, setShowOfferForm] = useState(false);
   const [offerMode, setOfferMode] = useState<'negotiate' | 'interested'>('negotiate');
   const [isSaved, setIsSaved] = useState(false);
-  const [snackbarOpen, setSnackbarOpen] = useState(false);
 
   const handleSave = async () => {
       try {
           await axios.post(`http://localhost:5000/api/users/saved/${id}`, {}, { withCredentials: true });
           setIsSaved(!isSaved);
-          setSnackbarOpen(true);
+          showToast(isSaved ? "Job Unsaved" : "Job Saved", 'success');
       } catch (error) {
           console.error('Error toggling save:', error);
+          showToast('Failed to save job', 'error');
       }
   };
 
@@ -105,12 +78,12 @@ const JobDetails = () => {
               amount: Number(negotiationAmount),
               message
           }, { withCredentials: true });
-          alert('Offer sent!');
+          showToast('Offer sent!', 'success');
           setNegotiationAmount('');
           setMessage('');
           setShowOfferForm(false);
       } catch (err: any) {
-          alert(err.response?.data?.message || 'Failed to send offer');
+          showToast(err.response?.data?.message || 'Failed to send offer', 'error');
       }
   };
 
@@ -119,8 +92,9 @@ const JobDetails = () => {
           await axios.put(`http://localhost:5000/api/negotiations/${negotiationId}`, { status: 'accepted' }, { withCredentials: true });
           fetchNegotiations();
           setJob({ ...job, status: 'assigned' });
+          showToast('Offer accepted', 'success');
       } catch (err) {
-          alert('Failed to accept');
+          showToast('Failed to accept', 'error');
       }
   };
 
@@ -128,8 +102,9 @@ const JobDetails = () => {
       try {
           await axios.put(`http://localhost:5000/api/negotiations/${negotiationId}`, { status: 'rejected' }, { withCredentials: true });
           fetchNegotiations();
+          showToast('Offer rejected', 'info');
       } catch (err) {
-          alert('Failed to reject');
+          showToast('Failed to reject', 'error');
       }
   };
 
@@ -238,7 +213,7 @@ const JobDetails = () => {
         {/* Details Grid */}
         <Box sx={{ mb: 5, bgcolor: '#f9fafb', p: 3, borderRadius: 3 }}>
           <Grid container spacing={3}>
-            <Grid item xs={12} sm={6}>
+            <Grid size={{ xs: 12, sm: 6 }}>
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
                 <CalendarTodayIcon sx={{ color: 'text.secondary' }} />
                 <Box>
@@ -249,7 +224,7 @@ const JobDetails = () => {
                 </Box>
               </Box>
             </Grid>
-            <Grid item xs={12} sm={6}>
+            <Grid size={{ xs: 12, sm: 6 }}>
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
                 <AccessTimeIcon sx={{ color: 'text.secondary' }} />
                 <Box>
@@ -260,7 +235,7 @@ const JobDetails = () => {
                 </Box>
               </Box>
             </Grid>
-            <Grid item xs={12}>
+            <Grid size={12}>
                <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
                 <LocationOnIcon sx={{ color: 'text.secondary' }} />
                 <Box>
@@ -364,6 +339,7 @@ const JobDetails = () => {
         </Box>
 
         {/* Offer Modal */}
+        {/* Offer Modal */}
         <Dialog open={showOfferForm} onClose={() => setShowOfferForm(false)} maxWidth="sm" fullWidth>
             <DialogTitle sx={{ fontWeight: 'bold' }}>
                 {offerMode === 'interested' ? 'Express Interest' : 'Make an Offer'}
@@ -420,12 +396,6 @@ const JobDetails = () => {
                 </Button>
             </DialogActions>
         </Dialog>
-        <Snackbar
-            open={snackbarOpen}
-            autoHideDuration={3000}
-            onClose={() => setSnackbarOpen(false)}
-            message={isSaved ? "Job Saved" : "Job Unsaved"}
-        />
 
         {/* Poster View: Negotiations */}
         {isPoster && (

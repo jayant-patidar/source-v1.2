@@ -52,18 +52,17 @@ class UserDAL {
     }
     toggleSavedJob(userId, jobId) {
         return __awaiter(this, void 0, void 0, function* () {
-            var _a, _b, _c;
+            var _a;
             const user = yield user_model_1.default.findById(userId);
             if (!user)
                 return null;
-            const isSaved = (_a = user.savedJobs) === null || _a === void 0 ? void 0 : _a.includes(jobId);
+            const isSaved = (_a = user.savedJobs) === null || _a === void 0 ? void 0 : _a.some((id) => id.toString() === jobId);
             if (isSaved) {
-                user.savedJobs = (_b = user.savedJobs) === null || _b === void 0 ? void 0 : _b.filter((id) => id.toString() !== jobId);
+                return yield user_model_1.default.findByIdAndUpdate(userId, { $pull: { savedJobs: jobId } }, { new: true });
             }
             else {
-                (_c = user.savedJobs) === null || _c === void 0 ? void 0 : _c.push(jobId);
+                return yield user_model_1.default.findByIdAndUpdate(userId, { $addToSet: { savedJobs: jobId } }, { new: true });
             }
-            return yield user.save();
         });
     }
     getSavedJobs(userId) {

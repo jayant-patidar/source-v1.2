@@ -15,8 +15,7 @@ interface Job {
   jobTime: string;
   category: string;
   createdAt: string;
-  category: string;
-  createdAt: string;
+
   seekerId: {
     _id: string;
     name: string;

@@ -6,9 +6,11 @@ import Register from './pages/Register';
 import Home from './pages/Home';
 import CreateJob from './pages/CreateJob';
 import JobDetails from './pages/JobDetails';
+import PaymentPage from './pages/payment/PaymentPage';
 import Profile from './pages/Profile';
 import PublicProfile from './pages/PublicProfile';
 import ActivityPage from './pages/ActivityPage';
+import GlobalToast from './components/GlobalToast';
 import { useAuthStore } from './store/authStore';
 import { Box, CircularProgress } from '@mui/material';
 
@@ -29,6 +31,7 @@ function App() {
 
   return (
     <Layout>
+      <GlobalToast />
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/login" element={!user ? <Login /> : <Navigate to="/" />} />
@@ -38,6 +41,7 @@ function App() {
         <Route path="/profile" element={user ? <Profile /> : <Navigate to="/login" />} />
         <Route path="/profile/:id" element={<PublicProfile />} />
         <Route path="/activity" element={user ? <ActivityPage /> : <Navigate to="/login" />} />
+        <Route path="/payment/:id" element={user ? <PaymentPage /> : <Navigate to="/login" />} />
       </Routes>
     </Layout>
   );

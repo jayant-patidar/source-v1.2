@@ -22,7 +22,7 @@ class NegotiationController {
     createNegotiation(req, res, next) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const negotiation = yield this.negotiationService.createNegotiation(req.body, req.user._id);
+                const negotiation = yield this.negotiationService.createNegotiation(req.body, req.user._id.toString());
                 // Create notification for seeker
                 const job = yield job_model_1.default.findById(negotiation.job);
                 if (job) {
@@ -56,7 +56,7 @@ class NegotiationController {
     getNegotiationsByUser(req, res, next) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const negotiations = yield this.negotiationService.getNegotiationsByProvider(req.user._id);
+                const negotiations = yield this.negotiationService.getNegotiationsByProvider(req.user._id.toString());
                 res.json(negotiations);
             }
             catch (error) {
@@ -67,7 +67,7 @@ class NegotiationController {
     getNegotiationsReceived(req, res, next) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const negotiations = yield this.negotiationService.getNegotiationsBySeeker(req.user._id);
+                const negotiations = yield this.negotiationService.getNegotiationsBySeeker(req.user._id.toString());
                 res.json(negotiations);
             }
             catch (error) {
@@ -79,14 +79,12 @@ class NegotiationController {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const { status } = req.body;
-                const negotiation = yield this.negotiationService.updateNegotiationStatus(req.params.id, status, req.user._id);
+                const negotiation = yield this.negotiationService.updateNegotiationStatus(req.params.id, status, req.user._id.toString());
                 if (negotiation) {
                     const job = yield job_model_1.default.findById(negotiation.job);
                     if (status === 'accepted' && job) {
-                        // Update Job Status
-                        job.status = 'accepted'; // or 'assigned'
-                        job.providerId = negotiation.provider;
-                        yield job.save();
+                        // Job is already updated in service
+                        // Just create notification
                         // Notify Provider
                         yield notification_model_1.default.create({
                             recipient: negotiation.provider,

@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { Card, CardContent, Typography, Box, Divider, Chip, CircularProgress } from '@mui/material';
+import { Card, CardContent, Typography, Box, Divider, Chip } from '@mui/material';
 import { Link } from 'react-router-dom';
 import { useJobStore } from '../store/jobStore';
 

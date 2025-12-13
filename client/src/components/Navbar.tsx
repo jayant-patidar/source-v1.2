@@ -1,17 +1,18 @@
 import { AppBar, Toolbar, Typography, Button, Box, Container, Avatar, Menu, MenuItem, InputBase } from '@mui/material';
 import { Link as RouterLink, useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../store/authStore';
+import { useToastStore } from '../store/toastStore';
 import { useState } from 'react';
 import SearchIcon from '@mui/icons-material/Search';
 import HomeIcon from '@mui/icons-material/Home';
 import WorkIcon from '@mui/icons-material/Work';
 import MessageIcon from '@mui/icons-material/Message';
-import NotificationsIcon from '@mui/icons-material/Notifications';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import NotificationMenu from './NotificationMenu';
 
 const Navbar = () => {
   const { user, logout } = useAuthStore();
+  const { showToast } = useToastStore();
   const navigate = useNavigate();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 
@@ -25,6 +26,7 @@ const Navbar = () => {
 
   const handleLogout = () => {
     logout();
+    showToast('Logout Successful!', 'success');
     handleClose();
     navigate('/login');
   };

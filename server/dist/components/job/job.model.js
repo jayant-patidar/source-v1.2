@@ -50,6 +50,7 @@ const JobSchema = new mongoose_1.Schema({
     jobDate: { type: Date, required: true },
     jobTime: { type: String, required: true },
     originalPay: { type: Number, required: true },
+    currentPay: { type: Number, required: false },
     updatedPay: [
         {
             pay: { type: Number, required: true },
@@ -70,10 +71,17 @@ const JobSchema = new mongoose_1.Schema({
     status: {
         type: String,
         default: 'open',
-        enum: ['open', 'accepted', 'completed', 'canceled'],
+        enum: ['open', 'accepted', 'in_progress', 'completed', 'canceled', 'paused', 'pending_completion'],
+    },
+    paymentStatus: {
+        type: String,
+        default: 'pending',
+        enum: ['pending', 'paid', 'failed'],
     },
     type: { type: String, required: false },
     tags: { type: [String], required: false },
+    requirements: { type: [String], required: false },
+    startTime: { type: Date, required: false },
 }, { timestamps: true });
 // Add geospatial index if needed later, for now keeping it simple as per request
 // JobSchema.index({ 'location.coordinates': '2dsphere' });
