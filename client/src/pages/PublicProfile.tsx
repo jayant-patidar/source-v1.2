@@ -10,6 +10,7 @@ import GitHubIcon from '@mui/icons-material/GitHub';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
 import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
 import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
+import ReplyIcon from '@mui/icons-material/Reply';
 
 interface Review {
   _id: string;
@@ -22,6 +23,12 @@ interface Review {
   job?: {
     _id: string;
     title: string;
+    seekerId: string;
+    providerId: string;
+  };
+  response?: {
+    message: string;
+    createdAt: string;
   };
   createdAt: string;
 }
@@ -246,35 +253,122 @@ const PublicProfile = () => {
       )}
 
       {tabValue === 1 && (
-          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
-              {reviews.length === 0 ? (
-                  <Paper elevation={0} sx={{ p: 6, textAlign: 'center', borderRadius: 3, border: '1px solid #e0e0e0' }}>
-                      <Typography variant="h6" color="text.secondary">No reviews yet.</Typography>
-                  </Paper>
-              ) : (
-                  reviews.map((review) => (
-                      <Paper key={review._id} elevation={0} sx={{ p: 3, borderRadius: 3, border: '1px solid #e0e0e0' }}>
-                          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 2 }}>
-                              <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                                  <Avatar sx={{ bgcolor: 'secondary.main' }}>
-                                      {review.reviewer?.name?.charAt(0).toUpperCase() || '?'}
-                                  </Avatar>
-                                  <Box>
-                                      <Typography variant="subtitle1" fontWeight="bold">
-                                          {review.reviewer?.name || 'Unknown User'}
-                                      </Typography>
-                                      <Typography variant="caption" color="text.secondary">
-                                          {format(new Date(review.createdAt), 'MMM d, yyyy')}
-                                          {review.job && ` • Job: ${review.job.title}`}
-                                      </Typography>
-                                  </Box>
-                              </Box>
-                              <Rating value={review.rating} readOnly size="small" />
-                          </Box>
-                          <Typography variant="body1">{review.comment}</Typography>
-                      </Paper>
-                  ))
-              )}
+          <Box>
+            {reviews.length === 0 ? (
+                <Paper elevation={0} sx={{ p: 6, textAlign: 'center', borderRadius: 3, border: '1px solid #e0e0e0' }}>
+                    <Typography variant="h6" color="text.secondary">No reviews yet.</Typography>
+                </Paper>
+            ) : (
+                <Grid container spacing={3}>
+                    {/* Reviews as Seeker */}
+                    <Grid size={{ xs: 12, md: 6 }}>
+                        <Paper elevation={0} sx={{ p: 2, height: '100%', border: '1px solid #e0e0e0', borderRadius: 3 }}>
+                             <Box sx={{ p: 1, pb: 2, borderBottom: '1px solid #eee', mb: 2, position: 'sticky', top: 0, bgcolor: 'background.paper', zIndex: 1 }}>
+                                <Typography variant="h6" fontWeight="bold" sx={{ color: 'primary.main', display: 'flex', alignItems: 'center', gap: 1 }}>
+                                    <WorkIcon /> Reviews as Seeker
+                                </Typography>
+                                <Typography variant="caption" color="text.secondary">
+                                    {reviews.filter(r => r.job?.seekerId === id).length} reviews
+                                </Typography>
+                            </Box>
+                            
+                            <Box sx={{ maxHeight: '600px', overflowY: 'auto', pr: 1 }}>
+                                {reviews.filter(r => r.job?.seekerId === id).length === 0 ? (
+                                    <Box py={4} textAlign="center">
+                                        <Typography color="text.secondary">No reviews received as Seeker.</Typography>
+                                    </Box>
+                                ) : (
+                                    reviews.filter(r => r.job?.seekerId === id).map((review) => (
+                                        <Paper key={review._id} elevation={0} sx={{ p: 2, mb: 2, borderRadius: 2, bgcolor: '#f8f9fa' }}>
+                                            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 1 }}>
+                                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+                                                    <Avatar sx={{ width: 32, height: 32, bgcolor: 'secondary.main', fontSize: '0.9rem' }}>
+                                                        {review.reviewer?.name?.charAt(0).toUpperCase() || '?'}
+                                                    </Avatar>
+                                                    <Box>
+                                                        <Typography variant="subtitle2" fontWeight="bold">
+                                                            {review.reviewer?.name || 'Unknown User'}
+                                                        </Typography>
+                                                        <Typography variant="caption" color="text.secondary" sx={{ display: 'block', lineHeight: 1 }}>
+                                                            {format(new Date(review.createdAt), 'MMM d, yyyy')}
+                                                        </Typography>
+                                                    </Box>
+                                                </Box>
+                                                <Rating value={review.rating} readOnly size="small" />
+                                            </Box>
+                                            <Typography variant="body2" sx={{ mt: 1, fontStyle: 'italic', color: 'text.primary' }}>"{review.comment}"</Typography>
+                                            {review.job && (
+                                                <Typography variant="caption" sx={{ display: 'block', mt: 1, color: 'text.disabled' }}>
+                                                    Job: {review.job.title}
+                                                </Typography>
+                                            )}
+                                            {review.response && (
+                                                <Paper variant="outlined" sx={{ p: 1.5, mt: 1.5, bgcolor: '#ffffff', display: 'flex', gap: 1.5, borderLeft: '3px solid #1976d2' }}>
+                                                    <ReplyIcon color="primary" fontSize="small" />
+                                                    <Box>
+                                                        <Typography variant="caption" fontWeight="bold" display="block">Reply from {profileUser?.name}</Typography>
+                                                        <Typography variant="body2" sx={{ fontSize: '0.85rem' }}>{review.response.message}</Typography>
+                                                        <Typography variant="caption" color="text.secondary" sx={{ fontSize: '0.7rem' }}>{format(new Date(review.response.createdAt), 'MMM d, yyyy')}</Typography>
+                                                    </Box>
+                                                </Paper>
+                                            )}
+                                        </Paper>
+                                    ))
+                                )}
+                            </Box>
+                        </Paper>
+                    </Grid>
+
+                    {/* Reviews as Provider */}
+                    <Grid size={{ xs: 12, md: 6 }}>
+                        <Paper elevation={0} sx={{ p: 2, height: '100%', border: '1px solid #e0e0e0', borderRadius: 3 }}>
+                            <Box sx={{ p: 1, pb: 2, borderBottom: '1px solid #eee', mb: 2, position: 'sticky', top: 0, bgcolor: 'background.paper', zIndex: 1 }}>
+                                <Typography variant="h6" fontWeight="bold" sx={{ color: 'secondary.main', display: 'flex', alignItems: 'center', gap: 1 }}>
+                                    <WorkIcon /> Reviews as Provider
+                                </Typography>
+                                <Typography variant="caption" color="text.secondary">
+                                    {reviews.filter(r => r.job?.providerId === id).length} reviews
+                                </Typography>
+                            </Box>
+
+                            <Box sx={{ maxHeight: '600px', overflowY: 'auto', pr: 1 }}>
+                                {reviews.filter(r => r.job?.providerId === id).length === 0 ? (
+                                    <Box py={4} textAlign="center">
+                                        <Typography color="text.secondary">No reviews received as Provider.</Typography>
+                                    </Box>
+                                ) : (
+                                    reviews.filter(r => r.job?.providerId === id).map((review) => (
+                                        <Paper key={review._id} elevation={0} sx={{ p: 2, mb: 2, borderRadius: 2, bgcolor: '#f8f9fa' }}>
+                                            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 1 }}>
+                                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+                                                    <Avatar sx={{ width: 32, height: 32, bgcolor: 'primary.main', fontSize: '0.9rem' }}>
+                                                        {review.reviewer?.name?.charAt(0).toUpperCase() || '?'}
+                                                    </Avatar>
+                                                    <Box>
+                                                        <Typography variant="subtitle2" fontWeight="bold">
+                                                            {review.reviewer?.name || 'Unknown User'}
+                                                        </Typography>
+                                                        <Typography variant="caption" color="text.secondary" sx={{ display: 'block', lineHeight: 1 }}>
+                                                            {format(new Date(review.createdAt), 'MMM d, yyyy')}
+                                                        </Typography>
+                                                    </Box>
+                                                </Box>
+                                                <Rating value={review.rating} readOnly size="small" />
+                                            </Box>
+                                            <Typography variant="body2" sx={{ mt: 1, fontStyle: 'italic', color: 'text.primary' }}>"{review.comment}"</Typography>
+                                            {review.job && (
+                                                <Typography variant="caption" sx={{ display: 'block', mt: 1, color: 'text.disabled' }}>
+                                                    Job: {review.job.title}
+                                                </Typography>
+                                            )}
+                                        </Paper>
+                                    ))
+                                )}
+                            </Box>
+                        </Paper>
+                    </Grid>
+                </Grid>
+            )}
           </Box>
       )}
     </Container>

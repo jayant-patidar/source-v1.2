@@ -18,8 +18,11 @@ export const createTransaction = async (req: Request, res: Response) => {
 
     await transaction.save();
 
-    // Update Job Payment Status
-    await Job.findByIdAndUpdate(jobId, { paymentStatus: 'paid' });
+    // Update Job Payment Status and Timeline
+    await Job.findByIdAndUpdate(jobId, { 
+      paymentStatus: 'paid',
+      $push: { timeline: { status: 'paid', timestamp: new Date(), actorId: payorId } }
+    });
 
     res.status(201).json(transaction);
   } catch (error) {

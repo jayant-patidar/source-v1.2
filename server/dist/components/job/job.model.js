@@ -78,6 +78,13 @@ const JobSchema = new mongoose_1.Schema({
         default: 'pending',
         enum: ['pending', 'paid', 'failed'],
     },
+    timeline: [
+        {
+            status: { type: String, required: true },
+            timestamp: { type: Date, default: Date.now },
+            actorId: { type: mongoose_1.default.Schema.Types.ObjectId, ref: 'User', required: false },
+        },
+    ],
     type: { type: String, required: false },
     tags: { type: [String], required: false },
     requirements: { type: [String], required: false },

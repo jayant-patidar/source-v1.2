@@ -4,6 +4,7 @@ import { Box, Typography, CircularProgress, Paper, Chip, Stack, Button } from '@
 import axios from 'axios';
 import { format } from 'date-fns';
 import PaymentIcon from '@mui/icons-material/Payment';
+import DescriptionIcon from '@mui/icons-material/Description';
 
 interface Job {
   _id: string;
@@ -91,6 +92,15 @@ const CompletedJobsView = ({ role }: CompletedJobsViewProps) => {
                           sx={{ mt: 0.5 }} 
                         />
                       )}
+                      <Button
+                        variant="text"
+                        size="small"
+                        startIcon={<DescriptionIcon />}
+                        onClick={() => navigate(`/contract/${job._id}`)}
+                        sx={{ display: 'block', ml: 'auto', mt: 1 }}
+                      >
+                        View Contract
+                      </Button>
                   </Box>
               </Box>
             </Paper>

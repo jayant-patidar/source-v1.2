@@ -20,6 +20,7 @@ export interface IJob extends Document {
   category: string;
   status: 'open' | 'accepted' | 'in_progress' | 'completed' | 'canceled' | 'paused' | 'pending_completion';
   paymentStatus: 'pending' | 'paid' | 'failed';
+  timeline: { status: string; timestamp: Date; actorId?: mongoose.Types.ObjectId; details?: string }[];
   type?: string;
   tags?: string[];
   requirements?: string[];
@@ -73,6 +74,13 @@ const JobSchema: Schema = new Schema(
       default: 'pending',
       enum: ['pending', 'paid', 'failed'],
     },
+    timeline: [
+      {
+        status: { type: String, required: true },
+        timestamp: { type: Date, default: Date.now },
+        actorId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: false },
+      },
+    ],
     type: { type: String, required: false },
     tags: { type: [String], required: false },
     requirements: { type: [String], required: false },

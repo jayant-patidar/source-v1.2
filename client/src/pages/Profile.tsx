@@ -15,6 +15,8 @@ import LanguageIcon from '@mui/icons-material/Language';
 import EmailIcon from '@mui/icons-material/Email';
 import PhoneIcon from '@mui/icons-material/Phone';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
+import ReplyIcon from '@mui/icons-material/Reply';
+import { Rating } from '@mui/material';
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -98,6 +100,8 @@ const Profile = () => {
   const [postedJobs, setPostedJobs] = useState<any[]>([]);
   const [myOffers, setMyOffers] = useState<any[]>([]);
   const [workedJobs, setWorkedJobs] = useState<any[]>([]);
+  const [reviews, setReviews] = useState<any[]>([]);
+  const [replyInput, setReplyInput] = useState<{ [key: string]: string }>({}); // Map review ID to reply text
 
   const fetchProfile = async () => {
     try {
@@ -136,6 +140,9 @@ const Profile = () => {
 
       const workedRes = await axios.get('http://localhost:5000/api/jobs/worked', { withCredentials: true });
       setWorkedJobs(workedRes.data);
+
+      const reviewsRes = await axios.get(`http://localhost:5000/api/reviews/${data._id}`, { withCredentials: true });
+      setReviews(reviewsRes.data);
 
     } catch (err: any) {
       setError('Failed to load profile data');
@@ -267,6 +274,25 @@ const Profile = () => {
     }
   };
 
+  const handleReplySubmit = async (reviewId: string) => {
+      const message = replyInput[reviewId];
+      if (!message) return;
+
+      try {
+          console.log(`[DEBUG] handleReplySubmit: Submitting reply for review ${reviewId}, message: ${message}`);
+          const { data } = await axios.post(`http://localhost:5000/api/reviews/${reviewId}/reply`, { message }, { withCredentials: true });
+          console.log(`[DEBUG] handleReplySubmit success, data:`, data);
+
+          // Update local state
+          setReviews(reviews.map(r => r._id === reviewId ? { ...r, response: data.response } : r));
+          setSuccess('Reply posted successfully');
+          setReplyInput({ ...replyInput, [reviewId]: '' });
+      } catch (err: any) {
+          console.error(`[DEBUG] handleReplySubmit error:`, err);
+          setError(err.response?.data?.message || 'Failed to post reply');
+      }
+  };
+
   if (!authUser) return <Container><Typography>Please login to view your profile.</Typography></Container>;
   if (loading && !profileData) return <Container sx={{ display: 'flex', justifyContent: 'center', mt: 10 }}><CircularProgress /></Container>;
 
@@ -341,7 +367,9 @@ const Profile = () => {
             <Tab label="Contact & Social" {...a11yProps(3)} />
             <Tab label="Security" {...a11yProps(4)} />
             <Tab label="My Activity" {...a11yProps(5)} />
+            <Tab label="Reviews" {...a11yProps(6)} />
           </Tabs>
+
           {success && <Alert severity="success" sx={{ m: 3 }}>{success}</Alert>}
           {error && <Alert severity="error" sx={{ m: 3 }}>{error}</Alert>}
 
@@ -839,6 +867,181 @@ const Profile = () => {
                     </Grid>
                 )}
             </Box>
+          </CustomTabPanel>
+
+          {/* Reviews Tab */}
+          <CustomTabPanel value={tabValue} index={6}>
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
+               <Typography variant="h5" fontWeight="bold">Reviews Received</Typography>
+               <Box>
+                   <Typography variant="caption" color="text.secondary">Seeker Rating: <strong>{Number(user.seekerRating || 0).toFixed(1)}</strong></Typography>
+                   <Typography variant="caption" color="text.secondary" sx={{ ml: 2 }}>Provider Rating: <strong>{Number(user.providerRating || 0).toFixed(1)}</strong></Typography>
+               </Box>
+            </Box>
+
+
+            {reviews.length === 0 ? (
+                <Paper variant="outlined" sx={{ p: 4, textAlign: 'center' }}>
+                    <Typography color="text.secondary">No reviews yet.</Typography>
+                </Paper>
+            ) : (
+                <Grid container spacing={3}>
+                    {/* Seeker Reviews Section */}
+                    <Grid size={{ xs: 12, md: 6 }}>
+                        <Paper elevation={0} sx={{ p: 2, height: '100%', border: '1px solid #e0e0e0', borderRadius: 2 }}>
+                             <Box sx={{ p: 1, borderBottom: '1px solid #eee', mb: 2, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                 <Typography variant="h6" fontWeight="bold" sx={{ display: 'flex', alignItems: 'center', gap: 1, color: 'primary.main' }}>
+                                     <WorkIcon /> Reviews as Seeker
+                                 </Typography>
+                                 <Chip label={`${reviews.filter(r => r.job?.seekerId === user._id).length}`} size="small" />
+                             </Box>
+                             
+                             <Box sx={{ maxHeight: '600px', overflowY: 'auto', pr: 1 }}>
+                                 {reviews.filter(r => r.job?.seekerId === user._id).length === 0 ? (
+                                     <Box py={4} textAlign="center">
+                                         <Typography color="text.secondary">No reviews received as Seeker.</Typography>
+                                     </Box>
+                                 ) : (
+                                     <Box display="flex" flexDirection="column" gap={2}>
+                                        {reviews.filter(r => r.job?.seekerId === user._id).map((review) => (
+                                            <Paper key={review._id} variant="outlined" sx={{ p: 2, bgcolor: '#f9f9f9' }}>
+                                                {/* Review Content */}
+                                                <Box display="flex" justifyContent="space-between" alignItems="flex-start">
+                                                    <Box display="flex" gap={1.5}>
+                                                        <Avatar src={review.reviewer.avatar} sx={{ width: 32, height: 32 }}>{review.reviewer.name.charAt(0)}</Avatar>
+                                                        <Box>
+                                                            <Typography variant="subtitle2" fontWeight="bold">{review.reviewer.name}</Typography>
+                                                            <Box display="flex" alignItems="center" gap={1} flexWrap="wrap">
+                                                                <Rating value={review.rating} readOnly size="small" />
+                                                                <Typography variant="caption" color="text.secondary">{format(new Date(review.createdAt), 'MMM d, yyyy')}</Typography>
+                                                            </Box>
+                                                        </Box>
+                                                    </Box>
+                                                </Box>
+                                                <Typography variant="body2" sx={{ mt: 1, mb: 1, fontStyle: 'italic' }}>"{review.comment}"</Typography>
+                                                <Typography variant="caption" color="text.secondary" display="block">Job: {review.job?.title}</Typography>
+                                                
+                                                {/* Reply Logic */}
+                                                {review.response ? (
+                                                    <Paper variant="outlined" sx={{ p: 1.5, mt: 1, bgcolor: '#ffffff', display: 'flex', gap: 1.5, borderLeft: '3px solid #1976d2' }}>
+                                                        <ReplyIcon color="primary" fontSize="small" />
+                                                        <Box>
+                                                            <Typography variant="caption" fontWeight="bold" display="block">Your Reply</Typography>
+                                                            <Typography variant="body2" sx={{ fontSize: '0.85rem' }}>{review.response.message}</Typography>
+                                                            <Typography variant="caption" color="text.secondary" sx={{ fontSize: '0.7rem' }}>{format(new Date(review.response.createdAt), 'MMM d, yyyy')}</Typography>
+                                                        </Box>
+                                                    </Paper>
+                                                ) : (
+                                                    <Box mt={1.5}>
+                                                        <TextField 
+                                                            fullWidth 
+                                                            size="small" 
+                                                            placeholder="Msg..." 
+                                                            value={replyInput[review._id] || ''}
+                                                            onChange={(e) => setReplyInput({ ...replyInput, [review._id]: e.target.value })}
+                                                            InputProps={{
+                                                                sx: { fontSize: '0.85rem' },
+                                                                endAdornment: (
+                                                                    <Button 
+                                                                        size="small" 
+                                                                        onClick={() => handleReplySubmit(review._id)}
+                                                                        disabled={!replyInput[review._id]}
+                                                                        sx={{ minWidth: 60, p: 0 }}
+                                                                    >
+                                                                        Reply
+                                                                    </Button>
+                                                                )
+                                                            }}
+                                                        />
+                                                    </Box>
+                                                )}
+                                            </Paper>
+                                        ))}
+                                     </Box>
+                                 )}
+                             </Box>
+                        </Paper>
+                    </Grid>
+
+                    {/* Provider Reviews Section */}
+                    <Grid size={{ xs: 12, md: 6 }}>
+                        <Paper elevation={0} sx={{ p: 2, height: '100%', border: '1px solid #e0e0e0', borderRadius: 2 }}>
+                             <Box sx={{ p: 1, borderBottom: '1px solid #eee', mb: 2, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                 <Typography variant="h6" fontWeight="bold" sx={{ display: 'flex', alignItems: 'center', gap: 1, color: 'secondary.main' }}>
+                                     <WorkIcon /> Reviews as Provider
+                                 </Typography>
+                                 <Chip label={`${reviews.filter(r => r.job?.providerId === user._id).length}`} size="small" />
+                             </Box>
+
+                             <Box sx={{ maxHeight: '600px', overflowY: 'auto', pr: 1 }}>
+                                 {reviews.filter(r => r.job?.providerId === user._id).length === 0 ? (
+                                     <Box py={4} textAlign="center">
+                                         <Typography color="text.secondary">No reviews received as Provider.</Typography>
+                                     </Box>
+                                 ) : (
+                                     <Box display="flex" flexDirection="column" gap={2}>
+                                        {reviews.filter(r => r.job?.providerId === user._id).map((review) => (
+                                            <Paper key={review._id} variant="outlined" sx={{ p: 2, bgcolor: '#f9f9f9' }}>
+                                                {/* Review Content */}
+                                                <Box display="flex" justifyContent="space-between" alignItems="flex-start">
+                                                    <Box display="flex" gap={1.5}>
+                                                        <Avatar src={review.reviewer.avatar} sx={{ width: 32, height: 32 }}>{review.reviewer.name.charAt(0)}</Avatar>
+                                                        <Box>
+                                                            <Typography variant="subtitle2" fontWeight="bold">{review.reviewer.name}</Typography>
+                                                            <Box display="flex" alignItems="center" gap={1} flexWrap="wrap">
+                                                                <Rating value={review.rating} readOnly size="small" />
+                                                                <Typography variant="caption" color="text.secondary">{format(new Date(review.createdAt), 'MMM d, yyyy')}</Typography>
+                                                            </Box>
+                                                        </Box>
+                                                    </Box>
+                                                </Box>
+                                                <Typography variant="body2" sx={{ mt: 1, mb: 1, fontStyle: 'italic' }}>"{review.comment}"</Typography>
+                                                <Typography variant="caption" color="text.secondary" display="block">Job: {review.job?.title}</Typography>
+                                                
+                                                {/* Reply Logic */}
+                                                {review.response ? (
+                                                    <Paper variant="outlined" sx={{ p: 1.5, mt: 1, bgcolor: '#ffffff', display: 'flex', gap: 1.5, borderLeft: '3px solid #1976d2' }}>
+                                                        <ReplyIcon color="primary" fontSize="small" />
+                                                        <Box>
+                                                            <Typography variant="caption" fontWeight="bold" display="block">Your Reply</Typography>
+                                                            <Typography variant="body2" sx={{ fontSize: '0.85rem' }}>{review.response.message}</Typography>
+                                                            <Typography variant="caption" color="text.secondary" sx={{ fontSize: '0.7rem' }}>{format(new Date(review.response.createdAt), 'MMM d, yyyy')}</Typography>
+                                                        </Box>
+                                                    </Paper>
+                                                ) : (
+                                                    <Box mt={1.5}>
+                                                        <TextField 
+                                                            fullWidth 
+                                                            size="small" 
+                                                            placeholder="Msg..." 
+                                                            value={replyInput[review._id] || ''}
+                                                            onChange={(e) => setReplyInput({ ...replyInput, [review._id]: e.target.value })}
+                                                            InputProps={{
+                                                                sx: { fontSize: '0.85rem' },
+                                                                endAdornment: (
+                                                                    <Button 
+                                                                        size="small" 
+                                                                        onClick={() => handleReplySubmit(review._id)}
+                                                                        disabled={!replyInput[review._id]}
+                                                                        sx={{ minWidth: 60, p: 0 }}
+                                                                    >
+                                                                        Reply
+                                                                    </Button>
+                                                                )
+                                                            }}
+                                                        />
+                                                    </Box>
+                                                )}
+                                            </Paper>
+                                        ))}
+                                     </Box>
+                                 )}
+                             </Box>
+                        </Paper>
+                    </Grid>
+                </Grid>
+            )}
+
           </CustomTabPanel>
         </Box>
       </Paper>

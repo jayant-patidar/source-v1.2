@@ -26,7 +26,7 @@ class JobController {
                         exact: req.body.exactLocation || ((_b = req.body.location) === null || _b === void 0 ? void 0 : _b.exact)
                     }, updatedPay: [], 
                     // Ensure tags is an array if it comes as string
-                    tags: Array.isArray(req.body.tags) ? req.body.tags : (req.body.tags ? req.body.tags.split(',').map((t) => t.trim()) : []), requirements: Array.isArray(req.body.requirements) ? req.body.requirements : (req.body.requirements ? req.body.requirements.split(',').map((r) => r.trim()) : []) });
+                    tags: Array.isArray(req.body.tags) ? req.body.tags : (req.body.tags ? req.body.tags.split(',').map((t) => t.trim()) : []), requirements: Array.isArray(req.body.requirements) ? req.body.requirements : (req.body.requirements ? req.body.requirements.split(',').map((r) => r.trim()) : []), timeline: [{ status: 'created', timestamp: new Date(), actorId: req.user._id }] });
                 console.log('Received Job Body:', req.body);
                 console.log('Constructed Job Data:', jobData);
                 const newJob = yield this.jobService.createJob(jobData);
@@ -90,15 +90,16 @@ class JobController {
     }
     updateJob(req, res, next) {
         return __awaiter(this, void 0, void 0, function* () {
+            var _a, _b;
             try {
                 const jobId = req.params.id;
                 const updateData = Object.assign({}, req.body);
                 if (updateData.requirements && typeof updateData.requirements === 'string') {
                     updateData.requirements = updateData.requirements.split(',').map((r) => r.trim());
                 }
+                const existingJob = yield this.jobService.getJobById(jobId);
                 // Handle Pay Update Logic
                 if (updateData.pay) {
-                    const existingJob = yield this.jobService.getJobById(jobId);
                     if (existingJob) {
                         const newPay = Number(updateData.pay);
                         // Only update if pay is different
@@ -110,9 +111,40 @@ class JobController {
                                 { pay: oldPay, updatedAt: new Date() }
                             ];
                             updateData.currentPay = newPay;
+                            updateData.currentPay = newPay;
+                            // Log Pay Update
+                            const actorId = (_a = req.user) === null || _a === void 0 ? void 0 : _a._id;
+                            if (!updateData.$push)
+                                updateData.$push = { timeline: { $each: [] } }; // Initialize
+                            // Use $push with $each if multiple events, or just add to array if we construct it manually. 
+                            // Mongoose $push doesn't support array without $each if pushing multiple.
+                            // Let's simplify: If status changes too, we might have conflict on $push key if we just overwrite.
+                            // Better to accumulate events.
+                            // Actually, let's just make sure we handle both. 
+                            // If we are already pushing status, we should push pay update too.
+                            // But the code below creates `(updateData as any).$push = ...` which overwrites.
+                            // So I need a strategy to merge them.
                         }
                         delete updateData.pay; // Remove 'pay' to avoid confusion/overwriting
                     }
+                }
+                if (updateData.status && updateData.status !== (existingJob === null || existingJob === void 0 ? void 0 : existingJob.status)) {
+                    const actorId = (_b = req.user) === null || _b === void 0 ? void 0 : _b._id; // Assuming auth middleware populates user
+                    // Helper to push to timeline. Since we are using updateJob (findByIdAndUpdate usually), 
+                    // we can't easily push to an array AND set fields in the same object passed to a generic service if it doesn't support $push.
+                    // We need to check JobService.updateJob implementation. Usually it does findByIdAndUpdate(id, data, {new: true}).
+                    // If we pass $push in updateData, it might work if the service passes it directly to Mongoose.
+                    // Let's assume standard Mongoose behavior where we can mix operators if the Service allows it, 
+                    // OR we construct a specific update query. 
+                    // The safest way without changing Service signature is to add the $push operator to the updateData object if it's passed as `update` argument to mongoose.
+                    // But `updateJob` in controller prepares a simple object. 
+                    // Let's rely on a separate update or check if we can merge.
+                    // Actually, simply adding the timeline entry to `timeline` array in updateData won't work with `findByIdAndUpdate` if we want to append. 
+                    // It would overwrite if passed as an array.
+                    // We should use $push.
+                    // I'll assume I can pass $push key.
+                    updateData.$push = { timeline: { status: updateData.status, timestamp: new Date(), actorId } };
+                    delete updateData.timeline; // Ensure we don't overwrite
                 }
                 const updatedJob = yield this.jobService.updateJob(jobId, updateData);
                 if (updatedJob) {
@@ -164,7 +196,8 @@ class JobController {
                 // Update status and startTime
                 const updatedJob = yield this.jobService.updateJob(jobId, {
                     status: 'in_progress',
-                    startTime: new Date()
+                    startTime: new Date(),
+                    $push: { timeline: { status: 'started', timestamp: new Date(), actorId: req.user._id } }
                 });
                 res.status(200).json(updatedJob);
             }

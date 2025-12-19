@@ -80,7 +80,8 @@ class NegotiationService {
                 // Update Job status
                 const updatedJob = yield this.jobDAL.updateJob(negotiation.job.toString(), {
                     status: 'accepted',
-                    providerId: new mongoose_1.default.Types.ObjectId(negotiation.provider.toString()) // Assign the applicant (Provider)
+                    providerId: new mongoose_1.default.Types.ObjectId(negotiation.provider.toString()), // Assign the applicant (Provider)
+                    $push: { timeline: { status: 'accepted', timestamp: new Date(), actorId: userId } }
                 });
                 console.log('Job Updated Result:', updatedJob);
             }

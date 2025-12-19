@@ -22,7 +22,8 @@ class JobController {
         updatedPay: [], // Initialize empty array
         // Ensure tags is an array if it comes as string
         tags: Array.isArray(req.body.tags) ? req.body.tags : (req.body.tags ? req.body.tags.split(',').map((t: string) => t.trim()) : []),
-        requirements: Array.isArray(req.body.requirements) ? req.body.requirements : (req.body.requirements ? req.body.requirements.split(',').map((r: string) => r.trim()) : [])
+        requirements: Array.isArray(req.body.requirements) ? req.body.requirements : (req.body.requirements ? req.body.requirements.split(',').map((r: string) => r.trim()) : []),
+        timeline: [{ status: 'created', timestamp: new Date(), actorId: req.user._id }]
       };
       console.log('Received Job Body:', req.body);
       console.log('Constructed Job Data:', jobData);
@@ -84,9 +85,12 @@ class JobController {
               updateData.requirements = updateData.requirements.split(',').map((r: string) => r.trim());
           }
 
+          const existingJob = await this.jobService.getJobById(jobId);
+          const actorId = (req as any).user?._id;
+          const timelineEvents: any[] = [];
+          
           // Handle Pay Update Logic
           if (updateData.pay) {
-              const existingJob = await this.jobService.getJobById(jobId);
               if (existingJob) {
                   const newPay = Number(updateData.pay);
                   // Only update if pay is different
@@ -98,12 +102,34 @@ class JobController {
                           { pay: oldPay, updatedAt: new Date() }
                       ];
                       updateData.currentPay = newPay;
+                      
+                      timelineEvents.push({ 
+                          status: 'pay_updated', 
+                          timestamp: new Date(), 
+                          actorId,
+                          details: `Pay updated to $${newPay}` 
+                      });
                   }
                   delete updateData.pay; // Remove 'pay' to avoid confusion/overwriting
               }
           }
 
-          const updatedJob = await this.jobService.updateJob(jobId, updateData);
+          // Detect Status Change and Update Timeline
+          if (updateData.status && updateData.status !== existingJob?.status) {
+               timelineEvents.push({ 
+                   status: updateData.status, 
+                   timestamp: new Date(), 
+                   actorId 
+               });
+          }
+
+          // If there are timeline events, add them to the update
+          if (timelineEvents.length > 0) {
+              (updateData as any).$push = { timeline: { $each: timelineEvents } };
+              delete updateData.timeline; // Ensure we don't overwrite if passed in body
+          }
+
+          const updatedJob = await this.jobService.updateJob(jobId, updateData as any);
           if (updatedJob) {
               res.status(200).json(updatedJob);
           } else {
@@ -150,8 +176,9 @@ class JobController {
       // Update status and startTime
       const updatedJob = await this.jobService.updateJob(jobId, {
         status: 'in_progress',
-        startTime: new Date()
-      });
+        startTime: new Date(),
+        $push: { timeline: { status: 'started', timestamp: new Date(), actorId: (req as any).user._id } }
+      } as any);
 
       res.status(200).json(updatedJob);
     } catch (error) {

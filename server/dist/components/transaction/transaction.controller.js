@@ -28,8 +28,11 @@ const createTransaction = (req, res) => __awaiter(void 0, void 0, void 0, functi
             metadata
         });
         yield transaction.save();
-        // Update Job Payment Status
-        yield job_model_1.default.findByIdAndUpdate(jobId, { paymentStatus: 'paid' });
+        // Update Job Payment Status and Timeline
+        yield job_model_1.default.findByIdAndUpdate(jobId, {
+            paymentStatus: 'paid',
+            $push: { timeline: { status: 'paid', timestamp: new Date(), actorId: payorId } }
+        });
         res.status(201).json(transaction);
     }
     catch (error) {

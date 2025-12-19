@@ -7,6 +7,7 @@ import Home from './pages/Home';
 import CreateJob from './pages/CreateJob';
 import JobDetails from './pages/JobDetails';
 import PaymentPage from './pages/payment/PaymentPage';
+import ContractView from './pages/contract/ContractView';
 import Profile from './pages/Profile';
 import PublicProfile from './pages/PublicProfile';
 import ActivityPage from './pages/ActivityPage';
@@ -42,6 +43,7 @@ function App() {
         <Route path="/profile/:id" element={<PublicProfile />} />
         <Route path="/activity" element={user ? <ActivityPage /> : <Navigate to="/login" />} />
         <Route path="/payment/:id" element={user ? <PaymentPage /> : <Navigate to="/login" />} />
+        <Route path="/contract/:id" element={user ? <ContractView /> : <Navigate to="/login" />} />
       </Routes>
     </Layout>
   );

@@ -34,6 +34,10 @@ class NegotiationController {
                         negotiation: negotiation._id,
                         message: `New offer of $${negotiation.amount} received for ${job.title}`
                     });
+                    // Log to Job Timeline
+                    yield job_model_1.default.findByIdAndUpdate(job._id, {
+                        $push: { timeline: { status: 'offer_received', timestamp: new Date(), actorId: req.user._id, details: `Offer of $${negotiation.amount}` } }
+                    });
                 }
                 res.status(201).json(negotiation);
             }
@@ -104,6 +108,10 @@ class NegotiationController {
                             job: job._id,
                             negotiation: negotiation._id,
                             message: `Your offer for ${job.title} was declined.`
+                        });
+                        // Log Timeline
+                        yield job_model_1.default.findByIdAndUpdate(job._id, {
+                            $push: { timeline: { status: 'offer_rejected', timestamp: new Date(), actorId: req.user._id } }
                         });
                     }
                 }
