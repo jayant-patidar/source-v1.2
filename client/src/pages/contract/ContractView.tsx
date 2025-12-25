@@ -13,7 +13,7 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import StarIcon from '@mui/icons-material/Star';
 import RateReviewIcon from '@mui/icons-material/RateReview';
 import { useAuthStore } from '../../store/authStore';
-import ReviewModal from '../../components/reviews/ReviewModal';
+import ReviewModal from '@/components/reviews/ReviewModal';
 import { Rating } from '@mui/material';
 import { useToastStore } from '../../store/toastStore';
 
@@ -155,21 +155,24 @@ const ContractView = () => {
       if (!job || !user) return;
       setSubmittingReview(true);
       try {
-          const { data } = await axios.post('http://localhost:5000/api/reviews', {
+          await axios.post('http://localhost:5000/api/reviews', {
               job: job._id,
               rating,
               comment
           }, { withCredentials: true });
           
-          setReviews([data, ...reviews]); // Prepend new review (will need to reload because populated fields missing in response usually? actually create returns the object, but populated fields might be missing. Better to just reload or construct partial.)
-          // Actually createReview returns the review object. Let's fully refresh or optimistic update.
-          // For simplicity, let's just push and maybe missing avatar/name won't break if we handle safe checks, but better to refresh.
-          // Let's reload the reviews.
+
+          // Reload reviews to get full populated data
           const reviewRes = await axios.get(`http://localhost:5000/api/reviews/job/${id}`, { withCredentials: true });
           setReviews(reviewRes.data);
 
           showToast('Review submitted successfully!', 'success');
           setReviewModalOpen(false);
+          
+          // No longer redirecting, staying on page to see review
+          // const targetView = user._id === job.seekerId._id ? 'seeker-completed-jobs' : 'completed-jobs';
+          // navigate('/activity', { state: { view: targetView } });
+
       } catch (error: any) {
           showToast(error.response?.data?.message || 'Failed to submit review', 'error');
       } finally {

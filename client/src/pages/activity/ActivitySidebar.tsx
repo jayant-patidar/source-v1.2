@@ -30,11 +30,6 @@ interface ActivitySidebarProps {
 }
 
 const ActivitySidebar = ({ currentView, onViewChange }: ActivitySidebarProps) => {
-  const [expanded, setExpanded] = useState<string | false>('My Requests (Seeker)');
-
-  const handleChange = (panel: string) => (_event: React.SyntheticEvent, isExpanded: boolean) => {
-    setExpanded(isExpanded ? panel : false);
-  };
   
   const menuGroups = [
     {
@@ -74,6 +69,24 @@ const ActivitySidebar = ({ currentView, onViewChange }: ActivitySidebarProps) =>
       ]
     }
   ];
+
+  const [expanded, setExpanded] = useState<string | false>(() => {
+    // Find the group that contains the current view
+    const activeGroup = menuGroups.find(group => 
+      group.items.some(item => item.id === currentView)
+    );
+    // If found and it's an accordion, return title. Otherwise default to Seeker or false.
+    if (activeGroup && activeGroup.type === 'accordion') {
+      return activeGroup.title;
+    }
+    // Fallback: if user is on a static page defined above, we might want to close accordions or keep default
+    // If strict default is needed:
+    return 'My Requests (Seeker)'; 
+  });
+
+  const handleChange = (panel: string) => (_event: React.SyntheticEvent, isExpanded: boolean) => {
+    setExpanded(isExpanded ? panel : false);
+  };
 
   return (
     <Paper 

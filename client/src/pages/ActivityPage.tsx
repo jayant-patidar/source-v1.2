@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { Box, Typography } from '@mui/material';
 import ActivityLayout from './activity/ActivityLayout';
 import ReceivedOffersView from './activity/ReceivedOffersView';
@@ -12,8 +11,15 @@ import SeekerOngoingJobsView from './activity/SeekerOngoingJobsView';
 import ProviderOngoingJobsView from './activity/ProviderOngoingJobsView';
 import RejectedOffersView from './activity/RejectedOffersView';
 
+import { useSearchParams } from 'react-router-dom';
+
 const ActivityPage = () => {
-  const [currentView, setCurrentView] = useState('received-offers');
+  const [searchParams, setSearchParams] = useSearchParams();
+  const currentView = searchParams.get('view') || 'received-offers';
+
+  const handleViewChange = (newView: string) => {
+    setSearchParams({ view: newView });
+  };
 
   const renderView = () => {
     switch (currentView) {
@@ -52,7 +58,7 @@ const ActivityPage = () => {
   };
 
   return (
-    <ActivityLayout currentView={currentView} onViewChange={setCurrentView}>
+    <ActivityLayout currentView={currentView} onViewChange={handleViewChange}>
       {renderView()}
     </ActivityLayout>
   );
