@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Box, Typography, Paper, Chip, Avatar, CircularProgress } from '@mui/material';
 import { Link } from 'react-router-dom';
 import { formatDistanceToNow } from 'date-fns';
-import axios from 'axios';
+import { offerService } from '../../services/offer.service';
 
 interface Negotiation {
   _id: string;
@@ -29,13 +29,15 @@ interface Negotiation {
   createdAt: string;
 }
 
+
+
 const RejectedOffersView = () => {
   const [rejectedOffers, setRejectedOffers] = useState<Negotiation[]>([]);
   const [loading, setLoading] = useState(true);
 
   const fetchOffers = async () => {
     try {
-      const { data } = await axios.get('http://localhost:5000/api/negotiations/received', { withCredentials: true });
+      const data = await offerService.getReceivedOffers();
       setRejectedOffers(data.filter((offer: Negotiation) => offer.status === 'rejected'));
     } catch (error) {
       console.error('Error fetching rejected offers:', error);

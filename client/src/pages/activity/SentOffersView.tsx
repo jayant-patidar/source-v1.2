@@ -2,7 +2,11 @@ import { useState, useEffect } from 'react';
 import { Box, Typography, Paper, Chip, CircularProgress } from '@mui/material';
 import { Link } from 'react-router-dom';
 import { formatDistanceToNow } from 'date-fns';
-import axios from 'axios';
+
+
+import { offerService } from '../../services/offer.service';
+
+// Interface Negotiation is already defined nicely in this file, I will keep it or move it to models if I was stricter, but for now I'll just refactor the logic.
 
 interface Negotiation {
   _id: string;
@@ -36,7 +40,7 @@ const SentOffersView = () => {
   useEffect(() => {
     const fetchOffers = async () => {
       try {
-        const { data } = await axios.get('http://localhost:5000/api/negotiations/my-offers', { withCredentials: true });
+        const data = await offerService.getSentOffers();
         setSentOffers(data);
       } catch (error) {
         console.error('Error fetching sent offers:', error);

@@ -1,7 +1,9 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Box, Typography, Paper, Grid, TextField, Button, Radio, RadioGroup, FormControlLabel, FormControl, Divider, CircularProgress } from '@mui/material';
-import axios from 'axios';
+import { jobService } from '../../services/job.service';
+import { transactionService } from '../../services/transaction.service';
+
 import { useToastStore } from '../../store/toastStore';
 import CreditCardIcon from '@mui/icons-material/CreditCard';
 import AccountBalanceIcon from '@mui/icons-material/AccountBalance';
@@ -13,7 +15,7 @@ interface Job {
   originalPay: number;
   currentPay?: number;
   providerId?: { name: string; _id: string };
-  seekerId: string;
+  seekerId: string | { _id: string };
 }
 
 const PaymentPage = () => {
@@ -28,7 +30,8 @@ const PaymentPage = () => {
   useEffect(() => {
     const fetchJob = async () => {
       try {
-        const { data } = await axios.get(`http://localhost:5000/api/jobs/${id}`, { withCredentials: true });
+        if (!id) return;
+        const data = await jobService.getJob(id);
         setJob(data);
       } catch (error) {
         showToast('Failed to load job details', 'error');
@@ -57,10 +60,10 @@ const PaymentPage = () => {
         }
       };
 
-      await axios.post('http://localhost:5000/api/transactions', payload, { withCredentials: true });
+      await transactionService.createTransaction(payload);
       showToast('Payment successful!', 'success');
       navigate('/activity');
-    } catch (error) {
+    } catch (error: any) {
       console.error(error);
       showToast('Payment failed. Please try again.', 'error');
     } finally {

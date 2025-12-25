@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import axios from 'axios';
+import { jobService } from '../services/job.service';
 
 interface Job {
   _id: string;
@@ -37,49 +37,45 @@ interface JobState {
   createJob: (jobData: any) => Promise<void>;
 }
 
-const API_URL = 'http://localhost:5000/api/jobs';
-const api = axios.create({ baseURL: API_URL, withCredentials: true });
-
 export const useJobStore = create<JobState>((set) => ({
   jobs: [],
   recentJobs: [],
   recommendedJobs: [],
   isLoading: false,
   error: null,
+  
   fetchJobs: async (filters = {}) => {
     set({ isLoading: true, error: null });
     try {
-      // Clean up filters (remove empty/null values)
-      const params = Object.fromEntries(
-        Object.entries(filters).filter(([_, v]) => v != null && v !== '')
-      );
-      const { data } = await api.get('/', { params });
+      const data = await jobService.getJobs(filters);
       set({ jobs: Array.isArray(data) ? data : [], isLoading: false });
     } catch (error: any) {
       set({ error: error.message, isLoading: false, jobs: [] });
     }
   },
+
   fetchRecentJobs: async () => {
     try {
-      const { data } = await api.get('/', { params: { limit: 5, sortBy: 'newest' } });
+      const data = await jobService.getRecentJobs();
       set({ recentJobs: Array.isArray(data) ? data : [] });
     } catch (error: any) {
       console.error('Failed to fetch recent jobs:', error);
     }
   },
+
   fetchRecommendedJobs: async () => {
     try {
-      // For now, just fetch 5 random/latest jobs. In real app, this would use user preferences.
-      const { data } = await api.get('/', { params: { limit: 5 } });
+      const data = await jobService.getRecommendedJobs();
       set({ recommendedJobs: Array.isArray(data) ? data : [] });
     } catch (error: any) {
       console.error('Failed to fetch recommended jobs:', error);
     }
   },
+
   createJob: async (jobData) => {
     set({ isLoading: true, error: null });
     try {
-      await api.post('/', jobData);
+      await jobService.createJob(jobData);
       set({ isLoading: false });
     } catch (error: any) {
       set({ error: error.message, isLoading: false });

@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { Container, Typography, Box, Button, TextField, Paper, Divider, Chip, CircularProgress, Avatar, Dialog, DialogTitle, DialogContent, DialogActions, Grid, Alert } from '@mui/material';
-import axios from 'axios';
+import { offerService } from '../services/offer.service';
+import { jobService } from '../services/job.service';
 import { useAuthStore } from '../store/authStore';
 import { useToastStore } from '../store/toastStore';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
@@ -34,7 +35,7 @@ const JobDetails = () => {
 
   const handleSave = async () => {
       try {
-          await axios.post(`http://localhost:5000/api/users/saved/${id}`, {}, { withCredentials: true });
+          await jobService.toggleSaveJob(id!);
           setIsSaved(!isSaved);
           showToast(isSaved ? "Job Unsaved" : "Job Saved", 'success');
       } catch (error) {
@@ -46,7 +47,8 @@ const JobDetails = () => {
   useEffect(() => {
     const fetchJob = async () => {
       try {
-        const { data } = await axios.get(`http://localhost:5000/api/jobs/${id}`, { withCredentials: true });
+        if (!id) return;
+        const data = await jobService.getJob(id);
         console.log('JobDetails API Fetch Result:', data);
         setJob(data);
         setLoading(false);
@@ -62,9 +64,12 @@ const JobDetails = () => {
     fetchJob();
   }, [id, user]);
 
+
+// ...
+
   const fetchNegotiations = async () => {
       try {
-          const { data } = await axios.get(`http://localhost:5000/api/negotiations/${id}`, { withCredentials: true });
+          const data = await offerService.getOffersByJob(id!);
           setNegotiations(data);
       } catch (err) {
           console.error(err);
@@ -73,11 +78,11 @@ const JobDetails = () => {
 
   const handleNegotiate = async () => {
       try {
-          await axios.post('http://localhost:5000/api/negotiations', {
-              jobId: id,
+          await offerService.createOffer({
+              jobId: id!,
               amount: Number(negotiationAmount),
               message
-          }, { withCredentials: true });
+          });
           showToast('Offer sent!', 'success');
           setNegotiationAmount('');
           setMessage('');
@@ -89,7 +94,7 @@ const JobDetails = () => {
 
   const handleAccept = async (negotiationId: string) => {
       try {
-          await axios.put(`http://localhost:5000/api/negotiations/${negotiationId}`, { status: 'accepted' }, { withCredentials: true });
+          await offerService.updateOfferStatus(negotiationId, 'accepted');
           fetchNegotiations();
           setJob({ ...job, status: 'assigned' });
           showToast('Offer accepted', 'success');
@@ -100,7 +105,7 @@ const JobDetails = () => {
 
   const handleReject = async (negotiationId: string) => {
       try {
-          await axios.put(`http://localhost:5000/api/negotiations/${negotiationId}`, { status: 'rejected' }, { withCredentials: true });
+          await offerService.updateOfferStatus(negotiationId, 'rejected');
           fetchNegotiations();
           showToast('Offer rejected', 'info');
       } catch (err) {

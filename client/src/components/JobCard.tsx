@@ -13,9 +13,12 @@ import BookmarkIcon from '@mui/icons-material/Bookmark';
 import { Link } from 'react-router-dom';
 import { format } from 'date-fns';
 import { useState } from 'react';
-import axios from 'axios';
+import { offerService } from '../services/offer.service';
+
+import { jobService } from '../services/job.service';
 
 const JobCard = ({ job }: { job: any }) => {
+  // ... (state hooks)
   const [open, setOpen] = useState(false);
   const [offerAmount, setOfferAmount] = useState('');
   const [message, setMessage] = useState('');
@@ -28,7 +31,7 @@ const JobCard = ({ job }: { job: any }) => {
 
   const handleSave = async () => {
     try {
-      await axios.post(`http://localhost:5000/api/users/saved/${job._id}`, {}, { withCredentials: true });
+      await jobService.toggleSaveJob(job._id);
       setIsSaved(!isSaved);
       setSnackbarOpen(true);
     } catch (error) {
@@ -54,11 +57,11 @@ const JobCard = ({ job }: { job: any }) => {
 
   const handleSend = async () => {
     try {
-      await axios.post('http://localhost:5000/api/negotiations', {
+      await offerService.createOffer({
         jobId: job._id,
         amount: Number(offerAmount),
         message
-      }, { withCredentials: true });
+      });
       alert('Notification sent successfully!');
       handleClose();
     } catch (error) {

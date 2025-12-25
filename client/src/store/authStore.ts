@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import axios from 'axios';
+import { authService } from '../services/auth.service';
 
 interface User {
   _id: string;
@@ -45,35 +45,6 @@ interface AuthState {
   checkAuth: () => Promise<void>;
 }
 
-const API_URL = 'http://localhost:5000/api/users';
-
-const api = axios.create({
-  baseURL: API_URL,
-  withCredentials: true,
-  timeout: 10000,
-});
-
-api.interceptors.response.use(
-  (response) => response,
-  async (error) => {
-    const originalRequest = error.config;
-
-    if (error.response?.status === 401 && !originalRequest._retry) {
-      originalRequest._retry = true;
-
-      try {
-        await api.post('/refresh');
-        return api(originalRequest);
-      } catch (refreshError) {
-        useAuthStore.getState().logout();
-        return Promise.reject(refreshError);
-      }
-    }
-
-    return Promise.reject(error);
-  }
-);
-
 export const useAuthStore = create<AuthState>((set) => ({
   user: null,
   isLoading: false,
@@ -82,8 +53,8 @@ export const useAuthStore = create<AuthState>((set) => ({
 
   checkAuth: async () => {
     try {
-      const { data } = await api.get('/profile');
-      set({ user: data, isCheckingAuth: false });
+      const user = await authService.getProfile();
+      set({ user, isCheckingAuth: false });
     } catch (error) {
       set({ user: null, isCheckingAuth: false });
     }
@@ -92,8 +63,8 @@ export const useAuthStore = create<AuthState>((set) => ({
   login: async (credentials) => {
     set({ isLoading: true, error: null });
     try {
-      const { data } = await api.post('/login', credentials);
-      set({ user: data, isLoading: false });
+      const user = await authService.login(credentials);
+      set({ user, isLoading: false });
     } catch (error: any) {
       set({ error: error.response?.data?.message || 'Login failed', isLoading: false });
       throw error;
@@ -103,8 +74,8 @@ export const useAuthStore = create<AuthState>((set) => ({
   register: async (userData) => {
     set({ isLoading: true, error: null });
     try {
-      const { data } = await api.post('/register', userData);
-      set({ user: data, isLoading: false });
+      const user = await authService.register(userData);
+      set({ user, isLoading: false });
     } catch (error: any) {
       set({ error: error.response?.data?.message || 'Registration failed', isLoading: false });
       throw error;
@@ -112,8 +83,13 @@ export const useAuthStore = create<AuthState>((set) => ({
   },
 
   logout: async () => {
-    await api.post('/logout', {});
-    set({ user: null });
+    try {
+        await authService.logout();
+    } catch (error) {
+        console.error("Logout failed", error);
+    } finally {
+        set({ user: null });
+    }
   },
 
   clearError: () => set({ error: null }),

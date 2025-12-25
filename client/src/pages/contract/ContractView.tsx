@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Box, Typography, Paper, Grid, Divider, CircularProgress, Chip, Stepper, Step, StepLabel, StepContent, Button, Avatar, Card, CardContent } from '@mui/material';
-import axios from 'axios';
+
 import { format } from 'date-fns';
 import DescriptionIcon from '@mui/icons-material/Description';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
@@ -17,6 +17,12 @@ import ReviewModal from '@/components/reviews/ReviewModal';
 import { Rating } from '@mui/material';
 import { useToastStore } from '../../store/toastStore';
 
+import { jobService } from '../../services/job.service';
+import { offerService } from '../../services/offer.service';
+import { transactionService } from '../../services/transaction.service';
+import { reviewService } from '../../services/review.service';
+
+// ... (keep interfaces)
 interface TimelineEvent {
   status: string;
   timestamp: string;
@@ -79,6 +85,7 @@ interface Review {
   createdAt: string;
 }
 
+
 const ContractView = () => {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -97,16 +104,17 @@ const ContractView = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [jobRes, negRes, transRes, reviewRes] = await Promise.all([
-          axios.get(`http://localhost:5000/api/jobs/${id}`, { withCredentials: true }),
-          axios.get(`http://localhost:5000/api/negotiations/${id}`, { withCredentials: true }),
-          axios.get(`http://localhost:5000/api/transactions/job/${id}`, { withCredentials: true }),
-          axios.get(`http://localhost:5000/api/reviews/job/${id}`, { withCredentials: true })
+        if (!id) return;
+        const [jobData, negData, transData, reviewData] = await Promise.all([
+          jobService.getJob(id),
+          offerService.getOffersByJob(id),
+          transactionService.getTransactionsByJob(id),
+          reviewService.getReviewsByJob(id)
         ]);
-        setJob(jobRes.data);
-        setNegotiations(negRes.data);
-        setTransactions(transRes.data);
-        setReviews(reviewRes.data);
+        setJob(jobData);
+        setNegotiations(negData);
+        setTransactions(transData);
+        setReviews(reviewData);
       } catch (error) {
         console.error(error);
       } finally {
@@ -155,24 +163,20 @@ const ContractView = () => {
       if (!job || !user) return;
       setSubmittingReview(true);
       try {
-          await axios.post('http://localhost:5000/api/reviews', {
+          await reviewService.createReview({
               job: job._id,
               rating,
               comment
-          }, { withCredentials: true });
+          });
           
 
           // Reload reviews to get full populated data
-          const reviewRes = await axios.get(`http://localhost:5000/api/reviews/job/${id}`, { withCredentials: true });
-          setReviews(reviewRes.data);
+          const reviewData = await reviewService.getReviewsByJob(id!);
+          setReviews(reviewData);
 
           showToast('Review submitted successfully!', 'success');
           setReviewModalOpen(false);
           
-          // No longer redirecting, staying on page to see review
-          // const targetView = user._id === job.seekerId._id ? 'seeker-completed-jobs' : 'completed-jobs';
-          // navigate('/activity', { state: { view: targetView } });
-
       } catch (error: any) {
           showToast(error.response?.data?.message || 'Failed to submit review', 'error');
       } finally {

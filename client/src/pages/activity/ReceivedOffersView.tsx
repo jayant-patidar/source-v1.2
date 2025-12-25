@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 import { formatDistanceToNow } from 'date-fns';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import CancelIcon from '@mui/icons-material/Cancel';
-import axios from 'axios';
+import { offerService } from '../../services/offer.service';
 
 interface Negotiation {
   _id: string;
@@ -37,7 +37,7 @@ const ReceivedOffersView = () => {
 
   const fetchOffers = async () => {
     try {
-      const { data } = await axios.get('http://localhost:5000/api/negotiations/received', { withCredentials: true });
+      const data = await offerService.getReceivedOffers();
       setReceivedOffers(data.filter((offer: Negotiation) => offer.status === 'pending'));
     } catch (error) {
       console.error('Error fetching received offers:', error);
@@ -52,7 +52,7 @@ const ReceivedOffersView = () => {
 
   const handleAccept = async (negotiationId: string) => {
     try {
-        await axios.put(`http://localhost:5000/api/negotiations/${negotiationId}`, { status: 'accepted' }, { withCredentials: true });
+        await offerService.updateOfferStatus(negotiationId, 'accepted');
         fetchOffers(); // Refresh
     } catch (err) {
         alert('Failed to accept');
@@ -61,7 +61,7 @@ const ReceivedOffersView = () => {
 
   const handleReject = async (negotiationId: string) => {
     try {
-        await axios.put(`http://localhost:5000/api/negotiations/${negotiationId}`, { status: 'rejected' }, { withCredentials: true });
+        await offerService.updateOfferStatus(negotiationId, 'rejected');
         fetchOffers(); // Refresh
     } catch (err) {
         alert('Failed to reject');

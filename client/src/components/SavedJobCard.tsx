@@ -2,7 +2,6 @@ import { Card, CardContent, Typography, Box, Chip, Avatar, IconButton, Snackbar 
 import { Link } from 'react-router-dom';
 import { format } from 'date-fns';
 import { useState } from 'react';
-import axios from 'axios';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import BookmarkIcon from '@mui/icons-material/Bookmark';
@@ -13,13 +12,15 @@ interface SavedJobCardProps {
   onUnsave: (jobId: string) => void;
 }
 
+import { jobService } from '../services/job.service';
+
 const SavedJobCard = ({ job, onUnsave }: SavedJobCardProps) => {
   const [isSaved, setIsSaved] = useState(true);
   const [snackbarOpen, setSnackbarOpen] = useState(false);
 
   const handleToggleSave = async () => {
     try {
-      await axios.post(`http://localhost:5000/api/users/saved/${job._id}`, {}, { withCredentials: true });
+      await jobService.toggleSaveJob(job._id);
       const newSavedState = !isSaved;
       setIsSaved(newSavedState);
       setSnackbarOpen(true);
