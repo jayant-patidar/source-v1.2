@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Box, Typography, CircularProgress, Paper, Chip, Stack, Button, Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions } from '@mui/material';
-import axios from 'axios';
+import { Link } from 'react-router-dom';
+import { jobService } from '../../services/job.service';
 import { format } from 'date-fns';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
@@ -17,7 +18,7 @@ interface Job {
   jobTime: string;
   location: { general: string };
   status: 'accepted';
-  seekerId: { name: string; avatar?: string };
+  seekerId: { name: string; avatar?: string; _id: string };
 }
 
 const UpcomingJobsView = () => {
@@ -30,7 +31,7 @@ const UpcomingJobsView = () => {
 
   const fetchJobs = async () => {
     try {
-      const { data } = await axios.get('http://localhost:5000/api/jobs/worked', { withCredentials: true });
+      const data = await jobService.getWorkedJobs();
       // Filter for accepted jobs (upcoming)
       const upcoming = data.filter((job: Job) => job.status === 'accepted');
       setJobs(upcoming);
@@ -64,7 +65,7 @@ const UpcomingJobsView = () => {
   const handleConfirmStart = async () => {
     if (!selectedJob) return;
     try {
-        await axios.put(`http://localhost:5000/api/jobs/${selectedJob._id}/start`, {}, { withCredentials: true });
+        await jobService.startJob(selectedJob._id);
         showToast('Job started successfully!', 'success');
         fetchJobs(); // Refresh list
         setOpenDialog(false);
@@ -95,9 +96,13 @@ const UpcomingJobsView = () => {
             <Paper key={job._id} sx={{ p: 3, border: '1px solid #e0e0e0', borderRadius: 2 }}>
               <Box display="flex" justifyContent="space-between" alignItems="flex-start">
                   <Box>
-                      <Typography variant="h6" fontWeight="bold">{job.title}</Typography>
+                      <Typography variant="h6" fontWeight="bold">
+                          <Link to={`/jobs/${job._id}`} style={{ textDecoration: 'none', color: 'inherit' }}>
+                              {job.title}
+                          </Link>
+                      </Typography>
                       <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
-                          Posted by {job.seekerId?.name}
+                          Posted by <Link to={`/profile/${job.seekerId?._id}`} style={{ textDecoration: 'none', color: 'inherit', fontWeight: 'bold' }}>{job.seekerId?.name}</Link>
                       </Typography>
                       <Box display="flex" gap={2} mt={1}>
                           <Box display="flex" alignItems="center" gap={0.5}>

@@ -13,8 +13,8 @@ import {
     ListItemText
 } from '@mui/material';
 import { Link } from 'react-router-dom';
+import { jobService } from '../../services/job.service';
 import { formatDistanceToNow } from 'date-fns';
-import axios from 'axios';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -58,7 +58,9 @@ const PostedJobsView = () => {
 
   const fetchJobs = async () => {
     try {
-      const { data } = await axios.get('http://localhost:5000/api/jobs/posted', { withCredentials: true });
+      const data = await jobService.getPostedJobs();
+      // Filter out non-active jobs if needed, but endpoint usually returns all posted by user
+      // Assuming endpoint returns all, we filter on frontend or rely on backend
       setJobs(data);
     } catch (error) {
       console.error('Error fetching posted jobs:', error);
@@ -93,43 +95,38 @@ const PostedJobsView = () => {
     setAnchorEl(null);
   };
 
-  const handleToggleVisibility = async () => {
-    if (!selectedJob) return;
-    try {
-        await axios.put(`http://localhost:5000/api/jobs/${selectedJob._id}`, 
-            { visibility: !selectedJob.visibility }, 
-            { withCredentials: true }
-        );
-        fetchJobs();
-    } catch (error) {
-        console.error('Error toggling visibility:', error);
-    } finally {
-        handleMenuClose();
-    }
+  const handleToggleVisibility = async (id: string, currentVisibility: boolean) => {
+      try {
+          await jobService.updateJob(id, { visibility: !currentVisibility });
+          // showToast(`Job is now ${!currentVisibility ? 'visible' : 'hidden'}`, 'success');
+          fetchJobs(); // Re-fetch to update visibility
+      } catch (error) {
+          console.error('Error toggling visibility:', error);
+          // showToast('Failed to update visibility', 'error');
+          alert('Failed to update visibility'); // Fallback for showToast
+      } finally {
+          handleMenuClose();
+      }
   };
 
-  const handleCancelJob = async () => {
-    if (!selectedJob) return;
+  const handleCancelJob = async (id: string) => {
     if (!window.confirm('Are you sure you want to cancel this job?')) return;
     try {
-        await axios.put(`http://localhost:5000/api/jobs/${selectedJob._id}`, 
-            { status: 'canceled' }, 
-            { withCredentials: true }
-        );
-        fetchJobs();
+      await jobService.updateJob(id, { status: 'canceled' }); 
+      fetchJobs();
     } catch (error) {
-        console.error('Error canceling job:', error);
+       console.error('Error canceling job:', error);
+       alert('Failed to cancel job');
     } finally {
         handleMenuClose();
     }
   };
 
-  const handleDelete = async () => {
-    if (!selectedJob) return;
+  const handleDeleteJob = async (id: string) => {
     if (!window.confirm('Are you sure you want to delete this job? This action cannot be undone.')) return;
     try {
-      await axios.delete(`http://localhost:5000/api/jobs/${selectedJob._id}`, { withCredentials: true });
-      fetchJobs();
+      await jobService.deleteJob(id);
+      setJobs(jobs.filter(job => job._id !== id));
     } catch (error) {
       console.error('Error deleting job:', error);
       alert('Failed to delete job');
@@ -140,7 +137,7 @@ const PostedJobsView = () => {
 
   const handleSaveJob = async (jobId: string, updatedData: any) => {
       try {
-          await axios.put(`http://localhost:5000/api/jobs/${jobId}`, updatedData, { withCredentials: true });
+          await jobService.updateJob(jobId, updatedData);
           fetchJobs();
       } catch (error) {
           console.error('Error updating job:', error);
@@ -271,17 +268,17 @@ const PostedJobsView = () => {
                 <ListItemIcon><AttachMoneyIcon fontSize="small" /></ListItemIcon>
                 <ListItemText>Update Pay</ListItemText>
             </MenuItem>
-            <MenuItem onClick={handleToggleVisibility}>
+            <MenuItem onClick={() => selectedJob && handleToggleVisibility(selectedJob._id, selectedJob.visibility)}>
                 <ListItemIcon>
                     {selectedJob?.visibility ? <VisibilityOffIcon fontSize="small" /> : <VisibilityIcon fontSize="small" />}
                 </ListItemIcon>
                 <ListItemText>{selectedJob?.visibility ? 'Hide Job' : 'Show Job'}</ListItemText>
             </MenuItem>
-            <MenuItem onClick={handleCancelJob} disabled={selectedJob?.status === 'canceled' || selectedJob?.status === 'completed'}>
+            <MenuItem onClick={() => selectedJob && handleCancelJob(selectedJob._id)} disabled={selectedJob?.status === 'canceled' || selectedJob?.status === 'completed'}>
                 <ListItemIcon><CancelIcon fontSize="small" /></ListItemIcon>
                 <ListItemText>Cancel Job</ListItemText>
             </MenuItem>
-            <MenuItem onClick={handleDelete} sx={{ color: 'error.main' }}>
+            <MenuItem onClick={() => selectedJob && handleDeleteJob(selectedJob._id)} sx={{ color: 'error.main' }}>
                 <ListItemIcon><DeleteIcon fontSize="small" color="error" /></ListItemIcon>
                 <ListItemText>Delete Job</ListItemText>
             </MenuItem>

@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { Box, Typography, CircularProgress, Paper, Chip, Stack, Button } from '@mui/material';
-import axios from 'axios';
+import { jobService } from '../../services/job.service';
 import { format } from 'date-fns';
 import PaymentIcon from '@mui/icons-material/Payment';
 import DescriptionIcon from '@mui/icons-material/Description';
@@ -13,8 +13,8 @@ interface Job {
   currentPay?: number;
   jobDate: string;
   status: 'completed';
-  seekerId: { name: string };
-  providerId?: { name: string };
+  seekerId: { name: string; _id: string };
+  providerId?: { name: string; _id: string };
   paymentStatus?: 'pending' | 'paid' | 'failed';
 }
 
@@ -28,19 +28,24 @@ const CompletedJobsView = ({ role }: CompletedJobsViewProps) => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const fetchJobs = async () => {
+    const fetchCompletedJobs = async () => {
       try {
-        const endpoint = role === 'seeker' ? 'http://localhost:5000/api/jobs/posted' : 'http://localhost:5000/api/jobs/worked';
-        const { data } = await axios.get(endpoint, { withCredentials: true });
+        let data = [];
+        if (role === 'seeker') {
+           data = await jobService.getPostedJobs();
+        } else {
+           data = await jobService.getWorkedJobs();
+        }
+        // Filter for completed jobs
         const completed = data.filter((job: Job) => job.status === 'completed');
         setJobs(completed);
       } catch (error) {
-        console.error('Failed to fetch jobs', error);
+        console.error('Failed to fetch completed jobs', error);
       } finally {
         setLoading(false);
       }
     };
-    fetchJobs();
+    fetchCompletedJobs();
   }, [role]);
 
   if (loading) return <Box display="flex" justifyContent="center" p={4}><CircularProgress /></Box>;
@@ -60,9 +65,21 @@ const CompletedJobsView = ({ role }: CompletedJobsViewProps) => {
             <Paper key={job._id} sx={{ p: 3, border: '1px solid #e0e0e0', borderRadius: 2, opacity: 0.9 }}>
               <Box display="flex" justifyContent="space-between" alignItems="center">
                   <Box>
-                      <Typography variant="h6" fontWeight="bold">{job.title}</Typography>
+                      <Typography variant="h6" fontWeight="bold">
+                          <Link to={`/jobs/${job._id}`} style={{ textDecoration: 'none', color: 'inherit' }}>
+                              {job.title}
+                          </Link>
+                      </Typography>
                       <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
-                          {role === 'seeker' ? `Provider: ${job.providerId?.name || 'Unknown'}` : `Client: ${job.seekerId?.name || 'Unknown'}`}
+                          {role === 'seeker' ? (
+                              <>
+                                  Provider: <Link to={`/profile/${job.providerId?._id}`} style={{ textDecoration: 'none', color: 'inherit', fontWeight: 'bold' }}>{job.providerId?.name || 'Unknown'}</Link>
+                              </>
+                          ) : (
+                              <>
+                                  Client: <Link to={`/profile/${job.seekerId?._id}`} style={{ textDecoration: 'none', color: 'inherit', fontWeight: 'bold' }}>{job.seekerId?.name || 'Unknown'}</Link>
+                              </>
+                          )}
                       </Typography>
                       <Typography variant="caption" color="text.secondary" display="block" sx={{ mt: 0.5 }}>
                           Completed on {format(new Date(job.jobDate), 'MMM d, yyyy')}

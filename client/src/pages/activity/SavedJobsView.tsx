@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Box, Typography, CircularProgress } from '@mui/material';
-import axios from 'axios';
 import SavedJobCard from '../../components/SavedJobCard';
+import { jobService } from '../../services/job.service';
 
 const SavedJobsView = () => {
   const [savedJobs, setSavedJobs] = useState<any[]>([]);
@@ -10,7 +10,7 @@ const SavedJobsView = () => {
   useEffect(() => {
     const fetchSavedJobs = async () => {
       try {
-        const { data } = await axios.get('http://localhost:5000/api/users/saved', { withCredentials: true });
+        const data = await jobService.getSavedJobs();
         setSavedJobs(data);
       } catch (error) {
         console.error('Error fetching saved jobs:', error);

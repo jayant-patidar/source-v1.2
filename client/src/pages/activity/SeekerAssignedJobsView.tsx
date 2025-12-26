@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Box, Typography, CircularProgress, Paper, Chip, Button, Stack, Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions } from '@mui/material';
-import axios from 'axios';
+import { jobService } from '../../services/job.service';
 import { format } from 'date-fns';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
@@ -29,7 +29,7 @@ const SeekerAssignedJobsView = () => {
 
   const fetchJobs = async () => {
     try {
-      const { data } = await axios.get('http://localhost:5000/api/jobs/posted', { withCredentials: true });
+      const data = await jobService.getPostedJobs();
       const assigned = data.filter((job: Job) => job.status === 'accepted');
       setJobs(assigned);
     } catch (error) {
@@ -62,7 +62,7 @@ const SeekerAssignedJobsView = () => {
   const handleConfirmStart = async () => {
     if (!selectedJob) return;
     try {
-        await axios.put(`http://localhost:5000/api/jobs/${selectedJob._id}/start`, {}, { withCredentials: true });
+        await jobService.startJob(selectedJob._id);
         showToast('Job started successfully!', 'success');
         fetchJobs(); // Refresh list
         setOpenDialog(false);

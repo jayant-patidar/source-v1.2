@@ -107,7 +107,11 @@ const ReceivedOffersView = () => {
                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, my: 2 }}>
                             <Avatar src={offer.provider.avatar} alt={offer.provider.name} />
                             <Box>
-                                <Typography variant="subtitle1" fontWeight="bold">{offer.provider.name}</Typography>
+                                <Typography variant="subtitle1" fontWeight="bold">
+                                    <Link to={`/profile/${offer.provider._id}`} style={{ textDecoration: 'none', color: 'inherit' }}>
+                                        {offer.provider.name}
+                                    </Link>
+                                </Typography>
                                 <Typography variant="caption">★ {offer.provider.providerRating?.toFixed(1) || 'N/A'} Provider Rating</Typography>
                             </Box>
                         </Box>

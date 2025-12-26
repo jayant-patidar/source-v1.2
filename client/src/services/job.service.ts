@@ -33,5 +33,35 @@ export const jobService = {
   async toggleSaveJob(id: string) {
     const { data } = await api.post(`/users/saved/${id}`);
     return data;
+  },
+
+  async getSavedJobs() {
+    const { data } = await api.get('/users/saved');
+    return data;
+  },
+
+  async getPostedJobs() {
+    const { data } = await api.get('/jobs/posted');
+    return data;
+  },
+
+  async getWorkedJobs() {
+    const { data } = await api.get('/jobs/worked');
+    return data;
+  },
+
+  async updateJob(id: string, updates: any) {
+    const { data } = await api.put(`/jobs/${id}`, updates);
+    return data;
+  },
+
+  async deleteJob(id: string) {
+    const { data } = await api.delete(`/jobs/${id}`);
+    return data;
+  },
+
+  async startJob(id: string) {
+    const { data } = await api.put(`/jobs/${id}/start`);
+    return data;
   }
 };

@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Box, Typography, CircularProgress, Paper, Chip, Button, Stack, Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions } from '@mui/material';
-import axios from 'axios';
+import { Link } from 'react-router-dom';
+import { jobService } from '../../services/job.service';
 import { format } from 'date-fns';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
@@ -19,7 +20,7 @@ interface Job {
   jobTime: string;
   location: { general: string };
   status: 'in_progress' | 'paused' | 'pending_completion';
-  providerId?: { name: string; avatar?: string };
+  providerId?: { name: string; avatar?: string; _id: string };
   startTime?: string;
 }
 
@@ -33,7 +34,7 @@ const SeekerOngoingJobsView = () => {
 
   const fetchJobs = async () => {
     try {
-      const { data } = await axios.get('http://localhost:5000/api/jobs/posted', { withCredentials: true });
+      const data = await jobService.getPostedJobs();
       // Filter for ongoing or paused jobs
       const ongoing = data.filter((job: Job) => ['in_progress', 'paused', 'pending_completion'].includes(job.status));
       setJobs(ongoing);
@@ -67,7 +68,7 @@ const SeekerOngoingJobsView = () => {
           // For now, assuming generic update endpoint works or we need to add specific ones.
           // Plan 4 said "PUT /api/jobs/:id/status" but we only have generic update in routes. 
           // Let's try generic update first.
-          await axios.put(`http://localhost:5000/api/jobs/${selectedJob._id}`, { status: newStatus }, { withCredentials: true });
+          await jobService.updateJob(selectedJob._id, { status: newStatus });
           showToast(`Job ${actionType}d successfully!`, 'success');
           fetchJobs();
           setOpenDialog(false);
@@ -100,7 +101,11 @@ const SeekerOngoingJobsView = () => {
               <Box display="flex" justifyContent="space-between" alignItems="flex-start">
                   <Box>
                       <Box display="flex" alignItems="center" gap={1} mb={0.5}>
-                          <Typography variant="h6" fontWeight="bold">{job.title}</Typography>
+                          <Typography variant="h6" fontWeight="bold">
+                              <Link to={`/jobs/${job._id}`} style={{ textDecoration: 'none', color: 'inherit' }}>
+                                  {job.title}
+                              </Link>
+                          </Typography>
                           <Chip 
                             label={job.status === 'paused' ? 'PAUSED' : (job.status === 'pending_completion' ? 'PENDING APPROVAL' : 'IN PROGRESS')} 
                             color={job.status === 'paused' ? 'warning' : (job.status === 'pending_completion' ? 'warning' : 'success')} 
@@ -109,7 +114,7 @@ const SeekerOngoingJobsView = () => {
                           />
                       </Box>
                       <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
-                          Provider: {job.providerId?.name || 'Assigned'}
+                          Provider: <Link to={`/profile/${job.providerId?._id}`} style={{ textDecoration: 'none', color: 'inherit', fontWeight: 'bold' }}>{job.providerId?.name || 'Assigned'}</Link>
                       </Typography>
                       <Box display="flex" gap={2} mt={1}>
                         <Box display="flex" alignItems="center" gap={0.5}>
