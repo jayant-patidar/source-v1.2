@@ -66,6 +66,32 @@ class NegotiationController {
     }
   }
 
+  async counterOffer(req: any, res: Response, next: NextFunction) {
+    try {
+      const negotiation = await this.negotiationService.counterOffer(req.params.id, req.body, req.user._id.toString());
+      
+      if (negotiation) {
+          const job = await Job.findById(negotiation.job);
+          if (job) {
+              // Notify the OTHER party
+              const recipient = negotiation.lastActor === 'seeker' ? negotiation.provider : negotiation.seeker;
+              await Notification.create({
+                  recipient,
+                  sender: req.user._id,
+                  type: 'counter_offer_received',
+                  job: job._id,
+                  negotiation: negotiation._id,
+                  message: `New counter offer of $${negotiation.amount} received for ${job.title}`
+              });
+          }
+      }
+
+      res.json(negotiation);
+    } catch (error) {
+      next(error);
+    }
+  }
+
   async updateNegotiationStatus(req: any, res: Response, next: NextFunction) {
     try {
       const { status } = req.body;
@@ -75,28 +101,32 @@ class NegotiationController {
           const job = await Job.findById(negotiation.job);
           
           if (status === 'accepted' && job) {
-              // Job is already updated in service
-              // Just create notification
+              // Notify the OTHER party
+              const recipient = req.user._id.toString() === negotiation.provider.toString() 
+                  ? negotiation.seeker 
+                  : negotiation.provider;
 
-
-              // Notify Provider
               await Notification.create({
-                  recipient: negotiation.provider,
+                  recipient,
                   sender: req.user._id,
                   type: 'offer_accepted',
                   job: job._id,
                   negotiation: negotiation._id,
-                  message: `Your offer for ${job.title} has been ACCEPTED!`
+                  message: `The offer for ${job.title} has been ACCEPTED!`
               });
           } else if (status === 'rejected' && job) {
-              // Notify Provider
+              // Notify the OTHER party
+              const recipient = req.user._id.toString() === negotiation.provider.toString() 
+                  ? negotiation.seeker 
+                  : negotiation.provider;
+
               await Notification.create({
-                  recipient: negotiation.provider,
+                  recipient,
                   sender: req.user._id,
                   type: 'offer_rejected',
                   job: job._id,
                   negotiation: negotiation._id,
-                  message: `Your offer for ${job.title} was declined.`
+                  message: `The offer for ${job.title} was declined.`
               });
 
               // Log Timeline

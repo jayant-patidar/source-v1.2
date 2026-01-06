@@ -11,6 +11,8 @@ router.get('/', jobController.getAllJobs.bind(jobController));
 router.get('/:id', jobController.getJobById.bind(jobController));
 router.put('/:id', protect, jobController.updateJob.bind(jobController));
 router.put('/:id/start', protect, jobController.startJob.bind(jobController));
+router.put('/:id/approve-start', protect, jobController.approveStart.bind(jobController));
+
 router.delete('/:id', protect, jobController.deleteJob.bind(jobController));
 
 export default router;

@@ -32,6 +32,10 @@ const JobDetails = () => {
   const [showOfferForm, setShowOfferForm] = useState(false);
   const [offerMode, setOfferMode] = useState<'negotiate' | 'interested'>('negotiate');
   const [isSaved, setIsSaved] = useState(false);
+  const [counterOpen, setCounterOpen] = useState(false);
+  const [selectedNegId, setSelectedNegId] = useState('');
+  const [counterAmount, setCounterAmount] = useState('');
+  const [counterMessage, setCounterMessage] = useState('');
 
   const handleSave = async () => {
       try {
@@ -96,10 +100,23 @@ const JobDetails = () => {
       try {
           await offerService.updateOfferStatus(negotiationId, 'accepted');
           fetchNegotiations();
-          setJob({ ...job, status: 'assigned' });
+          setJob({ ...job, status: 'accepted' });
           showToast('Offer accepted', 'success');
       } catch (err) {
           showToast('Failed to accept', 'error');
+      }
+  };
+
+  const handleCounter = async () => {
+      try {
+          await offerService.counterOffer(selectedNegId, Number(counterAmount), counterMessage);
+          showToast('Counter offer sent!', 'success');
+          setCounterOpen(false);
+          setCounterAmount('');
+          setCounterMessage('');
+          fetchNegotiations();
+      } catch (err: any) {
+          showToast(err.response?.data?.message || 'Failed to send counter', 'error');
       }
   };
 
@@ -266,11 +283,11 @@ const JobDetails = () => {
                         <LoopIcon sx={{ fontSize: 28, color: 'black' }} />
                         <Typography variant="caption" sx={{ fontSize: '0.8rem', mt: 0.5, fontWeight: 'bold' }}>Negotiate</Typography>
                     </Box>
-                    <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', cursor: 'pointer', opacity: 0.7, '&:hover': { opacity: 1 } }} onClick={() => alert('Requesting exact location...')}>
+                    <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', cursor: 'pointer', opacity: 0.7, '&:hover': { opacity: 1 } }} onClick={() => showToast('Requesting exact location...', 'info')}>
                         <ShareLocationIcon sx={{ fontSize: 28, color: 'black' }} />
                         <Typography variant="caption" sx={{ fontSize: '0.8rem', mt: 0.5, fontWeight: 'bold' }}>Locate</Typography>
                     </Box>
-                    <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', cursor: 'pointer', opacity: 0.7, '&:hover': { opacity: 1 } }} onClick={() => alert('Share functionality coming soon!')}>
+                    <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', cursor: 'pointer', opacity: 0.7, '&:hover': { opacity: 1 } }} onClick={() => showToast('Share functionality coming soon!', 'info')}>
                         <SendIcon sx={{ fontSize: 28, color: 'black' }} />
                         <Typography variant="caption" sx={{ fontSize: '0.8rem', mt: 0.5, fontWeight: 'bold' }}>Share</Typography>
                     </Box>
@@ -412,44 +429,123 @@ const JobDetails = () => {
                         <Typography color="text.secondary">No offers received yet.</Typography>
                     </Paper>
                 ) : (
-                    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-                        {negotiations.map((neg) => (
-                            <Paper key={neg._id} elevation={0} sx={{ p: 3, border: '1px solid #e0e0e0', borderRadius: 2 }}>
-                                <Box display="flex" justifyContent="space-between" alignItems="flex-start">
-                                    <Box>
-                                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
-                                            <Typography variant="subtitle1" fontWeight="bold">{neg.provider?.name}</Typography>
-                                            <Chip label={`$${neg.amount}`} size="small" color="primary" variant="outlined" sx={{ fontWeight: 'bold' }} />
-                                        </Box>
-                                        <Typography variant="body2" color="text.secondary" sx={{ bgcolor: '#f5f5f5', p: 1.5, borderRadius: 1, display: 'inline-block' }}>
-                                            "{neg.message || 'No message'}"
-                                        </Typography>
-                                    </Box>
-                                    <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 1 }}>
-                                        <Chip 
-                                            label={neg.status.toUpperCase()} 
-                                            size="small" 
-                                            color={neg.status === 'accepted' ? 'success' : neg.status === 'rejected' ? 'error' : 'default'} 
-                                            sx={{ fontWeight: 'bold' }}
-                                        />
-                                        {neg.status === 'pending' && (
-                                            <Box sx={{ display: 'flex', gap: 1 }}>
-                                                <Button variant="contained" size="small" color="success" onClick={() => handleAccept(neg._id)} sx={{ minWidth: 80 }}>
-                                                    Accept
-                                                </Button>
-                                                <Button variant="outlined" size="small" color="error" onClick={() => handleReject(neg._id)} sx={{ minWidth: 80 }}>
-                                                    Reject
-                                                </Button>
+                    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+                        {negotiations.map((neg) => {
+                            const canCounter = neg.lastActor === 'provider' && neg.status !== 'accepted' && neg.status !== 'rejected' && neg.seekerCounterCount < 2;
+                            const canAccept = neg.lastActor === 'provider' && neg.status !== 'accepted' && neg.status !== 'rejected';
+                            
+                            return (
+                                <Paper key={neg._id} elevation={0} sx={{ p: 3, border: '1px solid #e0e0e0', borderRadius: 2 }}>
+                                    <Box display="flex" justifyContent="space-between" alignItems="flex-start">
+                                        <Box sx={{ flexGrow: 1 }}>
+                                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 1 }}>
+                                                <Typography variant="subtitle1" fontWeight="bold">{neg.provider?.name}</Typography>
+                                                <Chip label={`$${neg.amount}`} size="small" color="success" sx={{ fontWeight: 'bold' }} />
+                                                <Chip 
+                                                    label={neg.status === 'countered' ? 'COUNTER OFFER' : neg.status.toUpperCase()} 
+                                                    size="small" 
+                                                    variant="outlined"
+                                                    color={neg.status === 'accepted' ? 'success' : neg.status === 'rejected' ? 'error' : 'warning'} 
+                                                    sx={{ fontWeight: 'bold' }}
+                                                />
                                             </Box>
-                                        )}
+                                            
+                                            <Box sx={{ bgcolor: '#f5f5f5', p: 2, borderRadius: 2, mb: 2 }}>
+                                                <Typography variant="body2" sx={{ fontStyle: 'italic', color: 'text.primary' }}>
+                                                    "{neg.message || 'No message'}"
+                                                </Typography>
+                                                {neg.offerHistory && neg.offerHistory.length > 1 && (
+                                                    <Box sx={{ mt: 2, pl: 2, borderLeft: '2px dashed #ccc' }}>
+                                                        <Typography variant="caption" color="text.secondary" fontWeight="bold" display="block" mb={1}>OFFER HISTORY</Typography>
+                                                        {neg.offerHistory.slice(0, -1).reverse().map((h: any, idx: number) => (
+                                                            <Box key={idx} sx={{ mb: 1 }}>
+                                                                <Typography variant="caption" sx={{ color: h.actor === 'seeker' ? 'primary.main' : 'success.main', fontWeight: 'bold' }}>
+                                                                    {h.actor === 'seeker' ? 'You' : neg.provider?.name}: ${h.amount}
+                                                                </Typography>
+                                                                <Typography variant="caption" color="text.secondary" sx={{ ml: 1 }}>
+                                                                    ({format(new Date(h.timestamp), 'MMM d, h:mm a')})
+                                                                </Typography>
+                                                            </Box>
+                                                        ))}
+                                                    </Box>
+                                                )}
+                                            </Box>
+                                            
+                                            <Box display="flex" gap={2}>
+                                                <Typography variant="caption" color="text.secondary">
+                                                    Your Counters: <strong>{neg.seekerCounterCount}/2</strong>
+                                                </Typography>
+                                                <Typography variant="caption" color="text.secondary">
+                                                    Provider Counters: <strong>{neg.providerCounterCount}/2</strong>
+                                                </Typography>
+                                            </Box>
+                                        </Box>
+
+                                        <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 1, ml: 2 }}>
+                                            {(canAccept || canCounter) && (
+                                                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+                                                    {canAccept && (
+                                                        <Button variant="contained" size="small" color="success" onClick={() => handleAccept(neg._id)} fullWidth>
+                                                            Accept Offer
+                                                        </Button>
+                                                    )}
+                                                    {canCounter && (
+                                                        <Button variant="outlined" size="small" color="primary" onClick={() => { setSelectedNegId(neg._id); setCounterAmount(''); setCounterOpen(true); }} fullWidth>
+                                                            Counter ({neg.seekerCounterCount}/2)
+                                                        </Button>
+                                                    )}
+                                                    <Button variant="outlined" size="small" color="error" onClick={() => handleReject(neg._id)} fullWidth>
+                                                        Reject
+                                                    </Button>
+                                                </Box>
+                                            )}
+                                        </Box>
                                     </Box>
-                                </Box>
-                            </Paper>
-                        ))}
+                                </Paper>
+                            );
+                        })}
                     </Box>
                 )}
             </Box>
         )}
+
+        {/* Counter Offer Modal */}
+        <Dialog open={counterOpen} onClose={() => setCounterOpen(false)} maxWidth="xs" fullWidth>
+            <DialogTitle sx={{ fontWeight: 'bold' }}>Make a Counter Offer</DialogTitle>
+            <DialogContent>
+                <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+                    Enter a new amount you'd like to propose.
+                </Typography>
+                <TextField
+                    autoFocus
+                    margin="dense"
+                    label="Counter Amount ($)"
+                    type="number"
+                    fullWidth
+                    value={counterAmount}
+                    onChange={(e) => setCounterAmount(e.target.value)}
+                    variant="outlined"
+                    sx={{ mb: 2 }}
+                />
+                <TextField
+                    margin="dense"
+                    label="Message (Optional)"
+                    placeholder="I can offer this amount instead..."
+                    fullWidth
+                    multiline
+                    rows={3}
+                    value={counterMessage}
+                    onChange={(e) => setCounterMessage(e.target.value)}
+                    variant="outlined"
+                />
+            </DialogContent>
+            <DialogActions sx={{ p: 3 }}>
+                <Button onClick={() => setCounterOpen(false)} sx={{ color: 'text.secondary' }}>Cancel</Button>
+                <Button variant="contained" color="primary" onClick={handleCounter} disabled={!counterAmount}>
+                    Send Counter
+                </Button>
+            </DialogActions>
+        </Dialog>
 
       </Paper>
     </Container>

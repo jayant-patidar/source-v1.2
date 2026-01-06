@@ -61,10 +61,18 @@ interface Job {
 interface Negotiation {
   _id: string;
   amount: number;
-  status: 'pending' | 'accepted' | 'rejected';
-  seeker: string;
-  provider: string; // The offer maker (applicant) if standard flow, or could be counter. 
-  // In our model: provider is the applicant.
+  status: 'pending' | 'accepted' | 'rejected' | 'countered';
+  seeker: any;
+  provider: any;
+  seekerCounterCount: number;
+  providerCounterCount: number;
+  lastActor: 'seeker' | 'provider';
+  offerHistory: {
+    amount: number;
+    message?: string;
+    actor: 'seeker' | 'provider';
+    timestamp: Date;
+  }[];
   createdAt: string;
 }
 
@@ -311,13 +319,61 @@ const ContractView = () => {
                   </Typography>
                   <Divider sx={{ mb: 2 }} />
                   {negotiations.map((neg, idx) => (
-                      <Box key={neg._id} mb={2} p={2} borderRadius={1} bgcolor="#f9fafb" borderLeft={`4px solid ${neg.status === 'accepted' ? '#2e7d32' : neg.status === 'rejected' ? '#d32f2f' : '#ed6c02'}`}>
-                          <Box display="flex" justifyContent="space-between">
-                             <Typography fontWeight="bold">Offer {idx + 1}</Typography>
-                             <Chip label={neg.status.toUpperCase()} size="small" color={neg.status === 'accepted' ? 'success' : neg.status === 'rejected' ? 'error' : 'warning'} />
-                          </Box>
-                          <Typography variant="body2" mt={0.5}>Amount: <strong>${neg.amount}</strong></Typography>
-                          <Typography variant="caption" color="text.secondary">Sent on {format(new Date(neg.createdAt), 'PPP p')}</Typography>
+                      <Box key={neg._id} mb={3}>
+                          <Typography variant="subtitle2" color="text.secondary" gutterBottom>NEGOTIATION #{idx + 1}</Typography>
+                          {neg.offerHistory && neg.offerHistory.length > 0 ? (
+                              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
+                                  {neg.offerHistory.map((h, hIdx) => (
+                                      <Box 
+                                          key={hIdx} 
+                                          p={2} 
+                                          borderRadius={2} 
+                                          bgcolor={h.actor === 'seeker' ? '#f0f7ff' : '#f6ffed'} 
+                                          borderLeft={`4px solid ${h.actor === 'seeker' ? '#1976d2' : '#52c41a'}`}
+                                      >
+                                          <Box display="flex" justifyContent="space-between" alignItems="center">
+                                              <Box display="flex" alignItems="center" gap={1}>
+                                                  <Typography variant="body2" fontWeight="bold" color={h.actor === 'seeker' ? 'primary.main' : 'success.main'}>
+                                                      {h.actor === 'seeker' ? 'SEEKER' : 'PROVIDER'} OFFER
+                                                  </Typography>
+                                                  <Chip label={`$${h.amount}`} size="small" variant="filled" />
+                                              </Box>
+                                              <Typography variant="caption" color="text.secondary">
+                                                  {format(new Date(h.timestamp), 'MMM d, h:mm a')}
+                                              </Typography>
+                                          </Box>
+                                          {h.message && (
+                                              <Typography variant="body2" sx={{ mt: 1, fontStyle: 'italic', color: 'text.secondary' }}>
+                                                  "{h.message}"
+                                              </Typography>
+                                          )}
+                                      </Box>
+                                  ))}
+                                  {neg.status === 'accepted' && (
+                                      <Box p={2} borderRadius={2} bgcolor="#e6fffa" border="1px solid #38b2ac" textAlign="center">
+                                          <Typography variant="body2" fontWeight="bold" color="#2c7a7b">
+                                              ✓ FINAL AGREEMENT REACHED
+                                          </Typography>
+                                      </Box>
+                                  )}
+                                  {neg.status === 'rejected' && (
+                                      <Box p={2} borderRadius={2} bgcolor="#fff5f5" border="1px solid #feb2b2" textAlign="center">
+                                          <Typography variant="body2" fontWeight="bold" color="#c53030">
+                                              ✕ NEGOTIATION CLOSED (REJECTED)
+                                          </Typography>
+                                      </Box>
+                                  )}
+                              </Box>
+                          ) : (
+                              <Box p={2} borderRadius={1} bgcolor="#f9fafb" borderLeft={`4px solid ${neg.status === 'accepted' ? '#2e7d32' : neg.status === 'rejected' ? '#d32f2f' : '#ed6c02'}`}>
+                                  <Box display="flex" justifyContent="space-between">
+                                     <Typography fontWeight="bold">Initial Offer</Typography>
+                                     <Chip label={neg.status.toUpperCase()} size="small" color={neg.status === 'accepted' ? 'success' : neg.status === 'rejected' ? 'error' : 'warning'} />
+                                  </Box>
+                                  <Typography variant="body2" mt={0.5}>Amount: <strong>${neg.amount}</strong></Typography>
+                                  <Typography variant="caption" color="text.secondary">Sent on {format(new Date(neg.createdAt), 'PPP p')}</Typography>
+                              </Box>
+                          )}
                       </Box>
                   ))}
                   <Box mt={2} p={2} bgcolor="#e8f5e9" borderRadius={1}>

@@ -15,7 +15,7 @@ interface Job {
   jobDate: string;
   jobTime: string;
   location: { general: string };
-  status: 'accepted';
+  status: 'accepted' | 'pending_start_approval';
   providerId?: { name: string; avatar?: string };
 }
 
@@ -30,7 +30,7 @@ const SeekerAssignedJobsView = () => {
   const fetchJobs = async () => {
     try {
       const data = await jobService.getPostedJobs();
-      const assigned = data.filter((job: Job) => job.status === 'accepted');
+      const assigned = data.filter((job: Job) => job.status === 'accepted' || job.status === 'pending_start_approval');
       setJobs(assigned);
     } catch (error) {
       console.error('Failed to fetch assigned jobs', error);
@@ -112,16 +112,41 @@ const SeekerAssignedJobsView = () => {
                       <Typography variant="h6" color="primary.main" fontWeight="bold">
                           ${job.currentPay || job.originalPay}
                       </Typography>
-                      <Chip label="Ready to Start" color="success" size="small" sx={{ mt: 1, mb: 1, display: 'block' }} />
-                      <Button 
-                        variant="contained" 
+                      <Chip 
+                        label={job.status === 'pending_start_approval' ? "Start Approval Requested" : "Ready to Start"} 
+                        color={job.status === 'pending_start_approval' ? "warning" : "success"} 
                         size="small" 
-                        color="primary" 
-                        startIcon={<PlayArrowIcon />}
-                        onClick={() => handleStartClick(job)}
-                      >
-                        Start Job
-                      </Button>
+                        sx={{ mt: 1, mb: 1, display: 'block' }} 
+                      />
+                      {job.status === 'pending_start_approval' ? (
+                          <Button 
+                            variant="contained" 
+                            size="small" 
+                            color="warning" 
+                            startIcon={<PlayArrowIcon />}
+                            onClick={async () => {
+                                try {
+                                    await jobService.approveStart(job._id);
+                                    showToast('Early start approved!', 'success');
+                                    fetchJobs();
+                                } catch (error) {
+                                    showToast('Failed to approve early start', 'error');
+                                }
+                            }}
+                          >
+                            Approve Early Start
+                          </Button>
+                      ) : (
+                          <Button 
+                            variant="contained" 
+                            size="small" 
+                            color="primary" 
+                            startIcon={<PlayArrowIcon />}
+                            onClick={() => handleStartClick(job)}
+                          >
+                            Start Job
+                          </Button>
+                      )}
                   </Box>
               </Box>
             </Paper>

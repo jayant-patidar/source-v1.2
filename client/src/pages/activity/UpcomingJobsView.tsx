@@ -17,7 +17,7 @@ interface Job {
   jobDate: string;
   jobTime: string;
   location: { general: string };
-  status: 'accepted';
+  status: 'accepted' | 'pending_start_approval';
   seekerId: { name: string; avatar?: string; _id: string };
 }
 
@@ -32,8 +32,8 @@ const UpcomingJobsView = () => {
   const fetchJobs = async () => {
     try {
       const data = await jobService.getWorkedJobs();
-      // Filter for accepted jobs (upcoming)
-      const upcoming = data.filter((job: Job) => job.status === 'accepted');
+      // Filter for accepted or pending start approval jobs (upcoming)
+      const upcoming = data.filter((job: Job) => job.status === 'accepted' || job.status === 'pending_start_approval');
       setJobs(upcoming);
     } catch (error) {
       console.error('Failed to fetch jobs', error);
@@ -119,15 +119,21 @@ const UpcomingJobsView = () => {
                       <Typography variant="h6" color="primary.main" fontWeight="bold">
                           ${job.currentPay || job.originalPay}
                       </Typography>
-                      <Chip label="Upcoming" color="info" size="small" sx={{ mt: 1, mb: 1, display: 'block' }} />
+                      <Chip 
+                        label={job.status === 'pending_start_approval' ? "Pending Approval" : "Upcoming"} 
+                        color={job.status === 'pending_start_approval' ? "warning" : "info"} 
+                        size="small" 
+                        sx={{ mt: 1, mb: 1, display: 'block' }} 
+                      />
                       <Button 
                         variant="contained" 
                         size="small" 
                         color="primary" 
                         startIcon={<PlayArrowIcon />}
                         onClick={() => handleStartClick(job)}
+                        disabled={job.status === 'pending_start_approval'}
                       >
-                        Start Job
+                        {job.status === 'pending_start_approval' ? "Waiting..." : "Start Job"}
                       </Button>
                   </Box>
               </Box>

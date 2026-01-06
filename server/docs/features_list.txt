@@ -27,7 +27,7 @@ A. Onboarding & Account Setup (COMMON)
   Set Default Role Preferences [PLANNED]
       - User chooses what they usually do (Seeker / Provider / Both)
       - Note: They can switch at any time
-  Add Payment Method (optional but encouraged) [PLANNED]
+  Add Payment Method [mock implemented]
   Set Service Area / Location Preferences [PLANNED]
 
 --------------------------------------------------------------------------------
@@ -51,8 +51,8 @@ B. Explore & Browse Posts
       Description, Pay, Date/Time [COMPLETED]
       Seeker Details (Rating, Member Since) [COMPLETED]
       Location (General vs Exact privacy) [COMPLETED]
-  Save a Post (UI Implemented, Mock Functionality) [IN PROGRESS]
-  Share a Post (UI Implemented, Mock Functionality) [IN PROGRESS]
+  Save a Post (Functional) [COMPLETED]
+  Share a Post [PLANNED]
   Report a Post [PLANNED]
       - Wrong info, fraud, inappropriate, etc.
 
@@ -64,9 +64,9 @@ C. Create & Manage Job Request
       Date/time [COMPLETED]
       Location (General & Exact) [COMPLETED]
       Photos [PLANNED]
-  Edit or Update Job Post [PLANNED]
-  Pause or Resume Post Visibility [PLANNED]
-  Delete Job Post [PLANNED]
+  Edit or Update Job Post [COMPLETED]
+  Pause or Resume Post Visibility [COMPLETED]
+  Delete Job Post [COMPLETED]
   View Posted Jobs (My Activity -> Posted Jobs) [COMPLETED]
 
 D. Interactions With Providers
@@ -78,29 +78,29 @@ D. Interactions With Providers
       Counter-offer [PLANNED]
       Chat History [PLANNED]
   Choose & Confirm a Provider (Accept Offer) [COMPLETED]
-  Cancel Engagement Before Service [PLANNED]
-  Track Provider (live/approx) Before Arrival [PLANNED]
+  Cancel Engagement Before Service [COMPLETED]
+  Track Provider (live/approx) Before Arrival [IN PROGRESS]
 
 E. Payments & Service Management
-  Select Payment Option [PLANNED]
-  Pay Deposit or Full Payment (depending on model) [PLANNED]
-  Receive Invoice [PLANNED]
+  Select Payment Option (Stripe Integration) [mock implemented]
+  Pay Deposit or Full Payment (Payment Page) [PLANNED]
+  Receive Invoice (Contract View) [COMPLETED]
 
 F. During the Service
   Chat with Provider [PLANNED]
-  Receive Status Updates [PLANNED]
+  Receive Status Updates [COMPLETED]
       - On the way
       - Started
       - In progress
       - Completed
 
 G. Completion & Ratings
-  Approve Completion [PLANNED]
-  Release Payment [PLANNED]
-  Rate Provider [PLANNED]
-  Write Review [PLANNED]
+  Approve Completion [COMPLETED]
+  Release Payment [COMPLETED]
+  Rate Provider [COMPLETED]
+  Write Review [COMPLETED]
   Provider Can Respond to Negative Reviews [PLANNED]
-  View Own Seeker Rating Summary [PLANNED]
+  View Own Seeker Rating Summary [COMPLETED]
 
 H. Support
   Raise a Dispute [PLANNED]
@@ -118,38 +118,37 @@ J. Browse Available Job Requests
       Distance [PLANNED]
       Date [PLANNED]
   Open Job Details [COMPLETED]
-  Locate Job on Map (UI Implemented, Mock Functionality) [IN PROGRESS]
-  Save or Bookmark Job (UI Implemented, Mock Functionality) [Completed]
-  Share Job (UI Implemented, Mock Functionality) [IN PROGRESS]
+  Locate Job on Map [PLANNED]
+  Save or Bookmark Job [COMPLETED]
+  Share Job [PLANNED]
 
 K. Interact With Seekers
   Show Interest in a Job (Express Interest Modal) [COMPLETED]
   Negotiate Price with Seeker (Make Offer Modal) [COMPLETED]
   Chat with Seeker (Message included in Offer) [PLANNED]
   Receive Confirmation from Seeker (Job Status: Assigned) [COMPLETED]
-  Accept or Decline Job Assignment [COMPLETED]
+  Accept or Decline Job offers [COMPLETED]
 
 L. Pre-Service Management
-  View Job Timeline & Requirements [PLANNED]
+  View Job Timeline & Requirements [COMPLETED]
   Mark “On the Way” [PLANNED]
   Mark “Arrived” [PLANNED]
 
 M. During the Service
-  Start Service Timer (if used) [PLANNED]
-  Send Progress Updates [PLANNED]
-  Mark as Completed [PLANNED]
+  Start Service Timer (Start Job timestamp) [COMPLETED]
+  Send Progress Updates [COMPLETED]
+  Mark as Completed [COMPLETED]
 
 N. Payments & Earnings
-  View Expected Earnings per Job [PLANNED]
-  Receive Payment After Completion [PLANNED]
+  Receive Payment After Completion [COMPLETED]
   Wallet Balance Summary [PLANNED]
   Withdraw Earnings to Bank/UPI [PLANNED]
   View Earnings History [PLANNED]
-  View Work History (My Activity -> Work History) [COMPLETED]
+  View Work History [COMPLETED]
 
 O. Ratings & Community Reputation
-  Rate Seeker After Job [PLANNED]
-  Add Feedback for Seeker [PLANNED]
+  Rate Seeker After Job [COMPLETED]
+  Add Feedback for Seeker [COMPLETED]
   View Provider Rating (Basic Display) [COMPLETED]
   View Seeker Rating (Basic Display) [COMPLETED]
   Respond to Negative Feedback [PLANNED]

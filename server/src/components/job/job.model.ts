@@ -18,7 +18,7 @@ export interface IJob extends Document {
   isNegotiable: boolean;
   expirationDate: Date;
   category: string;
-  status: 'open' | 'accepted' | 'in_progress' | 'completed' | 'canceled' | 'paused' | 'pending_completion';
+  status: 'open' | 'accepted' | 'in_progress' | 'completed' | 'canceled' | 'paused' | 'pending_completion' | 'pending_start_approval';
   paymentStatus: 'pending' | 'paid' | 'failed';
   timeline: { status: string; timestamp: Date; actorId?: mongoose.Types.ObjectId; details?: string }[];
   type?: string;
@@ -67,7 +67,7 @@ const JobSchema: Schema = new Schema(
     status: {
       type: String,
       default: 'open',
-      enum: ['open', 'accepted', 'in_progress', 'completed', 'canceled', 'paused', 'pending_completion'],
+      enum: ['open', 'accepted', 'in_progress', 'completed', 'canceled', 'paused', 'pending_completion', 'pending_start_approval'],
     },
     paymentStatus: {
       type: String,
@@ -79,6 +79,7 @@ const JobSchema: Schema = new Schema(
         status: { type: String, required: true },
         timestamp: { type: Date, default: Date.now },
         actorId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: false },
+        details: { type: String, required: false },
       },
     ],
     type: { type: String, required: false },

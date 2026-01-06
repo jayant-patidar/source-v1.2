@@ -15,6 +15,7 @@ import {
 import { Link } from 'react-router-dom';
 import { jobService } from '../../services/job.service';
 import { formatDistanceToNow } from 'date-fns';
+import { useToastStore } from '../../store/toastStore';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -47,6 +48,7 @@ interface Job {
 const PostedJobsView = () => {
   const [jobs, setJobs] = useState<Job[]>([]);
   const [loading, setLoading] = useState(true);
+  const { showToast } = useToastStore();
   
   // Menu State
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
@@ -98,12 +100,11 @@ const PostedJobsView = () => {
   const handleToggleVisibility = async (id: string, currentVisibility: boolean) => {
       try {
           await jobService.updateJob(id, { visibility: !currentVisibility });
-          // showToast(`Job is now ${!currentVisibility ? 'visible' : 'hidden'}`, 'success');
+          showToast(`Job is now ${!currentVisibility ? 'visible' : 'hidden'}`, 'success');
           fetchJobs(); // Re-fetch to update visibility
       } catch (error) {
           console.error('Error toggling visibility:', error);
-          // showToast('Failed to update visibility', 'error');
-          alert('Failed to update visibility'); // Fallback for showToast
+          showToast('Failed to update visibility', 'error');
       } finally {
           handleMenuClose();
       }
@@ -113,10 +114,11 @@ const PostedJobsView = () => {
     if (!window.confirm('Are you sure you want to cancel this job?')) return;
     try {
       await jobService.updateJob(id, { status: 'canceled' }); 
+      showToast('Job canceled successfully', 'info');
       fetchJobs();
     } catch (error) {
        console.error('Error canceling job:', error);
-       alert('Failed to cancel job');
+       showToast('Failed to cancel job', 'error');
     } finally {
         handleMenuClose();
     }
@@ -127,9 +129,10 @@ const PostedJobsView = () => {
     try {
       await jobService.deleteJob(id);
       setJobs(jobs.filter(job => job._id !== id));
+      showToast('Job deleted permanently', 'success');
     } catch (error) {
       console.error('Error deleting job:', error);
-      alert('Failed to delete job');
+      showToast('Failed to delete job', 'error');
     } finally {
         handleMenuClose();
     }

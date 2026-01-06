@@ -1,4 +1,4 @@
-import { Card, CardContent, Typography, Button, Box, Chip, Avatar, IconButton, Divider, Dialog, DialogTitle, DialogContent, DialogActions, TextField, Snackbar } from '@mui/material';
+import { Card, CardContent, Typography, Button, Box, Chip, Avatar, IconButton, Divider, Dialog, DialogTitle, DialogContent, DialogActions, TextField } from '@mui/material';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import { Menu, MenuItem, ListItemIcon, ListItemText } from '@mui/material';
 import ReportProblemIcon from '@mui/icons-material/ReportProblem';
@@ -14,6 +14,7 @@ import { Link } from 'react-router-dom';
 import { format } from 'date-fns';
 import { useState } from 'react';
 import { offerService } from '../services/offer.service';
+import { useToastStore } from '../store/toastStore';
 
 import { jobService } from '../services/job.service';
 
@@ -25,17 +26,17 @@ const JobCard = ({ job }: { job: any }) => {
   const [offerMode, setOfferMode] = useState<'negotiate' | 'interested'>('negotiate');
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [isSaved, setIsSaved] = useState(false); // Initial state should be checked from user profile
+  const { showToast } = useToastStore();
   const menuOpen = Boolean(anchorEl);
-
-  const [snackbarOpen, setSnackbarOpen] = useState(false);
 
   const handleSave = async () => {
     try {
       await jobService.toggleSaveJob(job._id);
       setIsSaved(!isSaved);
-      setSnackbarOpen(true);
+      showToast(isSaved ? "Job Unsaved" : "Job Saved", 'success');
     } catch (error) {
       console.error('Error toggling save:', error);
+      showToast('Failed to save job', 'error');
     }
   };
 
@@ -62,11 +63,11 @@ const JobCard = ({ job }: { job: any }) => {
         amount: Number(offerAmount),
         message
       });
-      alert('Notification sent successfully!');
+      showToast('Offer sent successfully!', 'success');
       handleClose();
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error sending notification:', error);
-      alert('Failed to send notification.');
+      showToast(error.response?.data?.message || 'Failed to send offer.', 'error');
     }
   };
 
@@ -223,11 +224,11 @@ const JobCard = ({ job }: { job: any }) => {
                  <LoopIcon sx={{ fontSize: 24, color: 'black' }} />
                  <Typography variant="caption" sx={{ fontSize: '0.7rem', mt: 0.5 }}>Negotiate</Typography>
               </Box>
-              <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', cursor: 'pointer', opacity: 0.7, '&:hover': { opacity: 1 } }} onClick={() => alert('Requesting exact location...')}>
+              <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', cursor: 'pointer', opacity: 0.7, '&:hover': { opacity: 1 } }} onClick={() => showToast('Requesting exact location...', 'info')}>
                  <ShareLocationIcon sx={{ fontSize: 24, color: 'black' }} />
                  <Typography variant="caption" sx={{ fontSize: '0.7rem', mt: 0.5 }}>Locate</Typography>
               </Box>
-              <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', cursor: 'pointer', opacity: 0.7, '&:hover': { opacity: 1 } }} onClick={() => alert('Share functionality coming soon!')}>
+              <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', cursor: 'pointer', opacity: 0.7, '&:hover': { opacity: 1 } }} onClick={() => showToast('Share functionality coming soon!', 'info')}>
                  <SendIcon sx={{ fontSize: 24, color: 'black' }} />
                  <Typography variant="caption" sx={{ fontSize: '0.7rem', mt: 0.5 }}>Share</Typography>
               </Box>
@@ -318,12 +319,6 @@ const JobCard = ({ job }: { job: any }) => {
           </Button>
         </DialogActions>
       </Dialog>
-      <Snackbar
-        open={snackbarOpen}
-        autoHideDuration={3000}
-        onClose={() => setSnackbarOpen(false)}
-        message={isSaved ? "Job Saved" : "Job Unsaved"}
-      />
     </>
   );
 };

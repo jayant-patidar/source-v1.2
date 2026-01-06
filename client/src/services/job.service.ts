@@ -63,5 +63,9 @@ export const jobService = {
   async startJob(id: string) {
     const { data } = await api.put(`/jobs/${id}/start`);
     return data;
+  },
+  async approveStart(id: string) {
+    const response = await api.put(`/jobs/${id}/approve-start`);
+    return response.data;
   }
 };

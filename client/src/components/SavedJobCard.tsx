@@ -1,4 +1,4 @@
-import { Card, CardContent, Typography, Box, Chip, Avatar, IconButton, Snackbar } from '@mui/material';
+import { Card, CardContent, Typography, Box, Chip, Avatar, IconButton } from '@mui/material';
 import { Link } from 'react-router-dom';
 import { format } from 'date-fns';
 import { useState } from 'react';
@@ -6,6 +6,7 @@ import LocationOnIcon from '@mui/icons-material/LocationOn';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import BookmarkIcon from '@mui/icons-material/Bookmark';
 import BookmarkBorderIcon from '@mui/icons-material/BookmarkBorder';
+import { useToastStore } from '../store/toastStore';
 
 interface SavedJobCardProps {
   job: any;
@@ -16,14 +17,14 @@ import { jobService } from '../services/job.service';
 
 const SavedJobCard = ({ job, onUnsave }: SavedJobCardProps) => {
   const [isSaved, setIsSaved] = useState(true);
-  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const { showToast } = useToastStore();
 
   const handleToggleSave = async () => {
     try {
       await jobService.toggleSaveJob(job._id);
       const newSavedState = !isSaved;
       setIsSaved(newSavedState);
-      setSnackbarOpen(true);
+      showToast(newSavedState ? "Job Saved" : "Job Unsaved", 'success');
       
       // If we are unsaving, notify the parent after a delay or immediately
       if (!newSavedState) {
@@ -35,6 +36,7 @@ const SavedJobCard = ({ job, onUnsave }: SavedJobCardProps) => {
       }
     } catch (error) {
       console.error('Error toggling save:', error);
+      showToast('Failed to toggle save', 'error');
     }
   };
 
@@ -101,13 +103,6 @@ const SavedJobCard = ({ job, onUnsave }: SavedJobCardProps) => {
 
         </CardContent>
       </Card>
-      
-      <Snackbar
-        open={snackbarOpen}
-        autoHideDuration={2000}
-        onClose={() => setSnackbarOpen(false)}
-        message={isSaved ? "Job Saved" : "Job Unsaved"}
-      />
     </>
   );
 };

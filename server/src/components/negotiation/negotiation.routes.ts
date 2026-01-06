@@ -9,5 +9,6 @@ router.get('/my-offers', protect, (req, res, next) => negotiationController.getN
 router.get('/received', protect, (req, res, next) => negotiationController.getNegotiationsReceived(req, res, next));
 router.get('/:jobId', protect, (req, res, next) => negotiationController.getNegotiations(req, res, next));
 router.put('/:id', protect, (req, res, next) => negotiationController.updateNegotiationStatus(req, res, next));
+router.put('/:id/counter', protect, (req, res, next) => negotiationController.counterOffer(req, res, next));
 
 export default router;

@@ -25,5 +25,10 @@ export const offerService = {
   async updateOfferStatus(id: string, status: 'accepted' | 'rejected') {
     const { data } = await api.put(`/negotiations/${id}`, { status });
     return data;
+  },
+
+  async counterOffer(id: string, amount: number, message?: string) {
+    const { data } = await api.put(`/negotiations/${id}/counter`, { amount, message });
+    return data;
   }
 };

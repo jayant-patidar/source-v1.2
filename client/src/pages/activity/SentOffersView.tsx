@@ -1,7 +1,9 @@
 import { useState, useEffect } from 'react';
-import { Box, Typography, Paper, Chip, CircularProgress } from '@mui/material';
+import { Box, Typography, Paper, Chip, CircularProgress, Button, Dialog, DialogTitle, DialogContent, DialogActions, TextField } from '@mui/material';
 import { Link } from 'react-router-dom';
 import { formatDistanceToNow } from 'date-fns';
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import { useToastStore } from '../../store/toastStore';
 
 
 import { offerService } from '../../services/offer.service';
@@ -29,27 +31,75 @@ interface Negotiation {
   };
   amount: number;
   message: string;
-  status: 'pending' | 'accepted' | 'rejected';
+  status: 'pending' | 'accepted' | 'rejected' | 'countered';
+  seekerCounterCount: number;
+  providerCounterCount: number;
+  lastActor: 'seeker' | 'provider';
+  offerHistory: {
+    amount: number;
+    message?: string;
+    actor: 'seeker' | 'provider';
+    timestamp: Date;
+  }[];
   createdAt: string;
 }
 
 const SentOffersView = () => {
   const [sentOffers, setSentOffers] = useState<Negotiation[]>([]);
   const [loading, setLoading] = useState(true);
+  const [counterOpen, setCounterOpen] = useState(false);
+  const [selectedNegId, setSelectedNegId] = useState('');
+  const [counterAmount, setCounterAmount] = useState('');
+  const [counterMessage, setCounterMessage] = useState('');
+  const { showToast } = useToastStore();
+
+  const fetchOffers = async () => {
+    try {
+      const data = await offerService.getSentOffers();
+      setSentOffers(data);
+    } catch (error) {
+      console.error('Error fetching sent offers:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const fetchOffers = async () => {
-      try {
-        const data = await offerService.getSentOffers();
-        setSentOffers(data);
-      } catch (error) {
-        console.error('Error fetching sent offers:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
     fetchOffers();
   }, []);
+
+  const handleAccept = async (negotiationId: string) => {
+    try {
+        await offerService.updateOfferStatus(negotiationId, 'accepted');
+        showToast('Offer accepted', 'success');
+        fetchOffers();
+    } catch (err: any) {
+        showToast(err.response?.data?.message || 'Failed to accept', 'error');
+    }
+  };
+
+  const handleReject = async (negotiationId: string) => {
+    try {
+        await offerService.updateOfferStatus(negotiationId, 'rejected');
+        showToast('Offer rejected', 'info');
+        fetchOffers();
+    } catch (err: any) {
+        showToast(err.response?.data?.message || 'Failed to reject', 'error');
+    }
+  };
+
+  const handleCounter = async () => {
+      try {
+          await offerService.counterOffer(selectedNegId, Number(counterAmount), counterMessage);
+          showToast('Counter offer sent!', 'success');
+          setCounterOpen(false);
+          setCounterAmount('');
+          setCounterMessage('');
+          fetchOffers();
+      } catch (err: any) {
+          showToast(err.response?.data?.message || 'Failed to send counter', 'error');
+      }
+  };
 
   if (loading) return <Box display="flex" justifyContent="center" p={4}><CircularProgress /></Box>;
 
@@ -95,14 +145,96 @@ const SentOffersView = () => {
 
                         <Paper sx={{ p: 2, bgcolor: '#f5f5f5', borderRadius: 2, mt: 2 }} elevation={0}>
                             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                <Typography variant="body2" fontWeight="bold">My Offer:</Typography>
+                                <Typography variant="body2" fontWeight="bold">Current Amount:</Typography>
                                 <Typography variant="h6" color="primary.main" fontWeight="bold">${offer.amount}</Typography>
                             </Box>
+                            {offer.message && (
+                                <Typography variant="body2" color="text.secondary" sx={{ fontStyle: 'italic', mt: 1 }}>
+                                    "{offer.message}"
+                                </Typography>
+                            )}
                         </Paper>
+
+                        <Box sx={{ mt: 2, mb: 1, display: 'flex', gap: 2 }}>
+                             <Typography variant="caption" color="text.secondary">Your Counters: {offer.providerCounterCount}/2</Typography>
+                             <Typography variant="caption" color="text.secondary">Seeker Counters: {offer.seekerCounterCount}/2</Typography>
+                        </Box>
+
+                        {/* Action Buttons for Provider if Seeker Countered */}
+                        {(offer.status === 'pending' || offer.status === 'countered') && (
+                            <Box sx={{ display: 'flex', gap: 1, justifyContent: 'flex-end', mt: 2 }}>
+                                {offer.lastActor === 'seeker' && (
+                                    <>
+                                        <Button 
+                                            variant="contained" 
+                                            color="success" 
+                                            size="small"
+                                            startIcon={<CheckCircleIcon />}
+                                            onClick={() => handleAccept(offer._id)}
+                                        >
+                                            Accept
+                                        </Button>
+                                        {offer.providerCounterCount < 2 && (
+                                            <Button 
+                                                variant="outlined" 
+                                                color="primary" 
+                                                size="small"
+                                                onClick={() => { setSelectedNegId(offer._id); setCounterAmount(''); setCounterOpen(true); }}
+                                            >
+                                                Counter ({offer.providerCounterCount}/2)
+                                            </Button>
+                                        )}
+                                        <Button 
+                                            variant="outlined" 
+                                            color="error" 
+                                            size="small"
+                                            onClick={() => handleReject(offer._id)}
+                                        >
+                                            Reject
+                                        </Button>
+                                    </>
+                                )}
+                            </Box>
+                        )}
                     </Paper>
                 </Box>
             ))}
         </Box>
+
+        {/* Counter Offer Modal */}
+        <Dialog open={counterOpen} onClose={() => setCounterOpen(false)} maxWidth="xs" fullWidth>
+            <DialogTitle sx={{ fontWeight: 'bold' }}>Counter Offer</DialogTitle>
+            <DialogContent>
+                <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>Propose a new price to the seeker.</Typography>
+                <TextField
+                    autoFocus
+                    margin="dense"
+                    label="Counter Amount ($)"
+                    type="number"
+                    fullWidth
+                    value={counterAmount}
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => setCounterAmount(e.target.value)}
+                    variant="outlined"
+                    sx={{ mb: 2 }}
+                />
+                <TextField
+                    margin="dense"
+                    label="Message (Optional)"
+                    fullWidth
+                    multiline
+                    rows={3}
+                    value={counterMessage}
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => setCounterMessage(e.target.value)}
+                    variant="outlined"
+                />
+            </DialogContent>
+            <DialogActions sx={{ p: 3 }}>
+                <Button onClick={() => setCounterOpen(false)}>Cancel</Button>
+                <Button variant="contained" color="primary" onClick={handleCounter} disabled={!counterAmount}>
+                    Send Counter
+                </Button>
+            </DialogActions>
+        </Dialog>
     </Box>
   );
 };

@@ -169,15 +169,69 @@ class JobController {
         return res.status(403).json({ error: 'Not authorized to start this job' });
       }
 
-      if (job.status !== 'accepted') {
+      if (job.status !== 'accepted' && job.status !== 'pending_start_approval') {
         return res.status(400).json({ error: 'Job must be accepted to start' });
       }
 
-      // Update status and startTime
+      // Check for early start
+      const now = new Date();
+      const jobDate = new Date(job.jobDate);
+      
+      // Parse jobTime (HH:mm)
+      const [hours, minutes] = job.jobTime.split(':').map(Number);
+      const scheduledTime = new Date(jobDate);
+      scheduledTime.setHours(hours, minutes, 0, 0);
+
+      // If actor is provider and it's early
+      if (isProvider && now < scheduledTime && !isSeeker) {
+          if (job.status === 'pending_start_approval') {
+              return res.status(400).json({ error: 'Start request already pending approval' });
+          }
+          
+          const updatedJob = await this.jobService.updateJob(jobId, {
+            status: 'pending_start_approval',
+            $push: { timeline: { status: 'start_requested_early', timestamp: new Date(), actorId: (req as any).user._id, details: 'Provider requested to start before scheduled time' } }
+          } as any);
+          return res.status(200).json({ message: 'Early start requested. Waiting for seeker approval.', job: updatedJob });
+      }
+
+      // Update status and startTime (normal start or seeker start)
       const updatedJob = await this.jobService.updateJob(jobId, {
         status: 'in_progress',
         startTime: new Date(),
         $push: { timeline: { status: 'started', timestamp: new Date(), actorId: (req as any).user._id } }
+      } as any);
+
+      res.status(200).json(updatedJob);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async approveStart(req: any, res: Response, next: NextFunction) {
+    try {
+      const jobId = req.params.id;
+      const job = await this.jobService.getJobById(jobId);
+
+      if (!job) {
+        return res.status(404).json({ error: 'Job not found' });
+      }
+
+      // Only Seeker can approve
+      const isSeeker = job.seekerId.toString() === req.user._id.toString() || (job.seekerId as any)._id?.toString() === req.user._id.toString();
+      
+      if (!isSeeker) {
+        return res.status(403).json({ error: 'Only seeker can approve early start' });
+      }
+
+      if (job.status !== 'pending_start_approval') {
+        return res.status(400).json({ error: 'Job is not pending start approval' });
+      }
+
+      const updatedJob = await this.jobService.updateJob(jobId, {
+        status: 'in_progress',
+        startTime: new Date(),
+        $push: { timeline: { status: 'started_early_approved', timestamp: new Date(), actorId: req.user._id } }
       } as any);
 
       res.status(200).json(updatedJob);
