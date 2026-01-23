@@ -15,12 +15,13 @@ class UserController {
     try {
       const newUser = await this.userService.createUser(req.body);
       if (newUser) {
-        generateToken(res, (newUser._id as any).toString());
+        const token = generateToken(res, (newUser._id as any).toString());
         res.status(201).json({
           _id: newUser._id,
           name: newUser.name,
           email: newUser.email,
-          role: 'user' // Default role
+          role: 'user', // Default role
+          token
         });
       }
     } catch (error) {
@@ -34,13 +35,14 @@ class UserController {
       const user = await this.userService.loginUser(email);
 
       if (user && (await user.matchPassword(password))) {
-        generateToken(res, (user._id as any).toString());
+        const token = generateToken(res, (user._id as any).toString());
         res.json({
           _id: user._id,
           name: user.name,
           email: user.email,
           seekerRating: user.seekerRating,
           providerRating: user.providerRating,
+          token
         });
       } else {
         res.status(401);
