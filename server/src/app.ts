@@ -3,6 +3,7 @@ import cors from 'cors';
 import helmet from 'helmet';
 import cookieParser from 'cookie-parser';
 import dotenv from 'dotenv';
+import rateLimit from 'express-rate-limit';
 import connectDB from './config/db';
 import logger from './utils/logger';
 import { errorHandler } from './middleware/error.middleware';
@@ -24,7 +25,9 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(helmet());
 app.use(cors({
-    origin: true, // Allow all origins for mobile development
+    origin: process.env.NODE_ENV === 'development'
+      ? ['http://localhost:5173', 'http://localhost:3000']
+      : ['https://your-production-domain.com'],
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization']
@@ -35,6 +38,14 @@ app.get('/', (req, res) => {
 });
 
 // Use new component routes
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 10, // 10 attempts per window
+  message: { error: 'Too many attempts, try again later' }
+});
+
+app.use('/api/users/login', authLimiter);
+app.use('/api/users/register', authLimiter);
 app.use('/api/users', userRoutes);
 app.use('/api/jobs', jobRoutes);
 app.use('/api/transactions', transactionRoutes);
