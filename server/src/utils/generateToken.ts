@@ -3,6 +3,8 @@ import jwt from 'jsonwebtoken';
 import { Types } from 'mongoose';
 
 const generateToken = (res: Response, userId: Types.ObjectId | string) => {
+  const isProduction = process.env.NODE_ENV !== 'development';
+
   const accessToken = jwt.sign({ userId }, process.env.JWT_SECRET || 'secret', {
     expiresIn: '1d',
   });
@@ -13,15 +15,15 @@ const generateToken = (res: Response, userId: Types.ObjectId | string) => {
 
   res.cookie('jwt', accessToken, {
     httpOnly: true,
-    secure: process.env.NODE_ENV !== 'development',
-    sameSite: 'strict',
+    secure: isProduction,
+    sameSite: isProduction ? 'none' : 'strict',
     maxAge: 24 * 60 * 60 * 1000, // 1 day
   });
 
   res.cookie('refresh_token', refreshToken, {
     httpOnly: true,
-    secure: process.env.NODE_ENV !== 'development',
-    sameSite: 'strict',
+    secure: isProduction,
+    sameSite: isProduction ? 'none' : 'strict',
     maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
   });
 

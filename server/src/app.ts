@@ -18,6 +18,9 @@ dotenv.config();
 
 const app = express();
 
+// Trust the first proxy (Render's reverse proxy) so secure cookies work properly
+app.set('trust proxy', 1);
+
 connectDB();
 
 app.use(express.json());
