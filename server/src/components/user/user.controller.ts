@@ -54,12 +54,17 @@ class UserController {
   }
 
   async logoutUser(req: Request, res: Response) {
+    const isProduction = process.env.NODE_ENV !== 'development';
     res.cookie('jwt', '', {
       httpOnly: true,
+      secure: isProduction,
+      sameSite: isProduction ? 'none' : 'strict',
       expires: new Date(0),
     });
     res.cookie('refresh_token', '', {
       httpOnly: true,
+      secure: isProduction,
+      sameSite: isProduction ? 'none' : 'strict',
       expires: new Date(0),
     });
     res.status(200).json({ message: 'Logged out successfully' });
@@ -81,10 +86,12 @@ class UserController {
         expiresIn: '15m',
       });
 
+      const isProduction = process.env.NODE_ENV !== 'development';
+
       res.cookie('jwt', accessToken, {
         httpOnly: true,
-        secure: process.env.NODE_ENV !== 'development',
-        sameSite: 'strict',
+        secure: isProduction,
+        sameSite: isProduction ? 'none' : 'strict',
         maxAge: 15 * 60 * 1000, // 15 minutes
       });
 
