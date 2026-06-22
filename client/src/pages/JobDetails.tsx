@@ -144,7 +144,7 @@ const JobDetails = () => {
   if (!job) return <Container><Typography>Job not found</Typography></Container>;
 
   // Correctly identify if current user is the poster
-  const isPoster = user && job.seekerId && job.seekerId._id === user._id;
+  const isPoster = user && (job.seekerId === user._id || (job.seekerId && job.seekerId._id === user._id));
   const poster = job.seekerId;
   console.log('JobDetails Render - Job:', job);
 

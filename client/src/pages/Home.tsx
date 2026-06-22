@@ -258,9 +258,11 @@ const Home = () => {
             ) : (
               <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0 }}>
                 {jobs && jobs.length > 0 ? (
-                  jobs.map((job) => (
-                    <JobCard key={job._id} job={job} />
-                  ))
+                  jobs
+                    .filter((job) => !user || (job.seekerId?._id !== user._id && job.seekerId !== user._id))
+                    .map((job) => (
+                      <JobCard key={job._id} job={job} />
+                    ))
                 ) : (
                   <Typography variant="body1" color="text.secondary" sx={{ textAlign: 'center', py: 4 }}>
                     No jobs found matching your criteria.

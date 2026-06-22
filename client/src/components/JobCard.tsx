@@ -29,6 +29,8 @@ const JobCard = ({ job }: { job: any }) => {
   const [isSaved, setIsSaved] = useState(false); // Initial state should be checked from user profile
   const { showToast } = useToastStore();
   const { user } = useAuthStore();
+  
+  const isPoster = user && (job.seekerId === user._id || (job.seekerId && job.seekerId._id === user._id));
 
   // Guard: show login prompt if user is not authenticated
   const requireAuth = (action: () => void) => {
@@ -229,47 +231,51 @@ const JobCard = ({ job }: { job: any }) => {
 
           <Divider sx={{ mb: 2 }} />
 
-          {/* Actions Icons Row */}
-          <Box sx={{ display: 'flex', justifyContent: 'space-around', mb: 2 }}>
-              <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', cursor: 'pointer', opacity: 0.7, '&:hover': { opacity: 1 } }} onClick={() => requireAuth(() => { setOfferMode('negotiate'); setOfferAmount(''); setOpen(true); })}>
-                 <LoopIcon sx={{ fontSize: 24, color: 'black' }} />
-                 <Typography variant="caption" sx={{ fontSize: '0.7rem', mt: 0.5 }}>Negotiate</Typography>
+          {!isPoster && (
+            <>
+              {/* Actions Icons Row */}
+              <Box sx={{ display: 'flex', justifyContent: 'space-around', mb: 2 }}>
+                  <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', cursor: 'pointer', opacity: 0.7, '&:hover': { opacity: 1 } }} onClick={() => requireAuth(() => { setOfferMode('negotiate'); setOfferAmount(''); setOpen(true); })}>
+                    <LoopIcon sx={{ fontSize: 24, color: 'black' }} />
+                    <Typography variant="caption" sx={{ fontSize: '0.7rem', mt: 0.5 }}>Negotiate</Typography>
+                  </Box>
+                  <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', cursor: 'pointer', opacity: 0.7, '&:hover': { opacity: 1 } }} onClick={() => requireAuth(() => showToast('Requesting exact location...', 'info'))}>
+                    <ShareLocationIcon sx={{ fontSize: 24, color: 'black' }} />
+                    <Typography variant="caption" sx={{ fontSize: '0.7rem', mt: 0.5 }}>Locate</Typography>
+                  </Box>
+                  <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', cursor: 'pointer', opacity: 0.7, '&:hover': { opacity: 1 } }} onClick={() => requireAuth(() => showToast('Share functionality coming soon!', 'info'))}>
+                    <SendIcon sx={{ fontSize: 24, color: 'black' }} />
+                    <Typography variant="caption" sx={{ fontSize: '0.7rem', mt: 0.5 }}>Share</Typography>
+                  </Box>
+                  <Box 
+                    sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', cursor: 'pointer', opacity: isSaved ? 1 : 0.7, '&:hover': { opacity: 1 } }} 
+                    onClick={() => requireAuth(handleSave)}
+                  >
+                    {isSaved ? <BookmarkIcon sx={{ fontSize: 24, color: 'black' }} /> : <BookmarkBorderIcon sx={{ fontSize: 24, color: 'black' }} />}
+                    <Typography variant="caption" sx={{ fontSize: '0.7rem', mt: 0.5 }}>{isSaved ? 'Saved' : 'Save'}</Typography>
+                  </Box>
               </Box>
-              <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', cursor: 'pointer', opacity: 0.7, '&:hover': { opacity: 1 } }} onClick={() => requireAuth(() => showToast('Requesting exact location...', 'info'))}>
-                 <ShareLocationIcon sx={{ fontSize: 24, color: 'black' }} />
-                 <Typography variant="caption" sx={{ fontSize: '0.7rem', mt: 0.5 }}>Locate</Typography>
-              </Box>
-              <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', cursor: 'pointer', opacity: 0.7, '&:hover': { opacity: 1 } }} onClick={() => requireAuth(() => showToast('Share functionality coming soon!', 'info'))}>
-                 <SendIcon sx={{ fontSize: 24, color: 'black' }} />
-                 <Typography variant="caption" sx={{ fontSize: '0.7rem', mt: 0.5 }}>Share</Typography>
-              </Box>
-              <Box 
-                sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', cursor: 'pointer', opacity: isSaved ? 1 : 0.7, '&:hover': { opacity: 1 } }} 
-                onClick={() => requireAuth(handleSave)}
-              >
-                 {isSaved ? <BookmarkIcon sx={{ fontSize: 24, color: 'black' }} /> : <BookmarkBorderIcon sx={{ fontSize: 24, color: 'black' }} />}
-                 <Typography variant="caption" sx={{ fontSize: '0.7rem', mt: 0.5 }}>{isSaved ? 'Saved' : 'Save'}</Typography>
-              </Box>
-          </Box>
 
-          {/* Interested Button */}
-          <Button 
-              fullWidth
-              variant="contained" 
-              onClick={() => requireAuth(() => { setOfferMode('interested'); setOfferAmount(job.originalPay); setOpen(true); })}
-              sx={{ 
-                bgcolor: '#000000', 
-                color: 'white', 
-                fontWeight: 'bold',
-                py: 1.2,
-                borderRadius: 2,
-                textTransform: 'none',
-                fontSize: '1rem',
-                '&:hover': { bgcolor: '#333' }
-              }}
-            >
-              INTERESTED
-          </Button>
+              {/* Interested Button */}
+              <Button 
+                  fullWidth
+                  variant="contained" 
+                  onClick={() => requireAuth(() => { setOfferMode('interested'); setOfferAmount(job.originalPay); setOpen(true); })}
+                  sx={{ 
+                    bgcolor: '#000000', 
+                    color: 'white', 
+                    fontWeight: 'bold',
+                    py: 1.2,
+                    borderRadius: 2,
+                    textTransform: 'none',
+                    fontSize: '1rem',
+                    '&:hover': { bgcolor: '#333' }
+                  }}
+                >
+                  INTERESTED
+              </Button>
+            </>
+          )}
         </CardContent>
       </Card>
 
