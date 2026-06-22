@@ -15,6 +15,7 @@ import { format } from 'date-fns';
 import { useState } from 'react';
 import { offerService } from '../services/offer.service';
 import { useToastStore } from '../store/toastStore';
+import { useAuthStore } from '../store/authStore';
 
 import { jobService } from '../services/job.service';
 
@@ -27,6 +28,16 @@ const JobCard = ({ job }: { job: any }) => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [isSaved, setIsSaved] = useState(false); // Initial state should be checked from user profile
   const { showToast } = useToastStore();
+  const { user } = useAuthStore();
+
+  // Guard: show login prompt if user is not authenticated
+  const requireAuth = (action: () => void) => {
+    if (!user) {
+      showToast('Please login', 'warning');
+      return;
+    }
+    action();
+  };
   const menuOpen = Boolean(anchorEl);
 
   const handleSave = async () => {
@@ -220,21 +231,21 @@ const JobCard = ({ job }: { job: any }) => {
 
           {/* Actions Icons Row */}
           <Box sx={{ display: 'flex', justifyContent: 'space-around', mb: 2 }}>
-              <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', cursor: 'pointer', opacity: 0.7, '&:hover': { opacity: 1 } }} onClick={() => { setOfferMode('negotiate'); setOfferAmount(''); setOpen(true); }}>
+              <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', cursor: 'pointer', opacity: 0.7, '&:hover': { opacity: 1 } }} onClick={() => requireAuth(() => { setOfferMode('negotiate'); setOfferAmount(''); setOpen(true); })}>
                  <LoopIcon sx={{ fontSize: 24, color: 'black' }} />
                  <Typography variant="caption" sx={{ fontSize: '0.7rem', mt: 0.5 }}>Negotiate</Typography>
               </Box>
-              <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', cursor: 'pointer', opacity: 0.7, '&:hover': { opacity: 1 } }} onClick={() => showToast('Requesting exact location...', 'info')}>
+              <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', cursor: 'pointer', opacity: 0.7, '&:hover': { opacity: 1 } }} onClick={() => requireAuth(() => showToast('Requesting exact location...', 'info'))}>
                  <ShareLocationIcon sx={{ fontSize: 24, color: 'black' }} />
                  <Typography variant="caption" sx={{ fontSize: '0.7rem', mt: 0.5 }}>Locate</Typography>
               </Box>
-              <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', cursor: 'pointer', opacity: 0.7, '&:hover': { opacity: 1 } }} onClick={() => showToast('Share functionality coming soon!', 'info')}>
+              <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', cursor: 'pointer', opacity: 0.7, '&:hover': { opacity: 1 } }} onClick={() => requireAuth(() => showToast('Share functionality coming soon!', 'info'))}>
                  <SendIcon sx={{ fontSize: 24, color: 'black' }} />
                  <Typography variant="caption" sx={{ fontSize: '0.7rem', mt: 0.5 }}>Share</Typography>
               </Box>
               <Box 
                 sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', cursor: 'pointer', opacity: isSaved ? 1 : 0.7, '&:hover': { opacity: 1 } }} 
-                onClick={handleSave}
+                onClick={() => requireAuth(handleSave)}
               >
                  {isSaved ? <BookmarkIcon sx={{ fontSize: 24, color: 'black' }} /> : <BookmarkBorderIcon sx={{ fontSize: 24, color: 'black' }} />}
                  <Typography variant="caption" sx={{ fontSize: '0.7rem', mt: 0.5 }}>{isSaved ? 'Saved' : 'Save'}</Typography>
@@ -245,7 +256,7 @@ const JobCard = ({ job }: { job: any }) => {
           <Button 
               fullWidth
               variant="contained" 
-              onClick={() => { setOfferMode('interested'); setOfferAmount(job.originalPay); setOpen(true); }}
+              onClick={() => requireAuth(() => { setOfferMode('interested'); setOfferAmount(job.originalPay); setOpen(true); })}
               sx={{ 
                 bgcolor: '#000000', 
                 color: 'white', 

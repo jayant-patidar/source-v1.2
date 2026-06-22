@@ -23,6 +23,15 @@ const JobDetails = () => {
   const { id } = useParams();
   const { user } = useAuthStore();
   const { showToast } = useToastStore();
+
+  // Guard: show login prompt if user is not authenticated
+  const requireAuth = (action: () => void) => {
+    if (!user) {
+      showToast('Please login', 'warning');
+      return;
+    }
+    action();
+  };
   const [job, setJob] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [negotiationAmount, setNegotiationAmount] = useState('');
@@ -275,23 +284,23 @@ const JobDetails = () => {
         </Box>
 
         {/* Action Buttons & Interested Button */}
-        {!isPoster && user && (
+        {!isPoster && (
             <Box sx={{ mb: 5 }}>
                 {/* Actions Icons Row */}
                 <Box sx={{ display: 'flex', justifyContent: 'space-around', mb: 3 }}>
-                    <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', cursor: 'pointer', opacity: 0.7, '&:hover': { opacity: 1 } }} onClick={() => { setOfferMode('negotiate'); setNegotiationAmount(''); setShowOfferForm(true); }}>
+                    <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', cursor: 'pointer', opacity: 0.7, '&:hover': { opacity: 1 } }} onClick={() => requireAuth(() => { setOfferMode('negotiate'); setNegotiationAmount(''); setShowOfferForm(true); })}>
                         <LoopIcon sx={{ fontSize: 28, color: 'black' }} />
                         <Typography variant="caption" sx={{ fontSize: '0.8rem', mt: 0.5, fontWeight: 'bold' }}>Negotiate</Typography>
                     </Box>
-                    <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', cursor: 'pointer', opacity: 0.7, '&:hover': { opacity: 1 } }} onClick={() => showToast('Requesting exact location...', 'info')}>
+                    <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', cursor: 'pointer', opacity: 0.7, '&:hover': { opacity: 1 } }} onClick={() => requireAuth(() => showToast('Requesting exact location...', 'info'))}>
                         <ShareLocationIcon sx={{ fontSize: 28, color: 'black' }} />
                         <Typography variant="caption" sx={{ fontSize: '0.8rem', mt: 0.5, fontWeight: 'bold' }}>Locate</Typography>
                     </Box>
-                    <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', cursor: 'pointer', opacity: 0.7, '&:hover': { opacity: 1 } }} onClick={() => showToast('Share functionality coming soon!', 'info')}>
+                    <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', cursor: 'pointer', opacity: 0.7, '&:hover': { opacity: 1 } }} onClick={() => requireAuth(() => showToast('Share functionality coming soon!', 'info'))}>
                         <SendIcon sx={{ fontSize: 28, color: 'black' }} />
                         <Typography variant="caption" sx={{ fontSize: '0.8rem', mt: 0.5, fontWeight: 'bold' }}>Share</Typography>
                     </Box>
-                    <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', cursor: 'pointer', opacity: isSaved ? 1 : 0.7, '&:hover': { opacity: 1 } }} onClick={handleSave}>
+                    <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', cursor: 'pointer', opacity: isSaved ? 1 : 0.7, '&:hover': { opacity: 1 } }} onClick={() => requireAuth(handleSave)}>
                         {isSaved ? <BookmarkIcon sx={{ fontSize: 28, color: 'black' }} /> : <BookmarkBorderIcon sx={{ fontSize: 28, color: 'black' }} />}
                         <Typography variant="caption" sx={{ fontSize: '0.8rem', mt: 0.5, fontWeight: 'bold' }}>{isSaved ? 'Saved' : 'Save'}</Typography>
                     </Box>
@@ -302,7 +311,7 @@ const JobDetails = () => {
                     fullWidth
                     variant="contained" 
                     size="large"
-                    onClick={() => { setOfferMode('interested'); setNegotiationAmount(job.originalPay); setShowOfferForm(true); }}
+                    onClick={() => requireAuth(() => { setOfferMode('interested'); setNegotiationAmount(job.originalPay); setShowOfferForm(true); })}
                     sx={{ 
                         bgcolor: 'black', 
                         color: 'white', 
