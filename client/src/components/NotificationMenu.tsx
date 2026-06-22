@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Badge, Menu, Typography, Box, Divider, List, ListItemButton, ListItemText, ListItemAvatar, Avatar } from '@mui/material';
 import NotificationsIcon from '@mui/icons-material/Notifications';
-import axios from 'axios';
+import api from '../services/api';
 import { formatDistanceToNow } from 'date-fns';
 import { useNavigate } from 'react-router-dom';
 
@@ -30,7 +30,7 @@ const NotificationMenu = () => {
 
   const fetchNotifications = async () => {
     try {
-      const res = await axios.get('http://localhost:5000/api/notifications', { withCredentials: true });
+      const res = await api.get('/notifications');
       setNotifications(res.data);
       setUnreadCount(res.data.filter((n: Notification) => !n.isRead).length);
     } catch (error) {
@@ -56,7 +56,7 @@ const NotificationMenu = () => {
   const handleNotificationClick = async (notification: Notification) => {
     try {
       if (!notification.isRead) {
-        await axios.put(`http://localhost:5000/api/notifications/${notification._id}/read`, {}, { withCredentials: true });
+        await api.put(`/notifications/${notification._id}/read`);
         // Update local state
         setNotifications(prev => prev.map(n => n._id === notification._id ? { ...n, isRead: true } : n));
         setUnreadCount(prev => Math.max(0, prev - 1));
@@ -75,7 +75,7 @@ const NotificationMenu = () => {
 
   const handleMarkAllRead = async () => {
       try {
-          await axios.put('http://localhost:5000/api/notifications/read-all', {}, { withCredentials: true });
+          await api.put('/notifications/read-all');
           setNotifications(prev => prev.map(n => ({ ...n, isRead: true })));
           setUnreadCount(0);
       } catch (error) {

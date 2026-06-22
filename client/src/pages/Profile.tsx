@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Container, Typography, Box, Paper, Avatar, TextField, Button, Grid, Chip, MenuItem, Alert, CircularProgress, IconButton, Divider, Tabs, Tab } from '@mui/material';
-import axios from 'axios';
+import api from '../services/api';
 import { useAuthStore } from '../store/authStore';
 import { format } from 'date-fns';
 import WorkIcon from '@mui/icons-material/Work';
@@ -106,7 +106,7 @@ const Profile = () => {
   const fetchProfile = async () => {
     try {
       setLoading(true);
-      const { data } = await axios.get('http://localhost:5000/api/users/profile', { withCredentials: true });
+      const { data } = await api.get('/users/profile');
       setProfileData(data);
       setFormData({
         name: data.name || '',
@@ -132,16 +132,16 @@ const Profile = () => {
       });
 
       // Fetch Activity Data
-      const postedRes = await axios.get('http://localhost:5000/api/jobs/posted', { withCredentials: true });
+      const postedRes = await api.get('/jobs/posted');
       setPostedJobs(postedRes.data);
 
-      const offersRes = await axios.get('http://localhost:5000/api/negotiations/my-offers', { withCredentials: true });
+      const offersRes = await api.get('/negotiations/my-offers');
       setMyOffers(offersRes.data);
 
-      const workedRes = await axios.get('http://localhost:5000/api/jobs/worked', { withCredentials: true });
+      const workedRes = await api.get('/jobs/worked');
       setWorkedJobs(workedRes.data);
 
-      const reviewsRes = await axios.get(`http://localhost:5000/api/reviews/${data._id}`, { withCredentials: true });
+      const reviewsRes = await api.get(`/reviews/${data._id}`);
       setReviews(reviewsRes.data);
 
     } catch (err: any) {
@@ -257,7 +257,7 @@ const Profile = () => {
         payload = { ...formData };
       }
 
-      const { data } = await axios.put('http://localhost:5000/api/users/profile', payload, { withCredentials: true });
+      const { data } = await api.put('/users/profile', payload);
       const updatedUser = { ...authUser, ...data };
       localStorage.setItem('user', JSON.stringify(updatedUser));
       
@@ -280,7 +280,7 @@ const Profile = () => {
 
       try {
           console.log(`[DEBUG] handleReplySubmit: Submitting reply for review ${reviewId}, message: ${message}`);
-          const { data } = await axios.post(`http://localhost:5000/api/reviews/${reviewId}/reply`, { message }, { withCredentials: true });
+          const { data } = await api.post(`/reviews/${reviewId}/reply`, { message });
           console.log(`[DEBUG] handleReplySubmit success, data:`, data);
 
           // Update local state

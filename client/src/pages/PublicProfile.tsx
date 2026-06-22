@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { Container, Typography, Box, Paper, Avatar, Chip, CircularProgress, Alert, Grid, Button, Divider, Tabs, Tab, Rating } from '@mui/material';
-import axios from 'axios';
+import api from '../services/api';
 import { format } from 'date-fns';
 import WorkIcon from '@mui/icons-material/Work';
 import LanguageIcon from '@mui/icons-material/Language';
@@ -45,8 +45,8 @@ const PublicProfile = () => {
     const fetchData = async () => {
       try {
         const [userRes, reviewsRes] = await Promise.all([
-          axios.get(`http://localhost:5000/api/users/${id}`, { withCredentials: true }),
-          axios.get(`http://localhost:5000/api/reviews/${id}`, { withCredentials: true })
+          api.get(`/users/${id}`),
+          api.get(`/reviews/${id}`)
         ]);
         setProfileUser(userRes.data);
         setReviews(reviewsRes.data);
