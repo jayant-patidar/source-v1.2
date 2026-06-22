@@ -16,7 +16,8 @@ class JobService {
   async getAllJobs(query: any): Promise<IJob[]> {
     const filter: any = {
       visibility: true,
-      status: 'open' // Also ensuring only open jobs are shown in the feed
+      status: 'open', // Also ensuring only open jobs are shown in the feed
+      expirationDate: { $gte: new Date() } // Don't show expired jobs
     };
 
     // Keyword Search (Title or Description)
