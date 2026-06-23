@@ -36,27 +36,22 @@ const Navbar = () => {
       <Container maxWidth="xl">
         <Toolbar disableGutters sx={{ height: 64 }}>
           {/* Logo */}
-          <Typography
-            variant="h5"
+          <Box
             component={RouterLink}
             to="/"
-            sx={{ 
-              mr: 4, 
-              textDecoration: 'none', 
-              color: 'white', 
-              fontWeight: 900, 
-              letterSpacing: '-0.5px',
-              fontSize: '1.8rem',
+            sx={{
+              mr: 4,
               display: 'flex',
-              flexDirection: 'column',
-              lineHeight: 1
+              alignItems: 'center',
+              textDecoration: 'none',
             }}
           >
-            SOURCE
-            <Typography variant="caption" sx={{ fontSize: '0.5rem', letterSpacing: '1px', color: '#888', textTransform: 'uppercase' }}>
-              For the People, By the People
-            </Typography>
-          </Typography>
+            <img
+              src="/logo1.png"
+              alt="Source"
+              style={{ height: 40, objectFit: 'contain' }}
+            />
+          </Box>
 
           {/* Search Bar */}
           <Box sx={{ 
