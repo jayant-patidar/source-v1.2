@@ -30,6 +30,9 @@ Comprehensive documentation of all backend features and API endpoints.
 - Request/response examples
 - Business rules and validation
 
+### 💡 [FEATURE_IDEAS.md](./FEATURE_IDEAS.md)
+A curated list of innovative feature proposals and brainstorming for future development (Reverse Marketplace, Trust Scores, Escrow, etc.).
+
 ### 💻 [CODE_STRUCTURE.md](./CODE_STRUCTURE.md)
 Detailed guide on code structure and patterns for each file type.
 
