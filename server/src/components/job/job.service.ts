@@ -17,7 +17,8 @@ class JobService {
     const filter: any = {
       visibility: true,
       status: 'open', // Also ensuring only open jobs are shown in the feed
-      expirationDate: { $gte: new Date() } // Don't show expired jobs
+      expirationDate: { $gte: new Date() }, // Don't show expired jobs
+      isArchived: false // Don't show archived jobs
     };
 
     // Keyword Search (Title or Description)
@@ -95,6 +96,18 @@ class JobService {
 
   async deleteJob(jobId: string): Promise<IJob | null> {
     return await this.jobDAL.deleteJob(jobId);
+  }
+
+  async getArchivedJobsByPoster(seekerId: string): Promise<IJob[]> {
+    return await this.jobDAL.getArchivedJobsByPoster(seekerId);
+  }
+
+  async getCancelledJobsByPoster(seekerId: string): Promise<IJob[]> {
+    return await this.jobDAL.getCancelledJobsByPoster(seekerId);
+  }
+
+  async getExpiredJobsByPoster(seekerId: string): Promise<IJob[]> {
+    return await this.jobDAL.getExpiredJobsByPoster(seekerId);
   }
 }
 

@@ -67,5 +67,35 @@ export const jobService = {
   async approveStart(id: string) {
     const response = await api.put(`/jobs/${id}/approve-start`);
     return response.data;
+  },
+
+  async archiveJob(id: string) {
+    const { data } = await api.put(`/jobs/${id}/archive`);
+    return data;
+  },
+
+  async unarchiveJob(id: string) {
+    const { data } = await api.put(`/jobs/${id}/unarchive`);
+    return data;
+  },
+
+  async repostJob(id: string, expirationDate: string) {
+    const { data } = await api.put(`/jobs/${id}/repost`, { expirationDate });
+    return data;
+  },
+
+  async getArchivedJobs() {
+    const { data } = await api.get('/jobs/archived');
+    return data;
+  },
+
+  async getCancelledJobs() {
+    const { data } = await api.get('/jobs/cancelled');
+    return data;
+  },
+
+  async getExpiredJobs() {
+    const { data } = await api.get('/jobs/expired');
+    return data;
   }
 };

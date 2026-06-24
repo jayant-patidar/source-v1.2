@@ -22,6 +22,9 @@ import BookmarkIcon from '@mui/icons-material/Bookmark';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import BlockIcon from '@mui/icons-material/Block';
 import ListAltIcon from '@mui/icons-material/ListAlt';
+import ArchiveIcon from '@mui/icons-material/Archive';
+import CancelIcon from '@mui/icons-material/Cancel';
+import TimerOffIcon from '@mui/icons-material/TimerOff';
 import { useState } from 'react';
 
 interface ActivitySidebarProps {
@@ -66,6 +69,15 @@ const ActivitySidebar = ({ currentView, onViewChange }: ActivitySidebarProps) =>
       type: 'static',
       items: [
         { id: 'saved-jobs', label: 'Saved Jobs', icon: <BookmarkIcon /> },
+      ]
+    },
+    {
+      title: 'History',
+      type: 'accordion',
+      items: [
+        { id: 'cancelled-jobs', label: 'Cancelled Jobs', icon: <CancelIcon /> },
+        { id: 'archived-jobs', label: 'Archived Jobs', icon: <ArchiveIcon /> },
+        { id: 'expired-jobs', label: 'Expired Jobs', icon: <TimerOffIcon /> },
       ]
     }
   ];

@@ -10,6 +10,9 @@ import SeekerAssignedJobsView from './activity/SeekerAssignedJobsView';
 import SeekerOngoingJobsView from './activity/SeekerOngoingJobsView';
 import ProviderOngoingJobsView from './activity/ProviderOngoingJobsView';
 import RejectedOffersView from './activity/RejectedOffersView';
+import ArchivedJobsView from './activity/ArchivedJobsView';
+import CancelledJobsView from './activity/CancelledJobsView';
+import ExpiredJobsView from './activity/ExpiredJobsView';
 
 import { useSearchParams } from 'react-router-dom';
 
@@ -52,6 +55,12 @@ const ActivityPage = () => {
         return <SeekerOngoingJobsView />;
       case 'provider-ongoing':
         return <ProviderOngoingJobsView />;
+      case 'archived-jobs':
+        return <ArchivedJobsView />;
+      case 'cancelled-jobs':
+        return <CancelledJobsView />;
+      case 'expired-jobs':
+        return <ExpiredJobsView />;
       default:
         return <ReceivedOffersView />;
     }

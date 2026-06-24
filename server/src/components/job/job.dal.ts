@@ -30,7 +30,24 @@ class JobDAL {
   }
 
   async getJobsByPoster(seekerId: string): Promise<IJob[]> {
-    return await Job.find({ seekerId }).sort({ createdAt: -1 }).populate('providerId', 'name');
+    return await Job.find({ seekerId, isArchived: false }).sort({ createdAt: -1 }).populate('providerId', 'name');
+  }
+
+  async getArchivedJobsByPoster(seekerId: string): Promise<IJob[]> {
+    return await Job.find({ seekerId, isArchived: true }).sort({ updatedAt: -1 }).populate('providerId', 'name');
+  }
+
+  async getCancelledJobsByPoster(seekerId: string): Promise<IJob[]> {
+    return await Job.find({ seekerId, status: 'canceled', isArchived: false }).sort({ updatedAt: -1 }).populate('providerId', 'name');
+  }
+
+  async getExpiredJobsByPoster(seekerId: string): Promise<IJob[]> {
+    return await Job.find({
+      seekerId,
+      expirationDate: { $lt: new Date() },
+      status: { $nin: ['completed', 'canceled'] },
+      isArchived: false
+    }).sort({ expirationDate: -1 }).populate('providerId', 'name');
   }
 
   async getJobsByProvider(providerId: string): Promise<IJob[]> {

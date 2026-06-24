@@ -239,6 +239,94 @@ class JobController {
       next(error);
     }
   }
+
+  async archiveJob(req: any, res: Response, next: NextFunction) {
+    try {
+      const job = await this.jobService.getJobById(req.params.id);
+      if (!job) return res.status(404).json({ error: 'Job not found' });
+
+      const isOwner = job.seekerId.toString() === req.user._id.toString() || (job.seekerId as any)._id?.toString() === req.user._id.toString();
+      if (!isOwner) return res.status(403).json({ error: 'Only the job poster can archive this job' });
+
+      const updatedJob = await this.jobService.updateJob(req.params.id, {
+        isArchived: true,
+        $push: { timeline: { status: 'archived', timestamp: new Date(), actorId: req.user._id } }
+      } as any);
+      res.status(200).json(updatedJob);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async unarchiveJob(req: any, res: Response, next: NextFunction) {
+    try {
+      const job = await this.jobService.getJobById(req.params.id);
+      if (!job) return res.status(404).json({ error: 'Job not found' });
+
+      const isOwner = job.seekerId.toString() === req.user._id.toString() || (job.seekerId as any)._id?.toString() === req.user._id.toString();
+      if (!isOwner) return res.status(403).json({ error: 'Only the job poster can unarchive this job' });
+
+      const updatedJob = await this.jobService.updateJob(req.params.id, {
+        isArchived: false,
+        $push: { timeline: { status: 'unarchived', timestamp: new Date(), actorId: req.user._id } }
+      } as any);
+      res.status(200).json(updatedJob);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async repostJob(req: any, res: Response, next: NextFunction) {
+    try {
+      const job = await this.jobService.getJobById(req.params.id);
+      if (!job) return res.status(404).json({ error: 'Job not found' });
+
+      const isOwner = job.seekerId.toString() === req.user._id.toString() || (job.seekerId as any)._id?.toString() === req.user._id.toString();
+      if (!isOwner) return res.status(403).json({ error: 'Only the job poster can repost this job' });
+
+      const { expirationDate } = req.body;
+      if (!expirationDate || new Date(expirationDate) <= new Date()) {
+        return res.status(400).json({ error: 'Expiration date must be in the future' });
+      }
+
+      const updatedJob = await this.jobService.updateJob(req.params.id, {
+        status: 'open',
+        expirationDate: new Date(expirationDate),
+        isArchived: false,
+        $push: { timeline: { status: 'reposted', timestamp: new Date(), actorId: req.user._id, details: 'Reposted with new expiration date' } }
+      } as any);
+      res.status(200).json(updatedJob);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async getArchivedJobs(req: any, res: Response, next: NextFunction) {
+    try {
+      const jobs = await this.jobService.getArchivedJobsByPoster(req.user._id);
+      res.status(200).json(jobs);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async getCancelledJobs(req: any, res: Response, next: NextFunction) {
+    try {
+      const jobs = await this.jobService.getCancelledJobsByPoster(req.user._id);
+      res.status(200).json(jobs);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async getExpiredJobs(req: any, res: Response, next: NextFunction) {
+    try {
+      const jobs = await this.jobService.getExpiredJobsByPoster(req.user._id);
+      res.status(200).json(jobs);
+    } catch (error) {
+      next(error);
+    }
+  }
 }
 
 export default new JobController();

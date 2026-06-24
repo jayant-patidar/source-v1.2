@@ -23,6 +23,7 @@ import MoreVertIcon from '@mui/icons-material/MoreVert';
 import EditIcon from '@mui/icons-material/Edit';
 import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
 import CancelIcon from '@mui/icons-material/Cancel';
+import ArchiveIcon from '@mui/icons-material/Archive';
 
 import EditJobDialog from '../../components/jobs/EditJobDialog';
 import UpdatePayDialog from '../../components/jobs/UpdatePayDialog';
@@ -63,7 +64,8 @@ const PostedJobsView = () => {
       const data = await jobService.getPostedJobs();
       // Filter out non-active jobs if needed, but endpoint usually returns all posted by user
       // Assuming endpoint returns all, we filter on frontend or rely on backend
-      setJobs(data);
+      // Filter out canceled jobs (they have their own view now)
+      setJobs(data.filter((j: any) => j.status !== 'canceled'));
     } catch (error) {
       console.error('Error fetching posted jobs:', error);
     } finally {
@@ -135,6 +137,19 @@ const PostedJobsView = () => {
       showToast('Failed to delete job', 'error');
     } finally {
         handleMenuClose();
+    }
+  };
+
+  const handleArchiveJob = async (id: string) => {
+    try {
+      await jobService.archiveJob(id);
+      showToast('Job archived', 'success');
+      fetchJobs();
+    } catch (error) {
+      console.error('Error archiving job:', error);
+      showToast('Failed to archive job', 'error');
+    } finally {
+      handleMenuClose();
     }
   };
 
@@ -280,6 +295,10 @@ const PostedJobsView = () => {
             <MenuItem onClick={() => selectedJob && handleCancelJob(selectedJob._id)} disabled={selectedJob?.status === 'canceled' || selectedJob?.status === 'completed'}>
                 <ListItemIcon><CancelIcon fontSize="small" /></ListItemIcon>
                 <ListItemText>Cancel Job</ListItemText>
+            </MenuItem>
+            <MenuItem onClick={() => selectedJob && handleArchiveJob(selectedJob._id)}>
+                <ListItemIcon><ArchiveIcon fontSize="small" /></ListItemIcon>
+                <ListItemText>Archive Job</ListItemText>
             </MenuItem>
             <MenuItem onClick={() => selectedJob && handleDeleteJob(selectedJob._id)} sx={{ color: 'error.main' }}>
                 <ListItemIcon><DeleteIcon fontSize="small" color="error" /></ListItemIcon>

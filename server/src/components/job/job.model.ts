@@ -25,6 +25,7 @@ export interface IJob extends Document {
   tags?: string[];
   requirements?: string[];
   startTime?: Date;
+  isArchived: boolean;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -86,6 +87,7 @@ const JobSchema: Schema = new Schema(
     tags: { type: [String], required: false },
     requirements: { type: [String], required: false },
     startTime: { type: Date, required: false },
+    isArchived: { type: Boolean, default: false },
   },
   { timestamps: true }
 );
