@@ -16,6 +16,6 @@ router.get('/saved', protect, userController.getSavedJobs.bind(userController));
 
 // User Management Routes
 router.get('/', protect, userController.getAllUsers.bind(userController));
-router.get('/:id', protect, userController.getPublicUserById.bind(userController));
+router.get('/:id', userController.getPublicUserById.bind(userController));
 
 export default router;

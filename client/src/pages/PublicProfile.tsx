@@ -64,7 +64,13 @@ const PublicProfile = () => {
   };
 
   if (loading) return <Box display="flex" justifyContent="center" mt={10}><CircularProgress /></Box>;
-  if (error) return <Container sx={{ mt: 4 }}><Alert severity="error">{error}</Alert></Container>;
+  if (error) return (
+    <Container sx={{ mt: 4, textAlign: 'center', py: 8 }}>
+      <Alert severity="info" sx={{ maxWidth: 500, mx: 'auto' }}>
+        {error}
+      </Alert>
+    </Container>
+  );
   if (!profileUser) return <Container sx={{ mt: 4 }}><Typography>User not found</Typography></Container>;
 
   return (
