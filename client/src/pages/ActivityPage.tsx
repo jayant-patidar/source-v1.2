@@ -13,6 +13,7 @@ import RejectedOffersView from './activity/RejectedOffersView';
 import ArchivedJobsView from './activity/ArchivedJobsView';
 import CancelledJobsView from './activity/CancelledJobsView';
 import ExpiredJobsView from './activity/ExpiredJobsView';
+import MyGigsView from './activity/MyGigsView';
 
 import { useSearchParams } from 'react-router-dom';
 
@@ -61,6 +62,8 @@ const ActivityPage = () => {
         return <CancelledJobsView />;
       case 'expired-jobs':
         return <ExpiredJobsView />;
+      case 'my-gigs':
+        return <MyGigsView />;
       default:
         return <ReceivedOffersView />;
     }

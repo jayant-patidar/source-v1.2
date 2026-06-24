@@ -5,6 +5,7 @@ import Login from './pages/Login';
 import Register from './pages/Register';
 import Home from './pages/Home';
 import CreateJob from './pages/CreateJob';
+import CreateGig from './pages/CreateGig';
 import JobDetails from './pages/JobDetails';
 import PaymentPage from './pages/payment/PaymentPage';
 import ContractView from './pages/contract/ContractView';
@@ -38,6 +39,7 @@ function App() {
         <Route path="/login" element={!user ? <Login /> : <Navigate to="/" />} />
         <Route path="/register" element={!user ? <Register /> : <Navigate to="/" />} />
         <Route path="/post-job" element={<CreateJob />} />
+        <Route path="/create-gig" element={<CreateGig />} />
         <Route path="/jobs/:id" element={<JobDetails />} />
         <Route path="/profile" element={user ? <Profile /> : <Navigate to="/login" />} />
         <Route path="/profile/:id" element={<PublicProfile />} />

@@ -1,8 +1,10 @@
 import { useEffect, useState } from 'react';
-import { Container, Typography, CircularProgress, Box, Paper, InputBase, IconButton, Grid, Popover, Menu, MenuItem, FormControl, InputLabel, Select, TextField, Button } from '@mui/material';
+import { Container, Typography, CircularProgress, Box, Paper, InputBase, IconButton, Grid, Popover, Menu, MenuItem, FormControl, InputLabel, Select, TextField, Button, Tabs, Tab } from '@mui/material';
 
 import JobCard from '../components/JobCard';
+import GigCard from '../components/GigCard';
 import { useJobStore } from '../store/jobStore';
+import { useGigStore } from '../store/gigStore';
 import UserSidebar from '../components/UserSidebar';
 import RightSidebar from '../components/RightSidebar';
 import PostJobBox from '../components/PostJobBox';
@@ -11,8 +13,11 @@ import SearchIcon from '@mui/icons-material/Search';
 import FilterListIcon from '@mui/icons-material/FilterList';
 
 const Home = () => {
-  const { jobs, isLoading, fetchJobs } = useJobStore();
+  const { jobs, isLoading: isJobsLoading, fetchJobs } = useJobStore();
+  const { gigs, isLoading: isGigsLoading, fetchGigs } = useGigStore();
   const { user } = useAuthStore();
+
+  const [activeTab, setActiveTab] = useState(0);
 
   // Filter & Sort State
   const [keyword, setKeyword] = useState('');
@@ -41,17 +46,29 @@ const Home = () => {
   }, [keyword, sortBy, category, minPay, maxPay, type, location, datePosted]);
 
   const applyFilters = () => {
-    fetchJobs({
-      keyword,
-      sortBy,
-      category,
-      minPay,
-      maxPay,
-      type,
-      location,
-      datePosted
-    });
+    if (activeTab === 0) {
+      fetchJobs({
+        keyword,
+        sortBy,
+        category,
+        minPay,
+        maxPay,
+        type,
+        location,
+        datePosted
+      });
+    } else {
+      fetchGigs({
+        keyword,
+        category
+      });
+    }
   };
+
+  useEffect(() => {
+    applyFilters();
+    // eslint-disable-next-line
+  }, [activeTab]);
 
   const handleFilterClick = (event: React.MouseEvent<HTMLButtonElement>) => {
     setAnchorEl(event.currentTarget);
@@ -71,7 +88,7 @@ const Home = () => {
   };
 
   return (
-    <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
+    <Container maxWidth="lg" sx={{ mt: 1, mb: 4 }}>
       <Grid container spacing={3} alignItems="stretch" sx={{ minHeight: '100vh' }}>
         {/* Left Sidebar - User Profile (3 columns) */}
         <Grid size={{ xs: 12, md: 3 }}>
@@ -82,7 +99,38 @@ const Home = () => {
 
         {/* Main Feed (6 columns) */}
         <Grid size={{ xs: 12, md: 6 }}>
-          <PostJobBox />
+          <Box sx={{ borderBottom: 1, borderColor: 'divider', mb: 3 }}>
+            <Tabs 
+              value={activeTab} 
+              onChange={(_, newValue) => setActiveTab(newValue)} 
+              textColor="inherit" 
+              indicatorColor="primary"
+              variant="fullWidth"
+              sx={{
+                '& .MuiTab-root': {
+                  fontSize: '1.1rem',
+                  fontWeight: 'bold',
+                  textTransform: 'none',
+                  py: 1.5,
+                  color: 'text.secondary'
+                },
+                '& .Mui-selected': {
+                  color: '#000',
+                },
+                '& .MuiTabs-indicator': {
+                  backgroundColor: '#000',
+                  height: 3,
+                  borderTopLeftRadius: 3,
+                  borderTopRightRadius: 3
+                }
+              }}
+            >
+              <Tab label="Jobs" />
+              <Tab label="Gigs" />
+            </Tabs>
+          </Box>
+
+          {activeTab === 0 && <PostJobBox />}
 
           {/* Search & Filter Bar */}
           <Box sx={{ display: 'flex', gap: 2, mb: 3 }}>
@@ -249,26 +297,50 @@ const Home = () => {
               </Paper>
           </Box>
 
-          {/* Jobs Feed */}
+          {/* Feed Content */}
           <Box>
-            {isLoading ? (
-              <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>
-                <CircularProgress />
-              </Box>
+            {activeTab === 0 ? (
+              // JOBS FEED
+              isJobsLoading ? (
+                <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>
+                  <CircularProgress />
+                </Box>
+              ) : (
+                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0 }}>
+                  {jobs && jobs.length > 0 ? (
+                    jobs
+                      .filter((job: any) => !user || job.seekerId?._id !== user._id)
+                      .map((job: any) => (
+                        <JobCard key={job._id} job={job} />
+                      ))
+                  ) : (
+                    <Typography variant="body1" color="text.secondary" sx={{ textAlign: 'center', py: 4 }}>
+                      No jobs found matching your criteria.
+                    </Typography>
+                  )}
+                </Box>
+              )
             ) : (
-              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0 }}>
-                {jobs && jobs.length > 0 ? (
-                  jobs
-                    .filter((job: any) => !user || job.seekerId?._id !== user._id)
-                    .map((job: any) => (
-                      <JobCard key={job._id} job={job} />
-                    ))
-                ) : (
-                  <Typography variant="body1" color="text.secondary" sx={{ textAlign: 'center', py: 4 }}>
-                    No jobs found matching your criteria.
-                  </Typography>
-                )}
-              </Box>
+              // GIGS FEED
+              isGigsLoading ? (
+                <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>
+                  <CircularProgress />
+                </Box>
+              ) : (
+                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0 }}>
+                  {gigs && gigs.length > 0 ? (
+                    gigs
+                      .filter((gig: any) => !user || gig.providerId?._id !== user._id)
+                      .map((gig: any) => (
+                        <GigCard key={gig._id} gig={gig} />
+                      ))
+                  ) : (
+                    <Typography variant="body1" color="text.secondary" sx={{ textAlign: 'center', py: 4 }}>
+                      No gigs found matching your criteria.
+                    </Typography>
+                  )}
+                </Box>
+              )
             )}
           </Box>
         </Grid>
