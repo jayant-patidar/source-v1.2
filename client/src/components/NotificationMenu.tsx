@@ -4,6 +4,7 @@ import NotificationsIcon from '@mui/icons-material/Notifications';
 import api from '../services/api';
 import { formatDistanceToNow } from 'date-fns';
 import { useNavigate } from 'react-router-dom';
+import { useAuthStore } from '../store/authStore';
 
 interface Notification {
   _id: string;
@@ -27,6 +28,7 @@ const NotificationMenu = () => {
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
   const navigate = useNavigate();
+  const { user } = useAuthStore();
 
   const fetchNotifications = async () => {
     try {
@@ -39,11 +41,12 @@ const NotificationMenu = () => {
   };
 
   useEffect(() => {
+    if (!user) return;
     fetchNotifications();
     // Optional: Poll for notifications every minute
     const interval = setInterval(fetchNotifications, 60000);
     return () => clearInterval(interval);
-  }, []);
+  }, [user]);
 
   const handleOpen = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);

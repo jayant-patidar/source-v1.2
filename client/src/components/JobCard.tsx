@@ -62,7 +62,7 @@ const JobCard = ({ job }: { job: any }) => {
   };
 
   const handleMenuAction = (action: string) => {
-    console.log(`Action: ${action} for job ${job._id}`);
+    // console.log(`Action: ${action} for job ${job._id}`);
     handleMenuClose();
     // Implement actual logic here (e.g., API call)
   };

@@ -62,7 +62,7 @@ const JobDetails = () => {
       try {
         if (!id) return;
         const data = await jobService.getJob(id);
-        console.log('JobDetails API Fetch Result:', data);
+        // console.log('JobDetails API Fetch Result:', data);
         setJob(data);
         setLoading(false);
         // Check if user is the poster (seekerId)
@@ -146,7 +146,6 @@ const JobDetails = () => {
   // Correctly identify if current user is the poster
   const isPoster = user && (job.seekerId === user._id || (job.seekerId && job.seekerId._id === user._id));
   const poster = job.seekerId;
-  console.log('JobDetails Render - Job:', job);
 
   return (
     <Container maxWidth="md" sx={{ mt: 4, mb: 8 }}>

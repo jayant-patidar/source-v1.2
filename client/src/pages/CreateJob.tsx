@@ -4,6 +4,8 @@ import { Box, Button, TextField, Typography, Container, MenuItem, Paper, FormCon
 import { useNavigate } from 'react-router-dom';
 import { useJobStore } from '../store/jobStore';
 import { useToastStore } from '../store/toastStore';
+import { useAuthStore } from '../store/authStore';
+import { useEffect } from 'react';
 
 const validationSchema = yup.object({
   title: yup.string().required('Title is required'),
@@ -16,6 +18,7 @@ const validationSchema = yup.object({
   jobDate: yup.date().required('Job Date is required'),
   jobTime: yup.string().required('Job Time is required'),
   expirationDate: yup.date().required('Expiration Date is required'),
+  expirationTime: yup.string().required('Expiration Time is required'),
   requirements: yup.array().of(yup.string()),
 });
 
@@ -23,6 +26,14 @@ const CreateJob = () => {
   const navigate = useNavigate();
   const { createJob, isLoading } = useJobStore();
   const { showToast } = useToastStore();
+  const { user } = useAuthStore();
+
+  useEffect(() => {
+    if (!user) {
+      showToast('Please login to seek a service', 'warning');
+      navigate('/login');
+    }
+  }, [user]);
 
   const formik = useFormik({
     initialValues: {
@@ -36,6 +47,7 @@ const CreateJob = () => {
       jobDate: '',
       jobTime: '',
       expirationDate: '',
+      expirationTime: '',
       isNegotiable: false,
       visibility: true,
       tags: '',
@@ -58,13 +70,13 @@ const CreateJob = () => {
           exactLocation: values.exactLocation,
           jobDate: values.jobDate,
           jobTime: values.jobTime,
-          expirationDate: values.expirationDate,
+          expirationDate: `${values.expirationDate}T${values.expirationTime}`,
           isNegotiable: values.isNegotiable,
           visibility: values.visibility,
           tags: values.tags, // Controller handles string splitting
           requirements: values.requirements,
         };
-        console.log('Submitting Job Payload:', payload);
+        // console.log('Submitting Job Payload:', payload);
         await createJob(payload);
         showToast('Job Posted Successfully!', 'success');
         navigate('/');
@@ -198,7 +210,8 @@ const CreateJob = () => {
                 helperText={formik.touched.jobTime && formik.errors.jobTime}
             />
           </Box>
-           <TextField
+          <Box sx={{ display: 'flex', gap: 2 }}>
+            <TextField
                 fullWidth
                 id="expirationDate"
                 name="expirationDate"
@@ -211,6 +224,20 @@ const CreateJob = () => {
                 error={formik.touched.expirationDate && Boolean(formik.errors.expirationDate)}
                 helperText={formik.touched.expirationDate && formik.errors.expirationDate}
             />
+            <TextField
+                fullWidth
+                id="expirationTime"
+                name="expirationTime"
+                label="Expiration Time"
+                type="time"
+                margin="normal"
+                InputLabelProps={{ shrink: true }}
+                value={formik.values.expirationTime}
+                onChange={formik.handleChange}
+                error={formik.touched.expirationTime && Boolean(formik.errors.expirationTime)}
+                helperText={formik.touched.expirationTime && formik.errors.expirationTime}
+            />
+          </Box>
 
             <TextField
                 fullWidth

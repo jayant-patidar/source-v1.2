@@ -279,9 +279,9 @@ const Profile = () => {
       if (!message) return;
 
       try {
-          console.log(`[DEBUG] handleReplySubmit: Submitting reply for review ${reviewId}, message: ${message}`);
+          // console.log(`[DEBUG] handleReplySubmit: Submitting reply for review ${reviewId}, message: ${message}`);
           const { data } = await api.post(`/reviews/${reviewId}/reply`, { message });
-          console.log(`[DEBUG] handleReplySubmit success, data:`, data);
+          // console.log(`[DEBUG] handleReplySubmit success, data:`, data);
 
           // Update local state
           setReviews(reviews.map(r => r._id === reviewId ? { ...r, response: data.response } : r));
