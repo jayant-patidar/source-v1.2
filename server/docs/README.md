@@ -23,7 +23,9 @@ Comprehensive documentation of all backend features and API endpoints.
 - User Management (registration, authentication, profiles)
 - Job Management (posting, searching, status tracking)
 - Negotiation System (offers, acceptance, rejection)
-- Review System (ratings, comments)
+- Review System (ratings, comments, replies)
+- Notification System (real-time alerts, read states)
+- Transaction System (payment tracking, statuses)
 - API endpoint specifications
 - Request/response examples
 - Business rules and validation
@@ -99,7 +101,9 @@ server/
 │   │   ├── user/
 │   │   ├── job/
 │   │   ├── negotiation/
-│   │   └── review/
+│   │   ├── review/
+│   │   ├── notification/
+│   │   └── transaction/
 │   ├── config/              # Configuration
 │   ├── middleware/          # Express middleware
 │   └── utils/               # Utilities

@@ -24,12 +24,9 @@ A. Onboarding & Account Setup (COMMON)
       Skills & Preferences [COMPLETED]
       Contact & Social Links [COMPLETED]
       ID verification (optional but boosts trust) [PLANNED]
-  Set Default Role Preferences [PLANNED]
-      - User chooses what they usually do (Seeker / Provider / Both)
-      - Note: They can switch at any time
   Add Payment Method [mock implemented]
   Set Service Area / Location Preferences [PLANNED]
-
+  While Registering for the first time, ask for location preferences, skills and job preferences, what type of services they provide and what type of services they are looking for.
 --------------------------------------------------------------------------------
 
 SECTION 1 — USER JOURNEY AS SERVICE SEEKER
@@ -43,8 +40,8 @@ B. Explore & Browse Posts
   Filters for Discovery [IN PROGRESS]
       Category [COMPLETED]
       Search (Title/Description) [COMPLETED]
-      Price range [PLANNED]
-      Distance [PLANNED]
+      Price range [COMPLETED]
+      Distance [COMPLETED]
       Ratings [PLANNED]
       Availability [PLANNED]
   View Post Details [COMPLETED]
@@ -63,11 +60,15 @@ C. Create & Manage Job Request
       Budget (Hourly/Fixed) [COMPLETED]
       Date/time [COMPLETED]
       Location (General & Exact) [COMPLETED]
+      Expiration Date & Time [COMPLETED]
       Photos [PLANNED]
   Edit or Update Job Post [COMPLETED]
   Pause or Resume Post Visibility [COMPLETED]
+  Archive Job Post [COMPLETED]
   Delete Job Post [COMPLETED]
   View Posted Jobs (My Activity -> Posted Jobs) [COMPLETED]
+  Manage Inactive Jobs (History -> Cancelled, Archived, Expired) [COMPLETED]
+  Repost Expired Job [COMPLETED]
 
 D. Interactions With Providers
   Receive Interests from Providers (View Offers on Job Details) [COMPLETED]
@@ -75,7 +76,7 @@ D. Interactions With Providers
   Negotiate with Providers [IN PROGRESS]
       Receive Offer Amount & Message [COMPLETED]
       Accept Offer [COMPLETED]
-      Counter-offer [PLANNED]
+      Counter-offer [COMPLETED]
       Chat History [PLANNED]
   Choose & Confirm a Provider (Accept Offer) [COMPLETED]
   Cancel Engagement Before Service [COMPLETED]
@@ -99,7 +100,7 @@ G. Completion & Ratings
   Release Payment [COMPLETED]
   Rate Provider [COMPLETED]
   Write Review [COMPLETED]
-  Provider Can Respond to Negative Reviews [PLANNED]
+  Provider Can Respond to Negative Reviews [COMPLETED]
   View Own Seeker Rating Summary [COMPLETED]
 
 H. Support
@@ -114,9 +115,9 @@ J. Browse Available Job Requests
   Browse Job Requests Feed [COMPLETED]
   Apply Filters [IN PROGRESS]
       Category [COMPLETED]
-      Budget [PLANNED]
-      Distance [PLANNED]
-      Date [PLANNED]
+      Budget [COMPLETED]
+      Location [COMPLETED]
+      Date [COMPLETED]
   Open Job Details [COMPLETED]
   Locate Job on Map [PLANNED]
   Save or Bookmark Job [COMPLETED]
@@ -151,9 +152,9 @@ O. Ratings & Community Reputation
   Add Feedback for Seeker [COMPLETED]
   View Provider Rating (Basic Display) [COMPLETED]
   View Seeker Rating (Basic Display) [COMPLETED]
-  Respond to Negative Feedback [PLANNED]
-      - Justify comment
-      - Add clarification
+  Respond to Negative Feedback [COMPLETED]
+      - Justify comment [COMPLETED]
+      - Add clarification [COMPLETED]
 
 P. Provider Profile Management
   Update Service Areas / Radius [PLANNED]
@@ -170,7 +171,6 @@ SECTION 3 — COMMON USER ACTIONS (Both Roles)
 General Features
   Universal Chat System (Real-time) [PLANNED]
   Push Notifications [PLANNED]
-  Dark Mode / Light Mode [PLANNED]
   Block or Mute Users [PLANNED]
   View Activity History [COMPLETED]
       Jobs as seeker (Posted Jobs) [COMPLETED]

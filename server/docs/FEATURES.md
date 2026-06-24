@@ -25,6 +25,13 @@ The job marketplace backend provides four main features: User Management, Job Po
   seekerRating: Number,  // Rating as job poster (0-5)
   providerRating: Number,// Rating as job worker (0-5)
   about: String,         // Optional bio
+  avatar: String,        // Profile picture URL
+  preferences: Object,   // Job types, categories, location preferences
+  skills: [String],      // List of skills
+  portfolio: [Object],   // Portfolio links and details
+  socialLinks: Object,   // LinkedIn, GitHub, etc.
+  savedJobs: [ObjectId], // Bookmarked jobs
+  availability: String,  // General availability
   createdAt: Date,       // Auto-generated
   updatedAt: Date        // Auto-generated
 }
@@ -148,11 +155,13 @@ Get current user's profile.
   },
   visibility: Boolean,       // Show exact location?
   isNegotiable: Boolean,     // Allow pay negotiation?
-  expirationDate: Date,      // When posting expires
+  expirationDate: Date,      // When posting expires (including time)
   category: String,          // Job category
   status: String,            // open/accepted/completed/canceled
   type: String,              // Optional job type
   tags: [String],            // Optional tags
+  requirements: [String],    // Specific job requirements
+  isArchived: Boolean,       // If the job is soft-hidden
   createdAt: Date,
   updatedAt: Date
 }
@@ -235,10 +244,25 @@ Get single job details.
 }
 ```
 
+#### GET `/api/jobs/archived` | `/api/jobs/cancelled` | `/api/jobs/expired`
+Get jobs belonging to the current user that fall under specific history statuses.
+
+**Authentication:** Required
+
 #### PUT `/api/jobs/:id`
 Update job details.
 
 **Authentication:** Required
+
+#### PUT `/api/jobs/:id/archive` & `/api/jobs/:id/unarchive`
+Archive or unarchive a job (moves it in/out of the feed without changing its main status).
+
+**Authentication:** Required (must be job poster)
+
+#### PUT `/api/jobs/:id/repost`
+Repost an expired job with a new expiration date to make it active again.
+
+**Authentication:** Required (must be job poster)
 
 #### DELETE `/api/jobs/:id`
 Delete a job posting.
@@ -404,6 +428,21 @@ Create a review for a user.
 - Cannot review same user twice for same job
 - Automatically updates user's seekerRating or providerRating based on their role in the job
 
+#### POST `/api/reviews/:reviewId/reply`
+Provider can reply to a review left by a seeker.
+
+**Authentication:** Required (Must be the reviewee)
+
+**Response:**
+```json
+{
+  "response": {
+    "message": "Thank you for the feedback!",
+    "createdAt": "2025-01-02T10:00:00Z"
+  }
+}
+```
+
 #### GET `/api/reviews/:userId`
 Get all reviews for a user.
 
@@ -420,6 +459,66 @@ Get all reviews for a user.
     "createdAt": "2025-01-01T10:00:00Z"
   }
 ]
+```
+
+---
+
+## 5. Notification System
+
+### Features
+- In-app notification polling
+- Tracking unread states
+- Alerts for offers, acceptances, rejections, and job updates
+
+### Database Schema
+```typescript
+{
+  recipient: ObjectId,    // User receiving the notification
+  sender: ObjectId,       // User who triggered it
+  type: String,           // 'offer_received', 'offer_accepted', 'offer_rejected', 'counter_offer_received', 'job_update'
+  job: ObjectId,          // Related job
+  negotiation: ObjectId,  // Related negotiation (optional)
+  message: String,        // Notification text
+  isRead: Boolean,        // Read status
+  createdAt: Date,
+  updatedAt: Date
+}
+```
+
+### API Endpoints
+
+#### GET `/api/notifications`
+Get all notifications for the current authenticated user.
+
+**Authentication:** Required
+
+#### PUT `/api/notifications/:id/read`
+Mark a specific notification as read.
+
+**Authentication:** Required
+
+---
+
+## 6. Transaction System
+
+### Features
+- Track payments between seekers and providers
+- Supports status flow (pending, success, failed)
+- Currency tracking and payment method logging
+
+### Database Schema
+```typescript
+{
+  jobId: ObjectId,          // Reference to the job
+  payerId: ObjectId,        // User making the payment
+  payeeId: ObjectId,        // User receiving the payment
+  amount: Number,           // Payment amount
+  currency: String,         // 'USD' etc.
+  paymentMethod: String,    // 'credit_card', 'paypal', 'etransfer'
+  status: String,           // 'success', 'failed', 'pending'
+  metadata: Object,         // Additional payment gateway info
+  createdAt: Date           // Auto-generated
+}
 ```
 
 ---

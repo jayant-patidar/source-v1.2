@@ -28,12 +28,24 @@ server/
 │   │   │   ├── negotiation.service.ts
 │   │   │   ├── negotiation.controller.ts
 │   │   │   └── negotiation.routes.ts
-│   │   └── review/                 # User reviews & ratings
-│   │       ├── review.model.ts
-│   │       ├── review.dal.ts
-│   │       ├── review.service.ts
-│   │       ├── review.controller.ts
-│   │       └── review.routes.ts
+│   │   ├── review/                 # User reviews & ratings
+│   │   │   ├── review.model.ts
+│   │   │   ├── review.dal.ts
+│   │   │   ├── review.service.ts
+│   │   │   ├── review.controller.ts
+│   │   │   └── review.routes.ts
+│   │   ├── notification/           # Real-time and push notifications
+│   │   │   ├── notification.model.ts
+│   │   │   ├── notification.dal.ts
+│   │   │   ├── notification.service.ts
+│   │   │   ├── notification.controller.ts
+│   │   │   └── notification.routes.ts
+│   │   └── transaction/            # Payments and financial tracking
+│   │       ├── transaction.model.ts
+│   │       ├── transaction.dal.ts
+│   │       ├── transaction.service.ts
+│   │       ├── transaction.controller.ts
+│   │       └── transaction.routes.ts
 │   ├── config/                     # Configuration files
 │   │   └── db.ts                   # MongoDB connection setup
 │   ├── middleware/                 # Express middleware
@@ -51,7 +63,7 @@ server/
 ## Architecture Principles
 
 ### 1. Component-Based Organization
-Each feature (User, Job, Negotiation, Review) is organized as a **self-contained component** with all related files in one directory.
+Each feature (User, Job, Negotiation, Review, Notification, Transaction) is organized as a **self-contained component** with all related files in one directory.
 
 **Benefits:**
 - Easy to locate all code related to a feature

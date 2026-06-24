@@ -1,73 +1,66 @@
-# React + TypeScript + Vite
+# Source (Client Frontend)
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+This is the frontend client application for the Job Marketplace, built with React, TypeScript, and Vite.
 
-Currently, two official plugins are available:
+## Tech Stack
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- **Framework**: React 18
+- **Language**: TypeScript
+- **Build Tool**: Vite
+- **UI Library**: Material UI (MUI) v5
+- **State Management**: Zustand
+- **Routing**: React Router DOM v6
+- **Forms & Validation**: Formik + Yup
+- **API Client**: Axios
+- **Date/Time Formatting**: date-fns
 
-## React Compiler
+## Directory Structure
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```
+client/
+├── public/                 # Static assets (images, icons)
+├── src/
+│   ├── assets/             # Bundled static assets
+│   ├── components/         # Reusable UI components
+│   │   ├── JobCard.tsx
+│   │   ├── NotificationMenu.tsx
+│   │   └── ...
+│   ├── pages/              # Route level components/views
+│   │   ├── Home.tsx
+│   │   ├── Login.tsx
+│   │   ├── Profile.tsx
+│   │   └── ...
+│   ├── store/              # Zustand global state stores
+│   │   ├── authStore.ts
+│   │   ├── jobStore.ts
+│   │   └── toastStore.ts
+│   ├── services/           # Axios instance and API logic
+│   │   └── api.ts
+│   ├── App.tsx             # Main Application / Routing Setup
+│   └── main.tsx            # Entry point
+├── package.json
+└── vite.config.ts
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## Available Scripts
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+In the project directory, you can run:
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+### `npm run dev`
+
+Runs the app in the development mode.\
+Open [http://localhost:5173](http://localhost:5173) to view it in the browser.
+
+### `npm run build`
+
+Builds the app for production to the `dist` folder.\
+It correctly bundles React in production mode and optimizes the build for the best performance.
+
+### `npm run lint`
+
+Runs ESLint to check for code quality and standard adherence.
+
+## Environment Variables
+
+Ensure you have your environment variables set up, particularly pointing to the backend API.
+By default in development, it may proxy requests or point directly to the backend URL via Axios base config.

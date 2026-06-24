@@ -53,6 +53,26 @@ export interface IUser extends Document {
   seekerRating: number;
   providerRating: number;
   about?: string;
+  avatar?: string;
+  preferences?: {
+    jobTypes: string[];
+    categories: string[];
+    minPay?: number;
+    location?: string;
+  };
+  skills?: string[];
+  portfolio?: {
+    title: string;
+    link: string;
+    description?: string;
+  }[];
+  socialLinks?: {
+    linkedin?: string;
+    github?: string;
+    website?: string;
+  };
+  savedJobs?: string[];
+  availability?: string;
   matchPassword: (enteredPassword: string) => Promise<boolean>;
 }
 
@@ -67,6 +87,26 @@ const UserSchema: Schema = new Schema(
     seekerRating: { type: Number, default: 0, min: 0, max: 5 },
     providerRating: { type: Number, default: 0, min: 0, max: 5 },
     about: { type: String, required: false },
+    avatar: { type: String, required: false },
+    preferences: {
+      jobTypes: [{ type: String }],
+      categories: [{ type: String }],
+      minPay: { type: Number },
+      location: { type: String }
+    },
+    skills: [{ type: String }],
+    portfolio: [{
+      title: { type: String, required: true },
+      link: { type: String, required: true },
+      description: { type: String }
+    }],
+    socialLinks: {
+      linkedin: { type: String },
+      github: { type: String },
+      website: { type: String }
+    },
+    savedJobs: [{ type: Schema.Types.ObjectId, ref: 'Job' }],
+    availability: { type: String }
   },
   { timestamps: true }
 );
