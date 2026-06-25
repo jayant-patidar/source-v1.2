@@ -1,9 +1,12 @@
 import { Box, Typography, Button, Paper, Divider, Stack } from '@mui/material';
 import { Link } from 'react-router-dom';
 import WorkOutlineIcon from '@mui/icons-material/WorkOutline';
+import SavingsIcon from '@mui/icons-material/Savings';
+import ShieldIcon from '@mui/icons-material/Shield';
+import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome';
 import HandshakeIcon from '@mui/icons-material/Handshake';
 import PaymentsIcon from '@mui/icons-material/Payments';
-import AutoAwesomeIcon from '@mui/icons-material/AutoAwesome';
+import SearchIcon from '@mui/icons-material/Search';
 
 const WelcomeSidebar = () => {
   return (
@@ -16,10 +19,10 @@ const WelcomeSidebar = () => {
         <Box sx={{ position: 'relative', zIndex: 1 }}>
           <AutoAwesomeIcon sx={{ fontSize: 48, color: '#000', mb: 1 }} />
           <Typography variant="h5" fontWeight="900" gutterBottom>
-            Join the Community
+            People Helping People
           </Typography>
           <Typography variant="body2" color="text.secondary" sx={{ mb: 3, lineHeight: 1.6 }}>
-            Connect with skilled professionals, post jobs, book gigs, and get work done efficiently.
+            Get everyday tasks done for less, or turn your side skills into extra cash. A community built on real connections.
           </Typography>
 
           <Button 
@@ -64,6 +67,45 @@ const WelcomeSidebar = () => {
 
       <Paper elevation={0} sx={{ p: 3, borderRadius: 3, border: '1px solid #e0e0e0', bgcolor: 'white' }}>
         <Typography variant="subtitle1" fontWeight="bold" gutterBottom>
+          Why Choose Us?
+        </Typography>
+        <Divider sx={{ mb: 2 }} />
+        
+        <Stack spacing={2.5}>
+          <Box sx={{ display: 'flex', gap: 2, alignItems: 'flex-start' }}>
+            <Box sx={{ bgcolor: '#e8f5e9', p: 1, borderRadius: 2 }}>
+              <SavingsIcon sx={{ color: '#2e7d32' }} />
+            </Box>
+            <Box>
+              <Typography variant="subtitle2" fontWeight="bold">Save on Services</Typography>
+              <Typography variant="caption" color="text.secondary">Hire locals directly and avoid massive corporate markups.</Typography>
+            </Box>
+          </Box>
+
+          <Box sx={{ display: 'flex', gap: 2, alignItems: 'flex-start' }}>
+            <Box sx={{ bgcolor: '#e3f2fd', p: 1, borderRadius: 2 }}>
+              <WorkOutlineIcon sx={{ color: '#1565c0' }} />
+            </Box>
+            <Box>
+              <Typography variant="subtitle2" fontWeight="bold">Earn Extra Income</Typography>
+              <Typography variant="caption" color="text.secondary">Monetize your side skills on your own schedule.</Typography>
+            </Box>
+          </Box>
+
+          <Box sx={{ display: 'flex', gap: 2, alignItems: 'flex-start' }}>
+            <Box sx={{ bgcolor: '#fce4ec', p: 1, borderRadius: 2 }}>
+              <ShieldIcon sx={{ color: '#c2185b' }} />
+            </Box>
+            <Box>
+              <Typography variant="subtitle2" fontWeight="bold">Trusted & Reliable</Typography>
+              <Typography variant="caption" color="text.secondary">Community ratings and secure payments keep you safe.</Typography>
+            </Box>
+          </Box>
+        </Stack>
+      </Paper>
+
+      <Paper elevation={0} sx={{ p: 3, borderRadius: 3, border: '1px solid #e0e0e0', bgcolor: 'white' }}>
+        <Typography variant="subtitle1" fontWeight="bold" gutterBottom>
           How it Works
         </Typography>
         <Divider sx={{ mb: 2 }} />
@@ -71,7 +113,7 @@ const WelcomeSidebar = () => {
         <Stack spacing={2.5}>
           <Box sx={{ display: 'flex', gap: 2, alignItems: 'flex-start' }}>
             <Box sx={{ bgcolor: '#f5f5f5', p: 1, borderRadius: 2 }}>
-              <WorkOutlineIcon sx={{ color: '#000' }} />
+              <SearchIcon sx={{ color: '#000' }} />
             </Box>
             <Box>
               <Typography variant="subtitle2" fontWeight="bold">Post or Browse</Typography>
