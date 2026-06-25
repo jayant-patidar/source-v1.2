@@ -2,9 +2,11 @@ import { useEffect } from 'react';
 import { Card, CardContent, Typography, Box, Divider, Chip } from '@mui/material';
 import { Link } from 'react-router-dom';
 import { useJobStore } from '../store/jobStore';
+import { useAuthStore } from '../store/authStore';
 
 const RightSidebar = () => {
   const { recentJobs, recommendedJobs, fetchRecentJobs, fetchRecommendedJobs } = useJobStore();
+  const { user } = useAuthStore();
 
   useEffect(() => {
     fetchRecentJobs();
@@ -21,8 +23,11 @@ const RightSidebar = () => {
           </Typography>
           <Divider sx={{ my: 2 }} />
           
-          {recommendedJobs.length > 0 ? (
-            recommendedJobs.map((job) => (
+          {recommendedJobs.filter((job: any) => !user || job.seekerId?._id !== user._id).length > 0 ? (
+            recommendedJobs
+              .filter((job: any) => !user || job.seekerId?._id !== user._id)
+              .slice(0, 5)
+              .map((job) => (
               <Box key={job._id} sx={{ mb: 2 }}>
                 <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 0.5 }}>
                   <Link to={`/jobs/${job._id}`} style={{ textDecoration: 'none', color: 'black' }}>
@@ -61,8 +66,11 @@ const RightSidebar = () => {
           </Typography>
           <Divider sx={{ my: 2 }} />
 
-          {recentJobs.length > 0 ? (
-            recentJobs.map((job) => (
+          {recentJobs.filter((job: any) => !user || job.seekerId?._id !== user._id).length > 0 ? (
+            recentJobs
+              .filter((job: any) => !user || job.seekerId?._id !== user._id)
+              .slice(0, 5)
+              .map((job) => (
               <Box key={job._id} sx={{ mb: 2 }}>
                 <Link to={`/jobs/${job._id}`} style={{ textDecoration: 'none', color: 'black' }}>
                     <Typography variant="subtitle2" fontWeight="bold" sx={{ '&:hover': { textDecoration: 'underline' } }}>
