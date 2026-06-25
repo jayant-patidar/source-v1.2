@@ -35,7 +35,18 @@ const GigCard = ({ gig }: GigCardProps) => {
                 {provider.name?.charAt(0).toUpperCase()}
               </Avatar>
               <Box>
-                <Typography variant="h6" fontWeight="bold" sx={{ lineHeight: 1.2 }}>
+                <Typography 
+                  variant="h6" 
+                  fontWeight="bold" 
+                  component={Link}
+                  to={`/gigs/${gig._id}`}
+                  sx={{ 
+                    lineHeight: 1.2, 
+                    textDecoration: 'none', 
+                    color: 'inherit',
+                    '&:hover': { textDecoration: 'underline' }
+                  }}
+                >
                   {gig.title}
                 </Typography>
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mt: 0.5 }}>
