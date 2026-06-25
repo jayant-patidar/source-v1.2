@@ -3,12 +3,13 @@ import { Container, Typography, CircularProgress, Box, Paper, InputBase, IconBut
 
 import JobCard from '../components/JobCard';
 import GigCard from '../components/GigCard';
-import { useJobStore } from '../store/jobStore';
-import { useGigStore } from '../store/gigStore';
 import UserSidebar from '../components/UserSidebar';
+import WelcomeSidebar from '../components/WelcomeSidebar';
 import RightSidebar from '../components/RightSidebar';
 import PostJobBox from '../components/PostJobBox';
 import { useAuthStore } from '../store/authStore';
+import { useJobStore } from '../store/jobStore';
+import { useGigStore } from '../store/gigStore';
 import SearchIcon from '@mui/icons-material/Search';
 import FilterListIcon from '@mui/icons-material/FilterList';
 
@@ -93,7 +94,7 @@ const Home = () => {
         {/* Left Sidebar - User Profile (3 columns) */}
         <Grid size={{ xs: 12, md: 3 }}>
           <Box sx={{ position: 'sticky', top: 80 }}>
-            {user && <UserSidebar />}
+            {user ? <UserSidebar /> : <WelcomeSidebar />}
           </Box>
         </Grid>
 
