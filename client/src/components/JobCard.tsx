@@ -183,6 +183,18 @@ const JobCard = ({ job }: { job: any }) => {
                   borderRadius: '8px',
                 }} 
               />
+              {job.isNegotiable === false && (
+                <Chip 
+                  label="Non-Negotiable" 
+                  size="small"
+                  sx={{ 
+                    bgcolor: '#ffebee', 
+                    color: '#c62828', 
+                    fontWeight: 'bold', 
+                    borderRadius: '8px',
+                  }} 
+                />
+              )}
             </Box>
           </Box>
 
@@ -235,7 +247,13 @@ const JobCard = ({ job }: { job: any }) => {
             <>
               {/* Actions Icons Row */}
               <Box sx={{ display: 'flex', justifyContent: 'space-around', mb: 2 }}>
-                  <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', cursor: 'pointer', opacity: 0.7, '&:hover': { opacity: 1 } }} onClick={() => requireAuth(() => { setOfferMode('negotiate'); setOfferAmount(''); setOpen(true); })}>
+                  <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', cursor: 'pointer', opacity: 0.7, '&:hover': { opacity: 1 } }} onClick={() => requireAuth(() => { 
+                    if (job.isNegotiable === false) {
+                      showToast('This job is non-negotiable. You can only express interest at the listed price.', 'warning');
+                      return;
+                    }
+                    setOfferMode('negotiate'); setOfferAmount(''); setOpen(true); 
+                  })}>
                     <LoopIcon sx={{ fontSize: 24, color: 'black' }} />
                     <Typography variant="caption" sx={{ fontSize: '0.7rem', mt: 0.5 }}>Negotiate</Typography>
                   </Box>

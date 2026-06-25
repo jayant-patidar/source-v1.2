@@ -186,9 +186,18 @@ const JobDetails = () => {
                         ${job.originalPay}
                     </Typography>
                 )}
-                <Typography variant="caption" color="text.secondary" fontWeight="bold">
-                    {job.type === 'hourly' ? 'PER HOUR' : 'FIXED PRICE'}
-                </Typography>
+                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 1 }}>
+                    <Typography variant="caption" color="text.secondary" fontWeight="bold">
+                        {job.type === 'hourly' ? 'PER HOUR' : 'FIXED PRICE'}
+                    </Typography>
+                    {job.isNegotiable === false && (
+                        <Chip 
+                            label="Non-Negotiable" 
+                            size="small"
+                            sx={{ bgcolor: '#ffebee', color: '#c62828', fontWeight: 'bold' }} 
+                        />
+                    )}
+                </Box>
             </Box>
           </Box>
 
@@ -287,7 +296,13 @@ const JobDetails = () => {
             <Box sx={{ mb: 5 }}>
                 {/* Actions Icons Row */}
                 <Box sx={{ display: 'flex', justifyContent: 'space-around', mb: 3 }}>
-                    <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', cursor: 'pointer', opacity: 0.7, '&:hover': { opacity: 1 } }} onClick={() => requireAuth(() => { setOfferMode('negotiate'); setNegotiationAmount(''); setShowOfferForm(true); })}>
+                    <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', cursor: 'pointer', opacity: 0.7, '&:hover': { opacity: 1 } }} onClick={() => requireAuth(() => { 
+                      if (job.isNegotiable === false) {
+                        showToast('This job is non-negotiable. You can only express interest at the listed price.', 'warning');
+                        return;
+                      }
+                      setOfferMode('negotiate'); setNegotiationAmount(''); setShowOfferForm(true); 
+                    })}>
                         <LoopIcon sx={{ fontSize: 28, color: 'black' }} />
                         <Typography variant="caption" sx={{ fontSize: '0.8rem', mt: 0.5, fontWeight: 'bold' }}>Negotiate</Typography>
                     </Box>
