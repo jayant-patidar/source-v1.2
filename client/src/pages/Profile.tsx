@@ -73,17 +73,11 @@ const Profile = () => {
     name: '',
     email: '',
     phone: '',
-    address: '',
+    address: { unit: '', street: '', city: '', province: '', postalCode: '', county: '' },
     DOB: '',
     about: '',
-    availability: '',
-    skills: [],
-    preferences: {
-      jobTypes: [],
-      categories: [],
-      minPay: '',
-      location: ''
-    },
+    providerProfile: { skills: [], serviceCategories: [], availability: '' },
+    seekerProfile: { requestCategories: [] },
     portfolio: [],
     socialLinks: {
       linkedin: '',
@@ -112,16 +106,23 @@ const Profile = () => {
         name: data.name || '',
         email: data.email || '',
         phone: data.phone || '',
-        address: data.address || '',
+        address: { 
+          unit: data.address?.unit || '', 
+          street: data.address?.street || '', 
+          city: data.address?.city || '', 
+          province: data.address?.province || '', 
+          postalCode: data.address?.postalCode || '', 
+          county: data.address?.county || '' 
+        },
         DOB: data.DOB ? format(new Date(data.DOB), 'yyyy-MM-dd') : '',
         about: data.about || '',
-        availability: data.availability || '',
-        skills: data.skills || [],
-        preferences: {
-          jobTypes: data.preferences?.jobTypes || [],
-          categories: data.preferences?.categories || [],
-          minPay: data.preferences?.minPay || '',
-          location: data.preferences?.location || ''
+        providerProfile: {
+          skills: data.providerProfile?.skills || [],
+          serviceCategories: data.providerProfile?.serviceCategories || [],
+          availability: data.providerProfile?.availability || ''
+        },
+        seekerProfile: {
+          requestCategories: data.seekerProfile?.requestCategories || []
         },
         portfolio: data.portfolio || [],
         socialLinks: {
@@ -177,19 +178,7 @@ const Profile = () => {
     });
   };
 
-  const handleAddSkill = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter' && skillInput.trim()) {
-      e.preventDefault();
-      if (!formData.skills.includes(skillInput.trim())) {
-        setFormData({ ...formData, skills: [...formData.skills, skillInput.trim()] });
-      }
-      setSkillInput('');
-    }
-  };
 
-  const handleDeleteSkill = (skillToDelete: string) => {
-    setFormData({ ...formData, skills: formData.skills.filter((skill: string) => skill !== skillToDelete) });
-  };
 
   const handleAddArrayItem = (e: React.KeyboardEvent, field: string, inputState: string, setInputState: (val: string) => void, nestedField?: string) => {
     if (e.key === 'Enter' && inputState.trim()) {
@@ -305,7 +294,7 @@ const Profile = () => {
         {/* Cover Photo */}
         <Box 
           sx={{ 
-            height: 200, 
+            height: 250, 
             background: 'linear-gradient(135deg, #1976d2 0%, #9c27b0 100%)',
             position: 'relative'
           }}
@@ -313,8 +302,8 @@ const Profile = () => {
         
         {/* Profile Content */}
         <Box sx={{ px: 4, pb: 4, position: 'relative' }}>
-          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', flexWrap: 'wrap' }}>
-            <Box sx={{ display: 'flex', alignItems: 'flex-end', mt: -8, mb: 2 }}>
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap' }}>
+            <Box sx={{ display: 'flex', alignItems: 'flex-start', mt: -8, mb: 2 }}>
               <Avatar 
                 src={user.avatar} 
                 alt={user.name}
@@ -329,9 +318,9 @@ const Profile = () => {
               >
                 {user.name?.charAt(0).toUpperCase()}
               </Avatar>
-              <Box sx={{ ml: 3, mb: 2, mt: 6 }}>
+              <Box sx={{ ml: 3, mb: 2, mt: 8 }}>
                 <Typography variant="h4" fontWeight="bold">{user.name}</Typography>
-                <Typography variant="h6" color="text.secondary">{user.about?.split('.')[0] || 'No headline'}</Typography>
+                <Typography variant="subtitle1" color="text.secondary">{user.about?.split('.')[0] || 'No headline'}</Typography>
                 
               </Box>
             </Box>
@@ -421,12 +410,82 @@ const Profile = () => {
               </Grid>
 
             </Grid>
+
+            <Divider sx={{ my: 3 }} />
+
+            <Typography variant="h6" fontWeight="bold" gutterBottom>Location</Typography>
+            <Grid container spacing={3}>
+              <Grid size={{ xs: 12, sm: 6 }}>
+                {editMode.personal ? (
+                  <TextField fullWidth label="Street" value={formData.address.street} onChange={(e) => handleNestedChange('address', 'street', e.target.value)} />
+                ) : (
+                  <Box>
+                    <Typography variant="subtitle2" color="text.secondary">Street</Typography>
+                    <Typography variant="body1">{user.address?.street || 'Not specified'}</Typography>
+                  </Box>
+                )}
+              </Grid>
+              <Grid size={{ xs: 12, sm: 3 }}>
+                {editMode.personal ? (
+                  <TextField fullWidth label="Unit/Apt" value={formData.address.unit} onChange={(e) => handleNestedChange('address', 'unit', e.target.value)} />
+                ) : (
+                  <Box>
+                    <Typography variant="subtitle2" color="text.secondary">Unit/Apt</Typography>
+                    <Typography variant="body1">{user.address?.unit || '-'}</Typography>
+                  </Box>
+                )}
+              </Grid>
+              <Grid size={{ xs: 12, sm: 3 }}>
+                {editMode.personal ? (
+                  <TextField fullWidth label="City" value={formData.address.city} onChange={(e) => handleNestedChange('address', 'city', e.target.value)} />
+                ) : (
+                  <Box>
+                    <Typography variant="subtitle2" color="text.secondary">City</Typography>
+                    <Typography variant="body1">{user.address?.city || 'Not specified'}</Typography>
+                  </Box>
+                )}
+              </Grid>
+              <Grid size={{ xs: 12, sm: 4 }}>
+                {editMode.personal ? (
+                  <TextField fullWidth select label="Province" value={formData.address.province} onChange={(e) => handleNestedChange('address', 'province', e.target.value)}>
+                    {['AB', 'BC', 'MB', 'NB', 'NL', 'NT', 'NS', 'NU', 'ON', 'PE', 'QC', 'SK', 'YT'].map(prov => (
+                       <MenuItem key={prov} value={prov}>{prov}</MenuItem>
+                    ))}
+                  </TextField>
+                ) : (
+                  <Box>
+                    <Typography variant="subtitle2" color="text.secondary">Province</Typography>
+                    <Typography variant="body1">{user.address?.province || 'Not specified'}</Typography>
+                  </Box>
+                )}
+              </Grid>
+              <Grid size={{ xs: 12, sm: 4 }}>
+                {editMode.personal ? (
+                  <TextField fullWidth label="Postal Code" value={formData.address.postalCode} onChange={(e) => handleNestedChange('address', 'postalCode', e.target.value)} />
+                ) : (
+                  <Box>
+                    <Typography variant="subtitle2" color="text.secondary">Postal Code</Typography>
+                    <Typography variant="body1">{user.address?.postalCode || 'Not specified'}</Typography>
+                  </Box>
+                )}
+              </Grid>
+              <Grid size={{ xs: 12, sm: 4 }}>
+                {editMode.personal ? (
+                  <TextField fullWidth label="County" value={formData.address.county} onChange={(e) => handleNestedChange('address', 'county', e.target.value)} />
+                ) : (
+                  <Box>
+                    <Typography variant="subtitle2" color="text.secondary">County</Typography>
+                    <Typography variant="body1">{user.address?.county || '-'}</Typography>
+                  </Box>
+                )}
+              </Grid>
+            </Grid>
           </CustomTabPanel>
 
           {/* Skills & Preferences Tab */}
           <CustomTabPanel value={tabValue} index={1}>
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-              <Typography variant="h6" fontWeight="bold">Skills</Typography>
+              <Typography variant="h6" fontWeight="bold">Role Profiles</Typography>
               {!editMode.skills ? (
                 <IconButton onClick={() => handleEditToggle('skills')} color="primary">
                   <EditIcon />
@@ -439,119 +498,109 @@ const Profile = () => {
               )}
             </Box>
 
-             {editMode.skills && (
-                <TextField 
-                  fullWidth 
-                  label="Add a skill (Press Enter)" 
-                  value={skillInput} 
-                  onChange={(e) => setSkillInput(e.target.value)} 
-                  onKeyDown={handleAddSkill} 
-                  helperText="Press Enter to add"
-                  sx={{ mb: 2 }}
-                />
-             )}
-            <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, mb: 4 }}>
-              {(editMode.skills ? formData.skills : user.skills)?.map((skill: string, index: number) => (
-                <Chip 
-                  key={index} 
-                  label={skill} 
-                  onDelete={editMode.skills ? () => handleDeleteSkill(skill) : undefined} 
-                  color="primary" 
-                  variant="outlined" 
-                />
-              ))}
-              {(!user.skills?.length && !editMode.skills) && <Typography color="text.secondary">No skills added.</Typography>}
-            </Box>
+            {/* Provider Section */}
+            <Typography variant="h6" fontWeight="bold" gutterBottom color="primary" sx={{ mt: 3 }}>Provider Profile</Typography>
+            <Typography variant="body2" color="text.secondary" gutterBottom>Settings for when you are offering services.</Typography>
+            
+            <Grid container spacing={3} sx={{ mb: 4 }}>
+              <Grid size={{ xs: 12, md: 6 }}>
+                <Typography variant="subtitle2" fontWeight="bold" gutterBottom>Skills</Typography>
+                {editMode.skills && (
+                  <TextField 
+                    fullWidth size="small" label="Add a skill (Press Enter)" value={skillInput} 
+                    onChange={(e) => setSkillInput(e.target.value)} 
+                    onKeyDown={(e) => handleAddArrayItem(e, 'providerProfile', skillInput, setSkillInput, 'skills')} 
+                    sx={{ mb: 1 }}
+                  />
+                )}
+                <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
+                  {(editMode.skills ? formData.providerProfile.skills : user.providerProfile?.skills)?.map((skill: string, index: number) => (
+                    <Chip key={index} label={skill} onDelete={editMode.skills ? () => handleDeleteArrayItem(skill, 'providerProfile', 'skills') : undefined} color="primary" variant="outlined" />
+                  ))}
+                  {(!user.providerProfile?.skills?.length && !editMode.skills) && <Typography color="text.secondary">No skills added.</Typography>}
+                </Box>
+              </Grid>
 
-            <Typography variant="h6" fontWeight="bold" gutterBottom sx={{ mt: 3 }}>Job Types</Typography>
-             {editMode.skills && (
-                <TextField 
-                  fullWidth 
-                  label="Add job type (e.g. Full-time, Remote) - Press Enter" 
-                  value={jobTypeInput} 
-                  onChange={(e) => setJobTypeInput(e.target.value)} 
-                  onKeyDown={(e) => handleAddArrayItem(e, 'preferences', jobTypeInput, setJobTypeInput, 'jobTypes')} 
-                  helperText="Press Enter to add"
-                  sx={{ mb: 2 }}
-                />
-             )}
-            <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, mb: 4 }}>
-              {(editMode.skills ? formData.preferences.jobTypes : user.preferences?.jobTypes)?.map((type: string, index: number) => (
-                <Chip 
-                  key={index} 
-                  label={type} 
-                  onDelete={editMode.skills ? () => handleDeleteArrayItem(type, 'preferences', 'jobTypes') : undefined} 
-                  color="info" 
-                  variant="outlined" 
-                />
-              ))}
-              {(!user.preferences?.jobTypes?.length && !editMode.skills) && <Typography color="text.secondary">No job types specified.</Typography>}
-            </Box>
+              <Grid size={{ xs: 12, md: 6 }}>
+                <Typography variant="subtitle2" fontWeight="bold" gutterBottom>Service Categories</Typography>
+                {editMode.skills && (
+                  <TextField 
+                    fullWidth size="small" label="Add category (Press Enter)" value={categoryInput} 
+                    onChange={(e) => setCategoryInput(e.target.value)} 
+                    onKeyDown={(e) => handleAddArrayItem(e, 'providerProfile', categoryInput, setCategoryInput, 'serviceCategories')} 
+                    sx={{ mb: 1 }}
+                  />
+                )}
+                <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
+                  {(editMode.skills ? formData.providerProfile.serviceCategories : user.providerProfile?.serviceCategories)?.map((cat: string, index: number) => (
+                    <Chip key={index} label={cat} onDelete={editMode.skills ? () => handleDeleteArrayItem(cat, 'providerProfile', 'serviceCategories') : undefined} color="secondary" variant="outlined" />
+                  ))}
+                  {(!user.providerProfile?.serviceCategories?.length && !editMode.skills) && <Typography color="text.secondary">No categories added.</Typography>}
+                </Box>
+              </Grid>
 
-            <Typography variant="h6" fontWeight="bold" gutterBottom>Categories</Typography>
-             {editMode.skills && (
-                <TextField 
-                  fullWidth 
-                  label="Add category (e.g. Engineering, Design) - Press Enter" 
-                  value={categoryInput} 
-                  onChange={(e) => setCategoryInput(e.target.value)} 
-                  onKeyDown={(e) => handleAddArrayItem(e, 'preferences', categoryInput, setCategoryInput, 'categories')} 
-                  helperText="Press Enter to add"
-                  sx={{ mb: 2 }}
-                />
-             )}
-            <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, mb: 4 }}>
-              {(editMode.skills ? formData.preferences.categories : user.preferences?.categories)?.map((cat: string, index: number) => (
-                <Chip 
-                  key={index} 
-                  label={cat} 
-                  onDelete={editMode.skills ? () => handleDeleteArrayItem(cat, 'preferences', 'categories') : undefined} 
-                  color="success" 
-                  variant="outlined" 
-                />
-              ))}
-              {(!user.preferences?.categories?.length && !editMode.skills) && <Typography color="text.secondary">No categories specified.</Typography>}
-            </Box>
-
-            <Divider sx={{ my: 3 }} />
-
-            <Typography variant="h6" fontWeight="bold" gutterBottom>Job Preferences</Typography>
-            <Grid container spacing={3}>
-               <Grid size={{ xs: 12, sm: 6 }}>
+              <Grid size={{ xs: 12, sm: 6 }}>
                  {editMode.skills ? (
-                    <TextField fullWidth label="Min Pay ($/hr)" type="number" value={formData.preferences.minPay} onChange={(e) => handleNestedChange('preferences', 'minPay', e.target.value)} />
-                 ) : (
-                    <Box>
-                      <Typography variant="subtitle2" color="text.secondary">Minimum Pay</Typography>
-                      <Typography variant="body1">{user.preferences?.minPay ? `$${user.preferences.minPay}/hr` : 'Not specified'}</Typography>
-                    </Box>
-                 )}
-               </Grid>
-               <Grid size={{ xs: 12, sm: 6 }}>
-                 {editMode.skills ? (
-                    <TextField fullWidth label="Preferred Location" value={formData.preferences.location} onChange={(e) => handleNestedChange('preferences', 'location', e.target.value)} />
-                 ) : (
-                    <Box>
-                      <Typography variant="subtitle2" color="text.secondary">Preferred Location</Typography>
-                      <Typography variant="body1">{user.preferences?.location || 'Not specified'}</Typography>
-                    </Box>
-                 )}
-               </Grid>
-               <Grid size={{ xs: 12, sm: 6 }}>
-                 {editMode.skills ? (
-                   <TextField fullWidth label="Availability" name="availability" select value={formData.availability} onChange={handleChange}>
-                      <MenuItem value="Full-time">Full-time</MenuItem>
-                      <MenuItem value="Part-time">Part-time</MenuItem>
-                      <MenuItem value="Contract">Contract</MenuItem>
-                      <MenuItem value="Freelance">Freelance</MenuItem>
+                   <TextField fullWidth label="Availability" select value={formData.providerProfile.availability} onChange={(e) => handleNestedChange('providerProfile', 'availability', e.target.value)}>
+                      <MenuItem value="Flexible">Flexible</MenuItem>
+                      <MenuItem value="Weekends Only">Weekends Only</MenuItem>
+                      <MenuItem value="Evenings">Evenings</MenuItem>
+                      <MenuItem value="Full-Time">Full-Time</MenuItem>
                    </TextField>
                 ) : (
                   <Box>
                     <Typography variant="subtitle2" color="text.secondary">Availability</Typography>
-                    <Typography variant="body1">{user.availability || 'Not specified'}</Typography>
+                    <Typography variant="body1">{user.providerProfile?.availability || 'Not specified'}</Typography>
                   </Box>
                 )}
-               </Grid>
+              </Grid>
+              <Grid size={{ xs: 12, sm: 6 }}>
+                 {editMode.skills ? (
+                   <TextField fullWidth type="number" label="Service Radius (km)" value={formData.providerProfile.serviceRadius || ''} onChange={(e) => handleNestedChange('providerProfile', 'serviceRadius', Number(e.target.value))} />
+                ) : (
+                  <Box>
+                    <Typography variant="subtitle2" color="text.secondary">Service Radius</Typography>
+                    <Typography variant="body1">{user.providerProfile?.serviceRadius ? `${user.providerProfile.serviceRadius} km` : 'Not specified'}</Typography>
+                  </Box>
+                )}
+              </Grid>
+            </Grid>
+
+            <Divider sx={{ my: 3 }} />
+
+            {/* Seeker Section */}
+            <Typography variant="h6" fontWeight="bold" gutterBottom color="primary">Seeker Profile</Typography>
+            <Typography variant="body2" color="text.secondary" gutterBottom>Settings for when you are hiring others.</Typography>
+            
+            <Grid container spacing={3}>
+              <Grid size={{ xs: 12, md: 6 }}>
+                <Typography variant="subtitle2" fontWeight="bold" gutterBottom>Request Categories</Typography>
+                {editMode.skills && (
+                  <TextField 
+                    fullWidth size="small" label="Add requested category (Press Enter)" value={jobTypeInput} 
+                    onChange={(e) => setJobTypeInput(e.target.value)} 
+                    onKeyDown={(e) => handleAddArrayItem(e, 'seekerProfile', jobTypeInput, setJobTypeInput, 'requestCategories')} 
+                    sx={{ mb: 1 }}
+                  />
+                )}
+                <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
+                  {(editMode.skills ? formData.seekerProfile.requestCategories : user.seekerProfile?.requestCategories)?.map((cat: string, index: number) => (
+                    <Chip key={index} label={cat} onDelete={editMode.skills ? () => handleDeleteArrayItem(cat, 'seekerProfile', 'requestCategories') : undefined} color="info" variant="outlined" />
+                  ))}
+                  {(!user.seekerProfile?.requestCategories?.length && !editMode.skills) && <Typography color="text.secondary">No request categories added.</Typography>}
+                </Box>
+              </Grid>
+
+              <Grid size={{ xs: 12, sm: 6 }}>
+                 {editMode.skills ? (
+                   <TextField fullWidth label="Default Location" value={formData.seekerProfile.defaultLocation || ''} onChange={(e) => handleNestedChange('seekerProfile', 'defaultLocation', e.target.value)} />
+                ) : (
+                  <Box>
+                    <Typography variant="subtitle2" color="text.secondary">Default Location</Typography>
+                    <Typography variant="body1">{user.seekerProfile?.defaultLocation || 'Not specified'}</Typography>
+                  </Box>
+                )}
+              </Grid>
             </Grid>
           </CustomTabPanel>
 
@@ -655,19 +704,6 @@ const Profile = () => {
                       <Box>
                         <Typography variant="subtitle2" color="text.secondary">Phone</Typography>
                         <Typography variant="body1">{user.phone || 'Not specified'}</Typography>
-                      </Box>
-                    </Box>
-                 )}
-              </Grid>
-               <Grid size={12}>
-                 {editMode.social ? (
-                    <TextField fullWidth label="Address" name="address" value={formData.address} onChange={handleChange} />
-                 ) : (
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                      <LocationOnIcon color="action" />
-                      <Box>
-                        <Typography variant="subtitle2" color="text.secondary">Address</Typography>
-                        <Typography variant="body1">{user.address || 'Not specified'}</Typography>
                       </Box>
                     </Box>
                  )}
