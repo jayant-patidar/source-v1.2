@@ -19,10 +19,10 @@ const WelcomeSidebar = () => {
         <Box sx={{ position: 'relative', zIndex: 1 }}>
           <AutoAwesomeIcon sx={{ fontSize: 48, color: '#000', mb: 1 }} />
           <Typography variant="h5" fontWeight="900" gutterBottom>
-            People Helping People
+            Join the Community
           </Typography>
           <Typography variant="body2" color="text.secondary" sx={{ mb: 3, lineHeight: 1.6 }}>
-            Get everyday tasks done for less, or turn your side skills into extra cash. A community built on real connections.
+            Connect with locals to get everyday tasks done, or share your skills to help others. A community built on real connections.
           </Typography>
 
           <Button 

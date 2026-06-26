@@ -7,7 +7,25 @@ export interface IUser extends Document {
   password?: string;
   DOB: Date;
   phone: string;
-  address: string;
+  address: {
+    unit?: string;
+    street: string;
+    city: string;
+    province: string;
+    postalCode: string;
+    county?: string;
+  };
+  providerProfile?: {
+    skills: string[];
+    serviceCategories: string[];
+    serviceRadius?: number;
+    availability?: string;
+  };
+  seekerProfile?: {
+    requestCategories: string[];
+    preferredTopics: string[];
+    defaultLocation?: string;
+  };
   seekerRating: number;
   providerRating: number;
   about?: string;
@@ -43,7 +61,25 @@ const UserSchema: Schema = new Schema(
     password: { type: String, required: true },
     DOB: { type: Date, required: true },
     phone: { type: String, required: true },
-    address: { type: String, required: true },
+    address: {
+      unit: { type: String },
+      street: { type: String, required: true },
+      city: { type: String, required: true },
+      province: { type: String, required: true, enum: ['AB', 'BC', 'MB', 'NB', 'NL', 'NT', 'NS', 'NU', 'ON', 'PE', 'QC', 'SK', 'YT'] },
+      postalCode: { type: String, required: true },
+      county: { type: String }
+    },
+    providerProfile: {
+      skills: [{ type: String }],
+      serviceCategories: [{ type: String }],
+      serviceRadius: { type: Number },
+      availability: { type: String }
+    },
+    seekerProfile: {
+      requestCategories: [{ type: String }],
+      preferredTopics: [{ type: String }],
+      defaultLocation: { type: String }
+    },
     seekerRating: { type: Number, default: 0, min: 0, max: 5 },
     providerRating: { type: Number, default: 0, min: 0, max: 5 },
     about: { type: String, required: false },

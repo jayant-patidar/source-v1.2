@@ -11,7 +11,25 @@ interface User {
   providerRating?: number;
   DOB?: string;
   phone?: string;
-  address?: string;
+  address?: {
+    unit?: string;
+    street: string;
+    city: string;
+    province: string;
+    postalCode: string;
+    county?: string;
+  };
+  providerProfile?: {
+    skills: string[];
+    serviceCategories: string[];
+    serviceRadius?: number;
+    availability?: string;
+  };
+  seekerProfile?: {
+    requestCategories: string[];
+    preferredTopics: string[];
+    defaultLocation?: string;
+  };
   about?: string;
   preferences?: {
     jobTypes: string[];
