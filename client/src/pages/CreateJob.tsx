@@ -1,6 +1,7 @@
 import { useFormik } from 'formik';
 import * as yup from 'yup';
-import { Box, Button, TextField, Typography, Container, MenuItem, Paper, FormControlLabel, Switch, Autocomplete, Chip } from '@mui/material';
+import { Box, Button, TextField, Typography, Container, MenuItem, Paper, FormControlLabel, Switch, Autocomplete, Chip, IconButton } from '@mui/material';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { useNavigate } from 'react-router-dom';
 import { useJobStore } from '../store/jobStore';
 import { useToastStore } from '../store/toastStore';
@@ -89,9 +90,14 @@ const CreateJob = () => {
   return (
     <Container maxWidth="md">
       <Paper elevation={0} sx={{ p: 4, borderRadius: 3, border: '1px solid #e2e8f0' }}>
-        <Typography variant="h4" fontWeight="bold" gutterBottom>
-          Post a Job
-        </Typography>
+        <Box display="flex" alignItems="center" mb={2}>
+          <IconButton onClick={() => navigate(-1)} sx={{ mr: 1 }}>
+            <ArrowBackIcon />
+          </IconButton>
+          <Typography variant="h4" fontWeight="bold">
+            Post a Job
+          </Typography>
+        </Box>
         <form onSubmit={formik.handleSubmit}>
           <TextField
             fullWidth
