@@ -1,4 +1,4 @@
-import { AppBar, Toolbar, Typography, Button, Box, Container, Avatar, Menu, MenuItem, InputBase } from '@mui/material';
+import { AppBar, Toolbar, Typography, Button, Box, Container, Avatar, Menu, MenuItem, InputBase, IconButton, Drawer, List, ListItem, ListItemIcon, ListItemText, Divider } from '@mui/material';
 import { Link as RouterLink, useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../store/authStore';
 import { useToastStore } from '../store/toastStore';
@@ -8,6 +8,9 @@ import HomeIcon from '@mui/icons-material/Home';
 import WorkIcon from '@mui/icons-material/Work';
 import MessageIcon from '@mui/icons-material/Message';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
+import MenuIcon from '@mui/icons-material/Menu';
+import PersonIcon from '@mui/icons-material/Person';
+import ExitToAppIcon from '@mui/icons-material/ExitToApp';
 import NotificationMenu from './NotificationMenu';
 
 const Navbar = () => {
@@ -15,6 +18,7 @@ const Navbar = () => {
   const { showToast } = useToastStore();
   const navigate = useNavigate();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const [mobileOpen, setMobileOpen] = useState(false);
 
   const handleMenu = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
@@ -24,10 +28,15 @@ const Navbar = () => {
     setAnchorEl(null);
   };
 
+  const handleMobileToggle = () => {
+    setMobileOpen(!mobileOpen);
+  };
+
   const handleLogout = () => {
     logout();
     showToast('Logout Successful!', 'success');
     handleClose();
+    setMobileOpen(false);
     navigate('/login');
   };
 
@@ -53,17 +62,19 @@ const Navbar = () => {
             />
           </Box>
 
+
+
           {/* Search Bar */}
           <Box sx={{ 
             flexGrow: 1, 
-            maxWidth: 600, 
+            maxWidth: { xs: '100%', md: 600 }, 
             bgcolor: 'white', 
             borderRadius: 1, 
-            display: 'flex', 
+            display: { xs: 'none', sm: 'flex' }, 
             alignItems: 'center',
             px: 2,
             py: 0.5,
-            mr: 4
+            mx: { xs: 2, md: 4 }
           }}>
             <InputBase
               placeholder="Search"
@@ -142,8 +153,65 @@ const Navbar = () => {
               <MenuItem onClick={handleLogout}>Logout</MenuItem>
             </Menu>
           </Box>
+
+          {/* Mobile Menu Icon (Right Aligned) */}
+          <Box sx={{ display: { xs: 'flex', md: 'none' }, ml: 'auto' }}>
+            <IconButton color="inherit" onClick={handleMobileToggle}>
+              <MenuIcon />
+            </IconButton>
+          </Box>
         </Toolbar>
       </Container>
+
+      {/* Mobile Drawer */}
+      <Drawer anchor="left" open={mobileOpen} onClose={handleMobileToggle}>
+        <Box sx={{ width: 250 }} role="presentation">
+          <Box sx={{ p: 2, display: 'flex', alignItems: 'center', bgcolor: '#000' }}>
+            <img src="/logo1.png" alt="Source" style={{ height: 30, objectFit: 'contain' }} />
+          </Box>
+          <Divider />
+          <List>
+            <ListItem component={RouterLink} to="/" onClick={handleMobileToggle} sx={{ color: 'inherit' }}>
+              <ListItemIcon><HomeIcon /></ListItemIcon>
+              <ListItemText primary="Home" />
+            </ListItem>
+            <ListItem component={RouterLink} to="/" onClick={handleMobileToggle} sx={{ color: 'inherit' }}>
+              <ListItemIcon><WorkIcon /></ListItemIcon>
+              <ListItemText primary="Jobs" />
+            </ListItem>
+            <ListItem component={RouterLink} to="/activity" onClick={handleMobileToggle} sx={{ color: 'inherit' }}>
+              <ListItemIcon><MessageIcon /></ListItemIcon>
+              <ListItemText primary="Activity" />
+            </ListItem>
+          </List>
+          <Divider />
+          <List>
+            {user ? (
+              <>
+                <ListItem component={RouterLink} to="/profile" onClick={handleMobileToggle} sx={{ color: 'inherit' }}>
+                  <ListItemIcon>
+                    <Avatar src={user.avatar} sx={{ width: 24, height: 24 }}>{user.name.charAt(0).toUpperCase()}</Avatar>
+                  </ListItemIcon>
+                  <ListItemText primary="Profile" />
+                </ListItem>
+                <ListItem component={RouterLink} to="/post-job" onClick={handleMobileToggle} sx={{ color: 'inherit' }}>
+                  <ListItemIcon><WorkIcon /></ListItemIcon>
+                  <ListItemText primary="Post a Job" />
+                </ListItem>
+                <ListItem onClick={handleLogout} sx={{ color: 'inherit', cursor: 'pointer' }}>
+                  <ListItemIcon><ExitToAppIcon /></ListItemIcon>
+                  <ListItemText primary="Logout" />
+                </ListItem>
+              </>
+            ) : (
+              <ListItem component={RouterLink} to="/login" onClick={handleMobileToggle} sx={{ color: 'inherit' }}>
+                <ListItemIcon><PersonIcon /></ListItemIcon>
+                <ListItemText primary="Login" />
+              </ListItem>
+            )}
+          </List>
+        </Box>
+      </Drawer>
     </AppBar>
   );
 };

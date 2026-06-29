@@ -210,17 +210,17 @@ const ContractView = () => {
         />
       )}
       {/* Header */}
-      <Box display="flex" justifyContent="space-between" alignItems="center" mb={4}>
-        <Box display="flex" alignItems="center" gap={2}>
+      <Box display="flex" justifyContent="space-between" alignItems={{ xs: 'flex-start', sm: 'center' }} flexDirection={{ xs: 'column', sm: 'row' }} gap={2} mb={4}>
+        <Box display="flex" alignItems="center" gap={2} flexWrap="wrap">
            <Button startIcon={<ArrowBackIcon />} onClick={() => navigate(-1)} color="inherit">Back</Button>
            <Divider orientation="vertical" flexItem />
            <DescriptionIcon fontSize="large" color="primary" />
            <Box>
-               <Typography variant="h5" fontWeight="bold">Contract #{job._id.slice(-6).toUpperCase()}</Typography>
+               <Typography variant="h5" fontWeight="bold" sx={{ wordBreak: 'break-all' }}>Contract #{job._id.slice(-6).toUpperCase()}</Typography>
                <Typography variant="caption" color="text.secondary">ID: {job._id}</Typography>
            </Box>
         </Box>
-        <Box display="flex" gap={1}>
+        <Box display="flex" gap={1} flexWrap="wrap">
              <Chip 
                 label={job.status.toUpperCase().replace('_', ' ')} 
                 color={job.status === 'completed' ? 'success' : 'primary'} 
@@ -237,7 +237,7 @@ const ContractView = () => {
                     color="secondary" 
                     startIcon={<RateReviewIcon />}
                     onClick={() => setReviewModalOpen(true)}
-                    sx={{ ml: 2 }}
+                    sx={{ ml: { xs: 0, sm: 2 } }}
                 >
                     Rate User
                 </Button>

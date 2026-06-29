@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Container, Typography, Box, Paper, Avatar, TextField, Button, Grid, Chip, MenuItem, Alert, CircularProgress, IconButton, Divider, Tabs, Tab } from '@mui/material';
+import { Container, Typography, Box, Paper, Avatar, TextField, Button, Grid, Chip, MenuItem, Alert, CircularProgress, IconButton, Divider, Tabs, Tab, Drawer, List, ListItemButton, ListItemText } from '@mui/material';
 import api from '../services/api';
 import { useAuthStore } from '../store/authStore';
 import { format } from 'date-fns';
@@ -15,6 +15,7 @@ import LanguageIcon from '@mui/icons-material/Language';
 import EmailIcon from '@mui/icons-material/Email';
 import PhoneIcon from '@mui/icons-material/Phone';
 import ReplyIcon from '@mui/icons-material/Reply';
+import MenuIcon from '@mui/icons-material/Menu';
 import { Rating } from '@mui/material';
 
 interface TabPanelProps {
@@ -69,6 +70,18 @@ const Profile = () => {
     social: false,
     security: false
   });
+
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const handleProfileMenuToggle = () => setMobileMenuOpen(!mobileMenuOpen);
+  const tabNames = [
+    "Personal Info", 
+    "Skills & Preferences", 
+    "Portfolio", 
+    "Contact & Social", 
+    "Security", 
+    "My Activity", 
+    "Reviews"
+  ];
 
   const [formData, setFormData] = useState<any>({
     name: '',
@@ -362,8 +375,8 @@ const Profile = () => {
           </Box>
         </Box>
 
-        {/* Tabs */}
-        <Box sx={{ borderBottom: 1, borderColor: 'divider', px: 2 }}>
+        {/* Tabs - Desktop */}
+        <Box sx={{ borderBottom: 1, borderColor: 'divider', px: 2, display: { xs: 'none', md: 'block' } }}>
           <Tabs value={tabValue} onChange={handleTabChange} aria-label="profile tabs">
             <Tab label="Personal Info" {...a11yProps(0)} />
             <Tab label="Skills & Preferences" {...a11yProps(1)} />
@@ -373,6 +386,43 @@ const Profile = () => {
             <Tab label="My Activity" {...a11yProps(5)} />
             <Tab label="Reviews" {...a11yProps(6)} />
           </Tabs>
+        </Box>
+
+        {/* Mobile Menu for Tabs */}
+        <Box sx={{ borderBottom: 1, borderColor: 'divider', px: 2, py: 1, display: { xs: 'flex', md: 'none' }, alignItems: 'center', gap: 2 }}>
+           <IconButton color="primary" onClick={handleProfileMenuToggle} edge="start">
+             <MenuIcon />
+           </IconButton>
+           <Typography variant="subtitle1" fontWeight="bold">
+             {tabNames[tabValue]}
+           </Typography>
+        </Box>
+        
+        <Drawer
+          anchor="left"
+          open={mobileMenuOpen}
+          onClose={handleProfileMenuToggle}
+          sx={{ display: { xs: 'block', md: 'none' }, '& .MuiDrawer-paper': { width: 280, boxSizing: 'border-box' } }}
+        >
+          <Box sx={{ p: 2 }}>
+            <Typography variant="h6" fontWeight="bold" gutterBottom>Profile Sections</Typography>
+            <Divider sx={{ mb: 2 }} />
+            <List>
+               {tabNames.map((name, index) => (
+                 <ListItemButton 
+                   key={index} 
+                   selected={tabValue === index}
+                   onClick={() => {
+                     setTabValue(index);
+                     setMobileMenuOpen(false);
+                   }}
+                 >
+                   <ListItemText primary={name} />
+                 </ListItemButton>
+               ))}
+            </List>
+          </Box>
+        </Drawer>
 
           {success && <Alert severity="success" sx={{ m: 3 }}>{success}</Alert>}
           {error && <Alert severity="error" sx={{ m: 3 }}>{error}</Alert>}
@@ -1102,8 +1152,7 @@ const Profile = () => {
             )}
 
           </CustomTabPanel>
-        </Box>
-      </Paper>
+        </Paper>
     </Container>
   );
 };

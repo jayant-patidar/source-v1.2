@@ -1,4 +1,4 @@
-import { Box, Container, useTheme, useMediaQuery, IconButton, Drawer } from '@mui/material';
+import { Box, Container, useTheme, useMediaQuery, IconButton, Drawer, Typography } from '@mui/material';
 import { useState } from 'react';
 import type { ReactNode } from 'react';
 import MenuIcon from '@mui/icons-material/Menu';
@@ -26,27 +26,51 @@ const ActivityLayout = ({ children, currentView, onViewChange }: ActivityLayoutP
     }
   };
 
+  const getViewName = (viewId: string) => {
+    const views: Record<string, string> = {
+      'dashboard': 'Dashboard',
+      'received-offers': 'Received Offers',
+      'rejected-offers': 'Rejected Offers',
+      'posted-jobs': 'Jobs I Posted',
+      'seeker-ongoing': 'Ongoing Jobs (Seeker)',
+      'seeker-completed-jobs': 'Completed Jobs (Seeker)',
+      'my-gigs': 'My Gigs',
+      'sent-offers': 'Sent Offers',
+      'upcoming-jobs': 'Upcoming Jobs',
+      'provider-ongoing': 'Ongoing Jobs (Provider)',
+      'completed-jobs': 'Completed Jobs (Provider)',
+      'saved-jobs': 'Saved Jobs',
+      'cancelled-jobs': 'Cancelled Jobs',
+      'archived-jobs': 'Archived Jobs',
+      'expired-jobs': 'Expired Jobs',
+    };
+    return views[viewId] || 'Activity Menu';
+  };
+
   return (
     <Container maxWidth="xl" sx={{ mt: 4, mb: 8, px: { xs: 0, md: 3 } }}>
-      <Box sx={{ display: 'flex', minHeight: '80vh', bgcolor: '#f9fafb', borderRadius: 3, overflow: 'hidden', border: '1px solid #e0e0e0' }}>
+      <Box sx={{ display: 'flex', flexDirection: { xs: 'column', md: 'row' }, minHeight: '80vh', bgcolor: '#f9fafb', borderRadius: 3, overflow: 'hidden', border: '1px solid #e0e0e0' }}>
         
-        {/* Mobile Menu Button */}
+        {/* Mobile Menu Button - Moved to a header block within the layout */}
         {isMobile && (
-          <IconButton
-            color="inherit"
-            aria-label="open drawer"
-            edge="start"
-            onClick={handleDrawerToggle}
-            sx={{ position: 'absolute', top: 80, left: 16, zIndex: 1200, bgcolor: 'white', boxShadow: 1 }}
-          >
-            <MenuIcon />
-          </IconButton>
+          <Box sx={{ p: 2, borderBottom: '1px solid #e0e0e0', display: 'flex', alignItems: 'center', gap: 2 }}>
+            <IconButton
+              color="primary"
+              aria-label="open drawer"
+              edge="start"
+              onClick={handleDrawerToggle}
+            >
+              <MenuIcon />
+            </IconButton>
+            <Typography variant="h6" fontWeight="bold">{getViewName(currentView)}</Typography>
+          </Box>
         )}
 
-        {/* Sidebar - Desktop */}
-        <Box sx={{ display: { xs: 'none', md: 'block' } }}>
-          <ActivitySidebar currentView={currentView} onViewChange={handleViewChange} />
-        </Box>
+        <Box sx={{ display: 'flex', flexGrow: 1 }}>
+          {/* Sidebar - Desktop */}
+          <Box sx={{ display: { xs: 'none', md: 'block' } }}>
+            <ActivitySidebar currentView={currentView} onViewChange={handleViewChange} />
+          </Box>
 
         {/* Sidebar - Mobile Drawer */}
         <Drawer
@@ -62,9 +86,10 @@ const ActivityLayout = ({ children, currentView, onViewChange }: ActivityLayoutP
           <ActivitySidebar currentView={currentView} onViewChange={handleViewChange} />
         </Drawer>
 
-        {/* Main Content */}
-        <Box component="main" sx={{ flexGrow: 1, p: 3, width: { md: `calc(100% - 280px)` } }}>
-          {children}
+          {/* Main Content */}
+          <Box component="main" sx={{ flexGrow: 1, p: { xs: 2, md: 3 }, width: { md: `calc(100% - 280px)` } }}>
+            {children}
+          </Box>
         </Box>
       </Box>
     </Container>

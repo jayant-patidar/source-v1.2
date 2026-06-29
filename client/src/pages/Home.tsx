@@ -92,7 +92,7 @@ const Home = () => {
     <Container maxWidth="lg" sx={{ mt: 1, mb: 4 }}>
       <Grid container spacing={3} alignItems="stretch" sx={{ minHeight: '100vh' }}>
         {/* Left Sidebar - User Profile (3 columns) */}
-        <Grid size={{ xs: 12, md: 3 }}>
+        <Grid size={{ xs: 12, md: 3 }} sx={{ display: { xs: 'none', md: 'block' } }}>
           <Box sx={{ position: 'sticky', top: 80 }}>
             {user ? <UserSidebar /> : <WelcomeSidebar />}
           </Box>
@@ -347,7 +347,7 @@ const Home = () => {
         </Grid>
 
         {/* Right Sidebar - Recommendations (3 columns) */}
-        <Grid size={{ xs: 12, md: 3 }}>
+        <Grid size={{ xs: 12, md: 3 }} sx={{ display: { xs: 'none', md: 'block' } }}>
           <Box sx={{ position: 'sticky', top: 80 }}>
             <RightSidebar />
           </Box>

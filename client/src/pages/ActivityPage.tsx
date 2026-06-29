@@ -1,4 +1,4 @@
-import { Box, Typography } from '@mui/material';
+import { Box, Typography, useTheme, useMediaQuery } from '@mui/material';
 import ActivityLayout from './activity/ActivityLayout';
 import ReceivedOffersView from './activity/ReceivedOffersView';
 import SentOffersView from './activity/SentOffersView';
@@ -18,8 +18,10 @@ import MyGigsView from './activity/MyGigsView';
 import { useSearchParams } from 'react-router-dom';
 
 const ActivityPage = () => {
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   const [searchParams, setSearchParams] = useSearchParams();
-  const currentView = searchParams.get('view') || 'received-offers';
+  const currentView = searchParams.get('view') || (isMobile ? 'dashboard' : 'received-offers');
 
   const handleViewChange = (newView: string) => {
     setSearchParams({ view: newView });
