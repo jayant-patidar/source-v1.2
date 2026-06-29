@@ -1,4 +1,4 @@
-import { Box, Typography, useTheme, useMediaQuery } from '@mui/material';
+import { useTheme, useMediaQuery } from '@mui/material';
 import ActivityLayout from './activity/ActivityLayout';
 import DashboardView from './activity/DashboardView';
 import ReceivedOffersView from './activity/ReceivedOffersView';
