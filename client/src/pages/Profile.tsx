@@ -23,6 +23,8 @@ interface TabPanelProps {
   value: number;
 }
 
+import TrustBadge from '../components/TrustBadge';
+
 function CustomTabPanel(props: TabPanelProps) {
   const { children, value, index, ...other } = props;
 
@@ -147,6 +149,19 @@ const Profile = () => {
     } catch (err: any) {
       setError('Failed to load profile data');
       console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSimulateVerify = async () => {
+    try {
+      setLoading(true);
+      await api.post('/users/verify');
+      await fetchProfile(); // re-fetch to get updated user and score
+      setSuccess('Identity verified! Trust score updated.');
+    } catch (err: any) {
+      setError('Verification failed.');
     } finally {
       setLoading(false);
     }
@@ -330,7 +345,8 @@ const Profile = () => {
           </Box>
 
           {/* Ratings */}
-          <Box sx={{ display: 'flex', gap: 2, mt: 2 }}>
+          <Box sx={{ display: 'flex', gap: 2, mt: 2, alignItems: 'center' }}>
+             <TrustBadge score={user.trustScore} isVerified={user.isVerified} />
              <Chip 
                 label={`Seeker: ${user.seekerRating !== undefined ? Number(user.seekerRating).toFixed(1) : 'N/A'} ★`} 
                 color="primary" 
@@ -385,7 +401,15 @@ const Profile = () => {
 
             <Divider sx={{ my: 3 }} />
 
-            <Typography variant="h6" fontWeight="bold" gutterBottom>Details</Typography>
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+              <Typography variant="h6" fontWeight="bold">Details</Typography>
+              {!user.isVerified && (
+                <Button variant="outlined" color="success" size="small" onClick={handleSimulateVerify}>
+                  Verify Identity (Simulation)
+                </Button>
+              )}
+            </Box>
+            
             <Grid container spacing={3}>
               <Grid size={{ xs: 12, sm: 6 }}>
                 {editMode.personal ? (

@@ -9,6 +9,10 @@ interface User {
   avatar?: string;
   seekerRating?: number;
   providerRating?: number;
+  trustScore?: number;
+  isVerified?: boolean;
+  canceledJobsCount?: number;
+  completedJobsCount?: number;
   DOB?: string;
   phone?: string;
   address?: {

@@ -18,6 +18,8 @@ const ExpiredJobsView = () => {
   const [repostOpen, setRepostOpen] = useState(false);
   const [repostJobId, setRepostJobId] = useState('');
   const [newExpirationDate, setNewExpirationDate] = useState('');
+  const [repostJobDate, setRepostJobDate] = useState('');
+  const [repostJobTime, setRepostJobTime] = useState('');
 
   const fetchJobs = async () => {
     try {
@@ -34,6 +36,11 @@ const ExpiredJobsView = () => {
 
   const handleRepostClick = (jobId: string) => {
     setRepostJobId(jobId);
+    const job = jobs.find(j => j._id === jobId);
+    if (job) {
+      setRepostJobDate(job.jobDate ? format(new Date(job.jobDate), 'yyyy-MM-dd') : '');
+      setRepostJobTime(job.jobTime || '');
+    }
     setNewExpirationDate('');
     setRepostOpen(true);
   };
@@ -44,7 +51,11 @@ const ExpiredJobsView = () => {
       return;
     }
     try {
-      await jobService.repostJob(repostJobId, newExpirationDate);
+      await jobService.repostJob(repostJobId, {
+        expirationDate: newExpirationDate,
+        jobDate: repostJobDate,
+        jobTime: repostJobTime
+      });
       showToast('Job reposted successfully!', 'success');
       setRepostOpen(false);
       fetchJobs();
@@ -152,7 +163,24 @@ const ExpiredJobsView = () => {
             value={newExpirationDate}
             onChange={(e) => setNewExpirationDate(e.target.value)}
             slotProps={{ inputLabel: { shrink: true }, htmlInput: { min: minDate } }}
-            sx={{ mt: 1 }}
+            sx={{ mt: 1, mb: 2 }}
+          />
+          <TextField
+            label="Job Date (Optional)"
+            type="date"
+            fullWidth
+            value={repostJobDate}
+            onChange={(e) => setRepostJobDate(e.target.value)}
+            slotProps={{ inputLabel: { shrink: true } }}
+            sx={{ mb: 2 }}
+          />
+          <TextField
+            label="Job Time (Optional)"
+            type="time"
+            fullWidth
+            value={repostJobTime}
+            onChange={(e) => setRepostJobTime(e.target.value)}
+            slotProps={{ inputLabel: { shrink: true } }}
           />
         </DialogContent>
         <DialogActions sx={{ px: 3, pb: 3 }}>

@@ -11,6 +11,7 @@ router.post('/logout', userController.logoutUser.bind(userController));
 router.post('/refresh', userController.refreshToken.bind(userController));
 router.get('/profile', protect, userController.getUserProfile.bind(userController));
 router.put('/profile', protect, userController.updateUserProfile.bind(userController));
+router.post('/verify', protect, userController.simulateVerification.bind(userController));
 router.post('/saved/:jobId', protect, userController.toggleSavedJob.bind(userController));
 router.get('/saved', protect, userController.getSavedJobs.bind(userController));
 

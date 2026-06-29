@@ -28,6 +28,10 @@ export interface IUser extends Document {
   };
   seekerRating: number;
   providerRating: number;
+  trustScore: number;
+  isVerified: boolean;
+  canceledJobsCount: number;
+  completedJobsCount: number;
   about?: string;
   avatar?: string;
   preferences?: {
@@ -82,6 +86,10 @@ const UserSchema: Schema = new Schema(
     },
     seekerRating: { type: Number, default: 0, min: 0, max: 5 },
     providerRating: { type: Number, default: 0, min: 0, max: 5 },
+    trustScore: { type: Number, default: 100 },
+    isVerified: { type: Boolean, default: false },
+    canceledJobsCount: { type: Number, default: 0 },
+    completedJobsCount: { type: Number, default: 0 },
     about: { type: String, required: false },
     avatar: { type: String, required: false },
     preferences: {

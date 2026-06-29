@@ -11,6 +11,7 @@ import LocationOnIcon from '@mui/icons-material/LocationOn';
 import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
 import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
 import ReplyIcon from '@mui/icons-material/Reply';
+import TrustBadge from '../components/TrustBadge';
 
 interface Review {
   _id: string;
@@ -112,7 +113,8 @@ const PublicProfile = () => {
           </Box>
 
           {/* Ratings Summary */}
-          <Box sx={{ display: 'flex', justifyContent: { xs: 'center', md: 'flex-start' }, gap: 2, mt: 2 }}>
+          <Box sx={{ display: 'flex', justifyContent: { xs: 'center', md: 'flex-start' }, gap: 2, mt: 2, alignItems: 'center' }}>
+             <TrustBadge score={profileUser.trustScore} isVerified={profileUser.isVerified} />
              <Chip 
                 label={`Seeker: ${profileUser.seekerRating !== undefined ? Number(profileUser.seekerRating).toFixed(1) : 'N/A'} ★`} 
                 color="primary" 

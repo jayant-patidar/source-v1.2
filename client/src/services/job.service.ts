@@ -79,8 +79,8 @@ export const jobService = {
     return data;
   },
 
-  async repostJob(id: string, expirationDate: string) {
-    const { data } = await api.put(`/jobs/${id}/repost`, { expirationDate });
+  async repostJob(id: string, payload: { expirationDate: string; jobDate?: string; jobTime?: string }) {
+    const { data } = await api.put(`/jobs/${id}/repost`, payload);
     return data;
   },
 

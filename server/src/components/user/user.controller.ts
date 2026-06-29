@@ -195,11 +195,26 @@ class UserController {
 
         const updatedUser = await this.userService.updateUser(req.user._id, updateData);
         
-        res.json(updatedUser);
+        // Recalculate trust score after profile changes (e.g. adding bio, avatar, phone)
+        const finalUser = await this.userService.recalculateTrustScore(req.user._id);
+
+        res.json(finalUser || updatedUser);
       } else {
         res.status(404);
         throw new Error('User not found');
       }
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async simulateVerification(req: any, res: Response, next: NextFunction) {
+    try {
+      // Set user as verified
+      await this.userService.updateUser(req.user._id, { isVerified: true });
+      // Recalculate trust score to apply the +200 points
+      const updatedUser = await this.userService.recalculateTrustScore(req.user._id);
+      res.json(updatedUser);
     } catch (error) {
       next(error);
     }

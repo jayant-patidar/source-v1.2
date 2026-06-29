@@ -2,7 +2,7 @@
 
 Based on the current architecture and feature set (Seeker/Provider universal accounts, negotiations, tracking, and reviews), here are several innovative, highly-doable features that would make the platform stand out:
 
-## 1. 🔄 The Reverse Marketplace (Provider "Gigs")
+## 1. 🔄 The Reverse Marketplace (Provider "Gigs")    -> DONE
 Currently, Seekers post jobs and Providers bid. **Flip the model:** Allow Providers to post standardized "Service Packages" (e.g., *"Basic Lawn Mowing - $40"*, *"2-Hour Home Cleaning - $80"*). 
 * **Why it's great:** It allows Seekers to instantly "Buy" a service like an e-commerce product without waiting for bids, drastically reducing friction for standard tasks.
 
@@ -19,7 +19,7 @@ Give providers a specific tool to snap a photo before starting a job, and a phot
 Sometimes a Seeker needs more than one person (e.g., needing 3 people to help move heavy furniture, or 2 servers for a party).
 * **How it works:** A Seeker specifies `Number of workers needed: 3`. The job stays open until 3 different providers are accepted, and the budget is distributed among them.
 
-## 5. 🛡️ Dynamic "Trust Score" (Beyond 5 Stars)
+## 5. 🛡️ Dynamic "Trust Score" (Beyond 5 Stars)  --DONE
 A 5-star system is standard, but a **Trust Score (0-1000)** is gamified and holistic.
 * **How it works:** Points are awarded for ID verification, high response rates, zero cancellations, and fast completion times. It gives new users a way to build trust even before they have 50 reviews, simply by being highly responsive and verified.
 

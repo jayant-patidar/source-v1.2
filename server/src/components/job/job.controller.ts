@@ -284,17 +284,22 @@ class JobController {
       const isOwner = job.seekerId.toString() === req.user._id.toString() || (job.seekerId as any)._id?.toString() === req.user._id.toString();
       if (!isOwner) return res.status(403).json({ error: 'Only the job poster can repost this job' });
 
-      const { expirationDate } = req.body;
+      const { expirationDate, jobDate, jobTime } = req.body;
       if (!expirationDate || new Date(expirationDate) <= new Date()) {
         return res.status(400).json({ error: 'Expiration date must be in the future' });
       }
 
-      const updatedJob = await this.jobService.updateJob(req.params.id, {
+      const updatePayload: any = {
         status: 'open',
         expirationDate: new Date(expirationDate),
         isArchived: false,
         $push: { timeline: { status: 'reposted', timestamp: new Date(), actorId: req.user._id, details: 'Reposted with new expiration date' } }
-      } as any);
+      };
+
+      if (jobDate) updatePayload.jobDate = new Date(jobDate);
+      if (jobTime) updatePayload.jobTime = jobTime;
+
+      const updatedJob = await this.jobService.updateJob(req.params.id, updatePayload);
       res.status(200).json(updatedJob);
     } catch (error) {
       next(error);
