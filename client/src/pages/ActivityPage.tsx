@@ -1,5 +1,6 @@
 import { Box, Typography, useTheme, useMediaQuery } from '@mui/material';
 import ActivityLayout from './activity/ActivityLayout';
+import DashboardView from './activity/DashboardView';
 import ReceivedOffersView from './activity/ReceivedOffersView';
 import SentOffersView from './activity/SentOffersView';
 import SavedJobsView from './activity/SavedJobsView';
@@ -30,12 +31,7 @@ const ActivityPage = () => {
   const renderView = () => {
     switch (currentView) {
       case 'dashboard':
-        return (
-            <Box sx={{ textAlign: 'center', py: 8 }}>
-                <Typography variant="h5" color="text.secondary">Dashboard Overview</Typography>
-                <Typography variant="body2" color="text.secondary">Summary stats coming soon...</Typography>
-            </Box>
-        );
+        return <DashboardView />;
       case 'received-offers':
         return <ReceivedOffersView />;
       case 'rejected-offers':
