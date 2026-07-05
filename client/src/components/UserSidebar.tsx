@@ -9,10 +9,10 @@ const UserSidebar = () => {
   if (!user) return null;
 
   return (
-    <Paper elevation={0} sx={{ overflow: 'hidden', borderRadius: 3, border: '1px solid #e0e0e0', bgcolor: 'white' }}>
+    <Paper elevation={0} sx={{ overflow: 'hidden', borderRadius: 4, bgcolor: 'white', boxShadow: '0 10px 30px rgba(0,0,0,0.05)' }}>
       {/* Cover Image Area */}
-      <Box sx={{ height: 100, bgcolor: '#212121', position: 'relative' }}>
-        {/* Optional: Add a subtle pattern or gradient here if needed */}
+      <Box sx={{ height: 120, background: 'linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%)', position: 'relative' }}>
+        <Box sx={{ position: 'absolute', top: -30, right: -30, width: 100, height: 100, borderRadius: '50%', background: 'rgba(255,255,255,0.1)', filter: 'blur(20px)' }} />
       </Box>
 
       {/* Avatar & Info */}
@@ -65,13 +65,14 @@ const UserSidebar = () => {
           to="/profile"
           startIcon={<EditIcon />}
           sx={{ 
-            color: 'black', 
-            borderColor: '#e0e0e0',
+            color: 'white', 
+            bgcolor: '#000',
             fontWeight: 'bold',
             textTransform: 'none',
             py: 1,
-            borderRadius: 2,
-            '&:hover': { bgcolor: '#f5f5f5', borderColor: '#bdbdbd' }
+            borderRadius: 3,
+            boxShadow: '0 4px 14px rgba(0,0,0,0.1)',
+            '&:hover': { bgcolor: '#333' }
           }}
         >
           Edit Profile

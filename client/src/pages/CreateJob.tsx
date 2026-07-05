@@ -21,6 +21,11 @@ const validationSchema = yup.object({
   expirationDate: yup.date().required('Expiration Date is required'),
   expirationTime: yup.string().required('Expiration Time is required'),
   requirements: yup.array().of(yup.string()),
+  estimatedHours: yup.number().when('type', {
+    is: (val: string) => val === 'hourly',
+    then: (schema) => schema.required('Estimated hours is required').positive().integer(),
+    otherwise: (schema) => schema.notRequired()
+  }),
 });
 
 const CreateJob = () => {
@@ -53,6 +58,8 @@ const CreateJob = () => {
       visibility: true,
       tags: '',
       requirements: [] as string[],
+      paymentMethod: 'cash',
+      estimatedHours: '',
     },
     validationSchema: validationSchema,
     onSubmit: async (values) => {
@@ -60,7 +67,9 @@ const CreateJob = () => {
         const payload = {
           title: values.title,
           description: values.description,
-          pay: Number(values.pay),
+          pay: values.type === 'hourly' ? Number(values.pay) * Number(values.estimatedHours) : Number(values.pay),
+          hourlyRate: values.type === 'hourly' ? Number(values.pay) : undefined,
+          estimatedHours: values.type === 'hourly' ? Number(values.estimatedHours) : undefined,
           type: values.type,
           category: values.category,
           location: {
@@ -76,6 +85,7 @@ const CreateJob = () => {
           visibility: values.visibility,
           tags: values.tags, // Controller handles string splitting
           requirements: values.requirements,
+          paymentMethod: values.paymentMethod,
         };
         // console.log('Submitting Job Payload:', payload);
         await createJob(payload);
@@ -128,7 +138,7 @@ const CreateJob = () => {
               fullWidth
               id="pay"
               name="pay"
-              label="Pay Amount"
+              label={formik.values.type === 'hourly' ? 'Hourly Rate ($)' : 'Total Pay Amount ($)'}
               type="number"
               margin="normal"
               value={formik.values.pay}
@@ -148,22 +158,58 @@ const CreateJob = () => {
               error={formik.touched.type && Boolean(formik.errors.type)}
               helperText={formik.touched.type && formik.errors.type}
             >
-              <MenuItem value="fixed">Fixed</MenuItem>
-              <MenuItem value="hourly">Hourly</MenuItem>
-              <MenuItem value="negotiable">Negotiable</MenuItem>
+              <MenuItem value="fixed">Fixed Price</MenuItem>
+              <MenuItem value="hourly">Hourly Rate</MenuItem>
             </TextField>
           </Box>
-          <TextField
-            fullWidth
-            id="category"
-            name="category"
-            label="Category (e.g. Cleaning, Moving)"
-            margin="normal"
-            value={formik.values.category}
-            onChange={formik.handleChange}
-            error={formik.touched.category && Boolean(formik.errors.category)}
-            helperText={formik.touched.category && formik.errors.category}
-          />
+          <Box sx={{ display: 'flex', gap: 2 }}>
+            <TextField
+              fullWidth
+              id="category"
+              name="category"
+              label="Category (e.g. Cleaning, Moving)"
+              margin="normal"
+              value={formik.values.category}
+              onChange={formik.handleChange}
+              error={formik.touched.category && Boolean(formik.errors.category)}
+              helperText={formik.touched.category && formik.errors.category}
+            />
+            <TextField
+              fullWidth
+              select
+              id="paymentMethod"
+              name="paymentMethod"
+              label="Payment Method"
+              margin="normal"
+              value={formik.values.paymentMethod}
+              onChange={formik.handleChange}
+            >
+              <MenuItem value="cash">Cash</MenuItem>
+              <MenuItem value="card">Card</MenuItem>
+              <MenuItem value="sourcecoin">SourceCoin</MenuItem>
+            </TextField>
+          </Box>
+          
+          {formik.values.type === 'hourly' && (
+            <TextField
+              fullWidth
+              id="estimatedHours"
+              name="estimatedHours"
+              label="Estimated Hours"
+              type="number"
+              margin="normal"
+              value={formik.values.estimatedHours}
+              onChange={formik.handleChange}
+              error={formik.touched.estimatedHours && Boolean(formik.errors.estimatedHours)}
+              helperText={
+                (formik.touched.estimatedHours && formik.errors.estimatedHours) || 
+                (formik.values.pay && formik.values.estimatedHours ? 
+                  `Calculated Total Pay: $${(Number(formik.values.pay) * Number(formik.values.estimatedHours)).toFixed(2)}` : 
+                  'Used to calculate total job pay')
+              }
+            />
+          )}
+
           <Box sx={{ display: 'flex', gap: 2 }}>
             <TextField
                 fullWidth

@@ -1,42 +1,82 @@
 import { Request, Response } from 'express';
-import Transaction from './transaction.model';
-import Job from '../job/job.model';
+import TransactionService from './transaction.service';
+import User from '../user/user.model';
 
-export const createTransaction = async (req: Request, res: Response) => {
-  try {
-    const { jobId, payorId, payeeId, amount, paymentMethod, metadata } = req.body;
+class TransactionController {
+  private transactionService: TransactionService;
 
-    const transaction = new Transaction({
-      jobId,
-      payerId: payorId,
-      payeeId,
-      amount,
-      paymentMethod,
-      status: 'success', // Mocking success for now
-      metadata
-    });
-
-    await transaction.save();
-
-    // Update Job Payment Status and Timeline
-    await Job.findByIdAndUpdate(jobId, { 
-      paymentStatus: 'paid',
-      $push: { timeline: { status: 'paid', timestamp: new Date(), actorId: payorId } }
-    });
-
-    res.status(201).json(transaction);
-  } catch (error) {
-    console.error('Create Transaction Error:', error);
-    res.status(500).json({ message: 'Failed to process payment' });
+  constructor() {
+    this.transactionService = new TransactionService();
   }
-};
 
-export const getTransactionsByJob = async (req: Request, res: Response) => {
-  try {
-    const { jobId } = req.params;
-    const transactions = await Transaction.find({ jobId }).sort({ createdAt: -1 });
-    res.json(transactions);
-  } catch (error) {
-    res.status(500).json({ message: 'Failed to fetch transactions' });
-  }
-};
+  purchaseCoins = async (req: any, res: Response) => {
+    try {
+      const { amount, method } = req.body;
+      const userId = req.user._id;
+
+      if (!amount || amount <= 0) {
+        return res.status(400).json({ message: 'Invalid amount' });
+      }
+
+      const transaction = await this.transactionService.purchaseCoins(userId, amount, method || 'credit_card');
+      res.status(201).json({ message: 'Coins purchased successfully', transaction });
+    } catch (error: any) {
+      console.error('Purchase Coins Error:', error);
+      res.status(500).json({ message: error.message || 'Failed to purchase coins' });
+    }
+  };
+
+  transferCoins = async (req: any, res: Response) => {
+    try {
+      const { jobId, receiverId, amount } = req.body;
+      const senderId = req.user._id;
+
+      if (!jobId || !receiverId || !amount) {
+        return res.status(400).json({ message: 'Missing required fields for transfer' });
+      }
+
+      const transaction = await this.transactionService.transferCoinsForJob(jobId, senderId, receiverId, amount);
+      res.status(200).json({ message: 'Coins transferred successfully', transaction });
+    } catch (error: any) {
+      console.error('Transfer Coins Error:', error);
+      res.status(400).json({ message: error.message || 'Failed to transfer coins' });
+    }
+  };
+
+  getUserTransactions = async (req: any, res: Response) => {
+    try {
+      const userId = req.user._id;
+      const transactions = await this.transactionService.getUserTransactions(userId);
+      res.status(200).json(transactions);
+    } catch (error) {
+      console.error('Get User Transactions Error:', error);
+      res.status(500).json({ message: 'Failed to fetch transactions' });
+    }
+  };
+
+  getTransactionsByJob = async (req: Request, res: Response) => {
+    try {
+      const { jobId } = req.params;
+      const transactions = await this.transactionService.getTransactionsByJob(jobId);
+      res.status(200).json(transactions);
+    } catch (error) {
+      console.error('Get Job Transactions Error:', error);
+      res.status(500).json({ message: 'Failed to fetch job transactions' });
+    }
+  };
+
+  getWalletBalance = async (req: any, res: Response) => {
+    try {
+      const userId = req.user._id;
+      const user = await User.findById(userId).select('wallet');
+      if (!user) return res.status(404).json({ message: 'User not found' });
+      
+      res.status(200).json({ wallet: user.wallet || { balance: 0, currency: 'SourceCoin' } });
+    } catch (error) {
+      console.error('Get Wallet Balance Error:', error);
+      res.status(500).json({ message: 'Failed to fetch wallet balance' });
+    }
+  };
+}
+
+export default new TransactionController();

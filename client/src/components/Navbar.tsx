@@ -11,6 +11,7 @@ import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import MenuIcon from '@mui/icons-material/Menu';
 import PersonIcon from '@mui/icons-material/Person';
 import ExitToAppIcon from '@mui/icons-material/ExitToApp';
+import AccountBalanceWalletIcon from '@mui/icons-material/AccountBalanceWallet';
 import NotificationMenu from './NotificationMenu';
 
 const Navbar = () => {
@@ -91,9 +92,9 @@ const Navbar = () => {
               <Typography variant="caption" sx={{ fontSize: '0.7rem', mt: 0.5, fontWeight: 500 }}>HOME</Typography>
             </Box>
             
-            <Box component={RouterLink} to="/" sx={{ width: 90, display: 'flex', flexDirection: 'column', alignItems: 'center', color: 'white', textDecoration: 'none', opacity: 0.7, '&:hover': { opacity: 1 } }}>
-              <WorkIcon sx={{ fontSize: 28 }} />
-              <Typography variant="caption" sx={{ fontSize: '0.7rem', mt: 0.5, fontWeight: 500 }}>JOBS</Typography>
+            <Box component={RouterLink} to="/wallet" sx={{ width: 90, display: 'flex', flexDirection: 'column', alignItems: 'center', color: 'white', textDecoration: 'none', opacity: 0.7, '&:hover': { opacity: 1 } }}>
+              <AccountBalanceWalletIcon sx={{ fontSize: 28 }} />
+              <Typography variant="caption" sx={{ fontSize: '0.7rem', mt: 0.5, fontWeight: 500 }}>WALLET</Typography>
             </Box>
 
             <Box component={RouterLink} to="/activity" sx={{ width: 90, display: 'flex', flexDirection: 'column', alignItems: 'center', color: 'white', textDecoration: 'none', opacity: 0.7, '&:hover': { opacity: 1 } }}>
@@ -149,6 +150,7 @@ const Navbar = () => {
               }}
             >
               <MenuItem component={RouterLink} to="/profile" onClick={handleClose}>Profile</MenuItem>
+              <MenuItem component={RouterLink} to="/wallet" onClick={handleClose}>Wallet</MenuItem>
               <MenuItem component={RouterLink} to="/post-job" onClick={handleClose}>Post a Job</MenuItem>
               <MenuItem onClick={handleLogout}>Logout</MenuItem>
             </Menu>
@@ -175,9 +177,9 @@ const Navbar = () => {
               <ListItemIcon><HomeIcon /></ListItemIcon>
               <ListItemText primary="Home" />
             </ListItem>
-            <ListItem component={RouterLink} to="/" onClick={handleMobileToggle} sx={{ color: 'inherit' }}>
-              <ListItemIcon><WorkIcon /></ListItemIcon>
-              <ListItemText primary="Jobs" />
+            <ListItem component={RouterLink} to="/wallet" onClick={handleMobileToggle} sx={{ color: 'inherit' }}>
+              <ListItemIcon><AccountBalanceWalletIcon /></ListItemIcon>
+              <ListItemText primary="Wallet" />
             </ListItem>
             <ListItem component={RouterLink} to="/activity" onClick={handleMobileToggle} sx={{ color: 'inherit' }}>
               <ListItemIcon><MessageIcon /></ListItemIcon>

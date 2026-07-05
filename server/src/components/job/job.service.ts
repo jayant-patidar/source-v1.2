@@ -18,7 +18,8 @@ class JobService {
       visibility: true,
       status: 'open', // Also ensuring only open jobs are shown in the feed
       expirationDate: { $gte: new Date() }, // Don't show expired jobs
-      isArchived: false // Don't show archived jobs
+      isArchived: false, // Don't show archived jobs
+      title: { $not: /\[Gig Booking\]/i } // Exclude gig bookings from public feed
     };
 
     // Keyword Search (Title or Description)

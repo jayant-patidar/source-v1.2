@@ -68,6 +68,10 @@ export const jobService = {
     const response = await api.put(`/jobs/${id}/approve-start`);
     return response.data;
   },
+  async declineStart(id: string) {
+    const response = await api.put(`/jobs/${id}/decline-start`);
+    return response.data;
+  },
 
   async archiveJob(id: string) {
     const { data } = await api.put(`/jobs/${id}/archive`);

@@ -16,7 +16,7 @@ const RightSidebar = () => {
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
       {/* Recommended Jobs */}
-      <Card sx={{ borderRadius: 3, boxShadow: 'none', border: '1px solid #e0e0e0' }}>
+      <Card sx={{ borderRadius: 4, boxShadow: '0 10px 30px rgba(0,0,0,0.05)', border: 'none' }}>
         <CardContent sx={{ p: 3 }}>
           <Typography variant="h6" fontWeight="bold" gutterBottom>
             Recommended Jobs
@@ -59,7 +59,7 @@ const RightSidebar = () => {
       </Card>
 
       {/* Recent Jobs */}
-      <Card sx={{ borderRadius: 3, boxShadow: 'none', border: '1px solid #e0e0e0' }}>
+      <Card sx={{ borderRadius: 4, boxShadow: '0 10px 30px rgba(0,0,0,0.05)', border: 'none' }}>
         <CardContent sx={{ p: 3 }}>
           <Typography variant="h6" fontWeight="bold" gutterBottom>
             Recent Jobs

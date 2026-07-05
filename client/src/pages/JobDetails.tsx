@@ -15,7 +15,9 @@ import BookmarkBorderIcon from '@mui/icons-material/BookmarkBorder';
 import BookmarkIcon from '@mui/icons-material/Bookmark';
 import ShareLocationIcon from '@mui/icons-material/ShareLocation';
 import LoopIcon from '@mui/icons-material/Loop';
+import AccountBalanceWalletIcon from '@mui/icons-material/AccountBalanceWallet';
 import { format, formatDistanceToNow } from 'date-fns';
+import { useTransactionStore } from '../store/transactionStore';
 
 // Job interface removed as it was unused
 
@@ -45,6 +47,20 @@ const JobDetails = () => {
   const [selectedNegId, setSelectedNegId] = useState('');
   const [counterAmount, setCounterAmount] = useState('');
   const [counterMessage, setCounterMessage] = useState('');
+  
+  const { transferCoins, isLoading: txLoading } = useTransactionStore();
+
+  const handleTransfer = async () => {
+    try {
+      if (!job.providerId) return;
+      await transferCoins(job._id, job.providerId._id || job.providerId, job.currentPay || job.originalPay);
+      showToast('SourceCoins transferred successfully!', 'success');
+      // Update local job state
+      setJob({ ...job, paymentStatus: 'paid' });
+    } catch (err: any) {
+      showToast(err.message || 'Failed to transfer coins', 'error');
+    }
+  };
 
   const handleSave = async () => {
       try {
@@ -198,6 +214,20 @@ const JobDetails = () => {
                         />
                     )}
                 </Box>
+                {isPoster && job.status === 'completed' && job.paymentMethod === 'sourcecoin' && job.paymentStatus !== 'paid' && (
+                    <Button
+                      variant="contained"
+                      startIcon={<AccountBalanceWalletIcon />}
+                      onClick={handleTransfer}
+                      disabled={txLoading}
+                      sx={{ mt: 2, bgcolor: 'black', color: 'white', '&:hover': { bgcolor: '#333' } }}
+                    >
+                      {txLoading ? <CircularProgress size={24} color="inherit" /> : 'Transfer SourceCoins'}
+                    </Button>
+                )}
+                {job.paymentStatus === 'paid' && (
+                  <Chip label="PAID" color="success" size="small" sx={{ mt: 2, fontWeight: 'bold' }} />
+                )}
             </Box>
           </Box>
 
@@ -270,6 +300,17 @@ const JobDetails = () => {
                   <Typography variant="caption" color="text.secondary" display="block">Time</Typography>
                   <Typography variant="body2" fontWeight="600">
                     {job.jobTime || 'Flexible'}
+                  </Typography>
+                </Box>
+              </Box>
+            </Grid>
+            <Grid size={{ xs: 12, sm: 6 }}>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                <AccountBalanceWalletIcon sx={{ color: 'text.secondary' }} />
+                <Box>
+                  <Typography variant="caption" color="text.secondary" display="block">Payment Method</Typography>
+                  <Typography variant="body2" fontWeight="600" textTransform="capitalize">
+                    {job.paymentMethod || 'cash'}
                   </Typography>
                 </Box>
               </Box>
@@ -454,7 +495,7 @@ const JobDetails = () => {
                 ) : (
                     <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
                         {negotiations.map((neg) => {
-                            const canCounter = neg.lastActor === 'provider' && neg.status !== 'accepted' && neg.status !== 'rejected' && neg.seekerCounterCount < 2;
+                            const canCounter = neg.lastActor === 'provider' && neg.status !== 'accepted' && neg.status !== 'rejected' && neg.seekerCounterCount < 2 && job?.isNegotiable;
                             const canAccept = neg.lastActor === 'provider' && neg.status !== 'accepted' && neg.status !== 'rejected';
                             
                             return (

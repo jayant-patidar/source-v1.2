@@ -174,7 +174,7 @@ const SentOffersView = () => {
                                         >
                                             Accept
                                         </Button>
-                                        {offer.providerCounterCount < 2 && (
+                                        {offer.providerCounterCount < 2 && offer.job?.isNegotiable && (
                                             <Button 
                                                 variant="outlined" 
                                                 color="primary" 

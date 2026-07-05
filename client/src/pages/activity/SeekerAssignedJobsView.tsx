@@ -119,23 +119,41 @@ const SeekerAssignedJobsView = () => {
                         sx={{ mt: 1, mb: 1, display: 'block' }} 
                       />
                       {job.status === 'pending_start_approval' ? (
-                          <Button 
-                            variant="contained" 
-                            size="small" 
-                            color="warning" 
-                            startIcon={<PlayArrowIcon />}
-                            onClick={async () => {
-                                try {
-                                    await jobService.approveStart(job._id);
-                                    showToast('Early start approved!', 'success');
-                                    fetchJobs();
-                                } catch (error) {
-                                    showToast('Failed to approve early start', 'error');
-                                }
-                            }}
-                          >
-                            Approve Early Start
-                          </Button>
+                          <Box sx={{ display: 'flex', gap: 1, justifyContent: 'flex-end', flexWrap: 'wrap' }}>
+                              <Button 
+                                variant="contained" 
+                                size="small" 
+                                color="warning" 
+                                startIcon={<PlayArrowIcon />}
+                                onClick={async () => {
+                                    try {
+                                        await jobService.approveStart(job._id);
+                                        showToast('Early start approved!', 'success');
+                                        fetchJobs();
+                                    } catch (error) {
+                                        showToast('Failed to approve early start', 'error');
+                                    }
+                                }}
+                              >
+                                Approve
+                              </Button>
+                              <Button 
+                                variant="outlined" 
+                                size="small" 
+                                color="error" 
+                                onClick={async () => {
+                                    try {
+                                        await jobService.declineStart(job._id);
+                                        showToast('Early start declined', 'info');
+                                        fetchJobs();
+                                    } catch (error) {
+                                        showToast('Failed to decline early start', 'error');
+                                    }
+                                }}
+                              >
+                                Decline
+                              </Button>
+                          </Box>
                       ) : (
                           <Button 
                             variant="contained" 

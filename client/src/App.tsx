@@ -13,6 +13,7 @@ import ContractView from './pages/contract/ContractView';
 import Profile from './pages/Profile';
 import PublicProfile from './pages/PublicProfile';
 import ActivityPage from './pages/ActivityPage';
+import Wallet from './pages/Wallet';
 import GlobalToast from './components/GlobalToast';
 import { useAuthStore } from './store/authStore';
 import { Box, CircularProgress } from '@mui/material';
@@ -44,6 +45,7 @@ function App() {
         <Route path="/jobs/:id" element={<JobDetails />} />
         <Route path="/gigs/:id" element={<GigDetails />} />
         <Route path="/profile" element={user ? <Profile /> : <Navigate to="/login" />} />
+        <Route path="/wallet" element={user ? <Wallet /> : <Navigate to="/login" />} />
         <Route path="/profile/:id" element={<PublicProfile />} />
         <Route path="/activity" element={user ? <ActivityPage /> : <Navigate to="/login" />} />
         <Route path="/payment/:id" element={user ? <PaymentPage /> : <Navigate to="/login" />} />

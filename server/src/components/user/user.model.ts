@@ -53,6 +53,10 @@ export interface IUser extends Document {
   };
   savedJobs?: string[];
   availability?: string;
+  wallet: {
+    balance: number;
+    currency: string;
+  };
   createdAt: Date;
   updatedAt: Date;
   matchPassword: (enteredPassword: string) => Promise<boolean>;
@@ -110,7 +114,11 @@ const UserSchema: Schema = new Schema(
       website: { type: String }
     },
     savedJobs: [{ type: Schema.Types.ObjectId, ref: 'Job' }],
-    availability: { type: String }
+    availability: { type: String },
+    wallet: {
+      balance: { type: Number, default: 0 },
+      currency: { type: String, default: 'SourceCoin' }
+    }
   },
   { timestamps: true }
 );

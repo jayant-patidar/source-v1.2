@@ -15,6 +15,7 @@ router.get('/:id', jobController.getJobById.bind(jobController));
 router.put('/:id', protect, jobController.updateJob.bind(jobController));
 router.put('/:id/start', protect, jobController.startJob.bind(jobController));
 router.put('/:id/approve-start', protect, jobController.approveStart.bind(jobController));
+router.put('/:id/decline-start', protect, jobController.declineStart.bind(jobController));
 router.put('/:id/archive', protect, jobController.archiveJob.bind(jobController));
 router.put('/:id/unarchive', protect, jobController.unarchiveJob.bind(jobController));
 router.put('/:id/repost', protect, jobController.repostJob.bind(jobController));

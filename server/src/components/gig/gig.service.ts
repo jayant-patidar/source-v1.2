@@ -97,6 +97,7 @@ class GigService {
       visibility: false,
       isNegotiable: false,
       status: 'accepted',
+      paymentMethod: bookingDetails.paymentMethod || 'cash',
       tags: gig.tags || [],
     };
 

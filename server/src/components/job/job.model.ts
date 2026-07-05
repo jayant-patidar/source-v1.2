@@ -19,9 +19,12 @@ export interface IJob extends Document {
   expirationDate: Date;
   category: string;
   status: 'open' | 'accepted' | 'in_progress' | 'completed' | 'canceled' | 'paused' | 'pending_completion' | 'pending_start_approval';
+  paymentMethod: 'cash' | 'card' | 'sourcecoin';
   paymentStatus: 'pending' | 'paid' | 'failed';
   timeline: { status: string; timestamp: Date; actorId?: mongoose.Types.ObjectId; details?: string }[];
   type?: string;
+  hourlyRate?: number;
+  estimatedHours?: number;
   tags?: string[];
   requirements?: string[];
   startTime?: Date;
@@ -70,6 +73,11 @@ const JobSchema: Schema = new Schema(
       default: 'open',
       enum: ['open', 'accepted', 'in_progress', 'completed', 'canceled', 'paused', 'pending_completion', 'pending_start_approval'],
     },
+    paymentMethod: {
+      type: String,
+      default: 'cash',
+      enum: ['cash', 'card', 'sourcecoin'],
+    },
     paymentStatus: {
       type: String,
       default: 'pending',
@@ -84,6 +92,8 @@ const JobSchema: Schema = new Schema(
       },
     ],
     type: { type: String, required: false },
+    hourlyRate: { type: Number, required: false },
+    estimatedHours: { type: Number, required: false },
     tags: { type: [String], required: false },
     requirements: { type: [String], required: false },
     startTime: { type: Date, required: false },

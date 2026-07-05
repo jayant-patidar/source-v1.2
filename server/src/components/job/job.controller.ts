@@ -19,6 +19,7 @@ class JobController {
             general: req.body.generalLocation || req.body.location?.general,
             exact: req.body.exactLocation || req.body.location?.exact
         },
+        paymentMethod: req.body.paymentMethod || 'cash',
         updatedPay: [], // Initialize empty array
         // Ensure tags is an array if it comes as string
         tags: Array.isArray(req.body.tags) ? req.body.tags : (req.body.tags ? req.body.tags.split(',').map((t: string) => t.trim()) : []),
@@ -232,6 +233,37 @@ class JobController {
         status: 'in_progress',
         startTime: new Date(),
         $push: { timeline: { status: 'started_early_approved', timestamp: new Date(), actorId: req.user._id } }
+      } as any);
+
+      res.status(200).json(updatedJob);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async declineStart(req: any, res: Response, next: NextFunction) {
+    try {
+      const jobId = req.params.id;
+      const job = await this.jobService.getJobById(jobId);
+
+      if (!job) {
+        return res.status(404).json({ error: 'Job not found' });
+      }
+
+      // Only Seeker can decline
+      const isSeeker = job.seekerId.toString() === req.user._id.toString() || (job.seekerId as any)._id?.toString() === req.user._id.toString();
+      
+      if (!isSeeker) {
+        return res.status(403).json({ error: 'Only seeker can decline early start' });
+      }
+
+      if (job.status !== 'pending_start_approval') {
+        return res.status(400).json({ error: 'Job is not pending start approval' });
+      }
+
+      const updatedJob = await this.jobService.updateJob(jobId, {
+        status: 'accepted',
+        $push: { timeline: { status: 'started_early_declined', timestamp: new Date(), actorId: req.user._id } }
       } as any);
 
       res.status(200).json(updatedJob);

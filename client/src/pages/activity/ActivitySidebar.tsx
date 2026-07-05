@@ -25,6 +25,7 @@ import CancelIcon from '@mui/icons-material/Cancel';
 import TimerOffIcon from '@mui/icons-material/TimerOff';
 import WorkIcon from '@mui/icons-material/Work';
 import StorefrontIcon from '@mui/icons-material/Storefront';
+import AssignmentIcon from '@mui/icons-material/Assignment';
 import { useState } from 'react';
 
 interface ActivitySidebarProps {
@@ -46,21 +47,22 @@ const ActivitySidebar = ({ currentView, onViewChange }: ActivitySidebarProps) =>
       title: 'My Requests (Seeker)',
       type: 'accordion',
       items: [
-        { id: 'received-offers', label: 'Received Offers', icon: <CallReceivedIcon /> },
-        { id: 'rejected-offers', label: 'Rejected Offers', icon: <BlockIcon /> },
         { id: 'posted-jobs', label: 'Jobs I Posted', icon: <WorkIcon /> },
+        { id: 'received-offers', label: 'Received Offers', icon: <CallReceivedIcon /> },
+        { id: 'assigned-jobs', label: 'Assigned Jobs', icon: <AssignmentIcon /> },
         { id: 'seeker-ongoing', label: 'Ongoing Jobs', icon: <LoopIcon /> },
         { id: 'seeker-completed-jobs', label: 'Completed Jobs', icon: <CheckCircleIcon /> },
+        { id: 'rejected-offers', label: 'Rejected Offers', icon: <BlockIcon /> },
       ]
     },
     {
       title: 'My Work (Provider)',
       type: 'accordion',
       items: [
-        { id: 'my-gigs', label: 'My Gigs', icon: <StorefrontIcon /> },
-        { id: 'sent-offers', label: 'Sent Offers', icon: <SendIcon /> },
         { id: 'upcoming-jobs', label: 'Upcoming Jobs', icon: <CalendarTodayIcon /> },
         { id: 'provider-ongoing', label: 'Ongoing Jobs', icon: <LoopIcon /> },
+        { id: 'sent-offers', label: 'Sent Offers', icon: <SendIcon /> },
+        { id: 'my-gigs', label: 'My Gigs', icon: <StorefrontIcon /> },
         { id: 'completed-jobs', label: 'Completed Jobs', icon: <CheckCircleIcon /> },
       ]
     },

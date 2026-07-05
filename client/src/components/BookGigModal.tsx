@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Dialog, DialogTitle, DialogContent, DialogActions, Button, TextField, Box, Typography, CircularProgress } from '@mui/material';
+import { Dialog, DialogTitle, DialogContent, DialogActions, Button, TextField, Box, Typography, CircularProgress, MenuItem } from '@mui/material';
 import { useFormik } from 'formik';
 import * as yup from 'yup';
 import { useGigStore } from '../store/gigStore';
@@ -33,6 +33,7 @@ const BookGigModal = ({ open, onClose, gig }: BookGigModalProps) => {
       jobTime: '',
       generalLocation: user?.address || '',
       exactLocation: '',
+      paymentMethod: 'cash',
     },
     validationSchema: validationSchema,
     enableReinitialize: true,
@@ -117,6 +118,20 @@ const BookGigModal = ({ open, onClose, gig }: BookGigModalProps) => {
             error={formik.touched.exactLocation && Boolean(formik.errors.exactLocation)}
             helperText={formik.touched.exactLocation && formik.errors.exactLocation}
           />
+          <TextField
+            fullWidth
+            select
+            id="paymentMethod"
+            name="paymentMethod"
+            label="Payment Method"
+            margin="normal"
+            value={formik.values.paymentMethod}
+            onChange={formik.handleChange}
+          >
+            <MenuItem value="cash">Cash</MenuItem>
+            <MenuItem value="card">Card</MenuItem>
+            <MenuItem value="sourcecoin">SourceCoin</MenuItem>
+          </TextField>
         </form>
       </DialogContent>
       <DialogActions sx={{ px: 3, py: 2 }}>
