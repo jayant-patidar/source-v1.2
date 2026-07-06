@@ -150,14 +150,7 @@ const Navbar = () => {
               <Typography variant="caption" sx={{ fontSize: '0.65rem', fontWeight: 700, letterSpacing: '0.5px' }}>ACTIVITY</Typography>
             </Box>
 
-            <Box sx={{ 
-              width: 85, py: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', 
-              color: 'white', borderRadius: 3, opacity: 0.7, cursor: 'pointer',
-              transition: 'all 0.2s', '&:hover': { opacity: 1, bgcolor: 'rgba(255,255,255,0.05)' } 
-            }}>
-               <NotificationMenu />
-               <Typography variant="caption" sx={{ fontSize: '0.65rem', fontWeight: 700, letterSpacing: '0.5px' }}>ALERTS</Typography>
-            </Box>
+            <NotificationMenu />
             
             {user ? (
               <Box 

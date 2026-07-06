@@ -77,62 +77,64 @@ const PublicProfile = () => {
   return (
     <Container maxWidth="lg" sx={{ mt: 4, mb: 8 }}>
       {/* Header Section */}
-      <Paper elevation={3} sx={{ borderRadius: 4, overflow: 'hidden', mb: 4 }}>
+      <Paper elevation={0} sx={{ borderRadius: 4, overflow: 'hidden', mb: 4, border: '1px solid rgba(0,0,0,0.05)', bgcolor: '#ffffff' }}>
         {/* Cover Photo */}
         <Box 
           sx={{ 
-            height: 200, 
-            background: 'linear-gradient(135deg, #1976d2 0%, #9c27b0 100%)',
+            height: 240, 
+            background: 'linear-gradient(135deg, #6366f1 0%, #a855f7 100%)',
             position: 'relative'
           }}
         />
         
         {/* Profile Content */}
-        <Box sx={{ px: { xs: 2, md: 4 }, pb: 4, position: 'relative' }}>
-          <Box sx={{ display: 'flex', flexDirection: { xs: 'column', md: 'row' }, alignItems: { xs: 'center', md: 'flex-end' }, mt: -8, mb: 2 }}>
+        <Box sx={{ px: { xs: 2, md: 5 }, pb: 4, position: 'relative' }}>
+          <Box sx={{ display: 'flex', flexDirection: { xs: 'column', md: 'row' }, alignItems: { xs: 'center', md: 'flex-end' }, mt: -10, mb: 3 }}>
             <Avatar 
               src={profileUser.avatar} 
               alt={profileUser.name}
               sx={{ 
                 width: 160, 
                 height: 160, 
-                border: '5px solid white', 
-                bgcolor: 'primary.main', 
+                border: '6px solid white', 
+                bgcolor: '#4f46e5', 
                 fontSize: '4rem',
-                boxShadow: 3
+                boxShadow: '0 10px 25px rgba(0,0,0,0.1)'
               }}
             >
               {profileUser.name.charAt(0).toUpperCase()}
             </Avatar>
-            <Box sx={{ ml: { xs: 0, md: 3 }, mt: { xs: 2, md: 0 }, textAlign: { xs: 'center', md: 'left' }, mb: 2 }}>
-              <Typography variant="h4" fontWeight="bold">{profileUser.name}</Typography>
-              <Typography variant="body1" color="text.secondary" sx={{ display: 'flex', alignItems: 'center', justifyContent: { xs: 'center', md: 'flex-start' }, gap: 1 }}>
+            <Box sx={{ ml: { xs: 0, md: 4 }, mt: { xs: 2, md: 0 }, textAlign: { xs: 'center', md: 'left' }, mb: 2 }}>
+              <Typography variant="h4" fontWeight="900" sx={{ color: '#0f172a', letterSpacing: '-0.5px' }}>{profileUser.name}</Typography>
+              <Typography variant="body1" sx={{ color: '#64748b', display: 'flex', alignItems: 'center', justifyContent: { xs: 'center', md: 'flex-start' }, gap: 1, mt: 0.5, fontWeight: 600 }}>
                 <CalendarTodayIcon fontSize="small" /> Member since {profileUser.createdAt ? format(new Date(profileUser.createdAt), 'MMMM yyyy') : 'N/A'}
               </Typography>
             </Box>
           </Box>
 
           {/* Ratings Summary */}
-          <Box sx={{ display: 'flex', justifyContent: { xs: 'center', md: 'flex-start' }, gap: 2, mt: 2, alignItems: 'center' }}>
+          <Box sx={{ display: 'flex', justifyContent: { xs: 'center', md: 'flex-start' }, gap: 2, mt: 2, alignItems: 'center', flexWrap: 'wrap' }}>
              <TrustBadge score={profileUser.trustScore} isVerified={profileUser.isVerified} />
              <Chip 
                 label={`Seeker: ${profileUser.seekerRating !== undefined ? Number(profileUser.seekerRating).toFixed(1) : 'N/A'} ★`} 
-                color="primary" 
-                variant="outlined" 
-                sx={{ fontWeight: 'bold' }}
+                sx={{ fontWeight: 800, borderRadius: 2, bgcolor: 'rgba(99, 102, 241, 0.1)', color: '#4f46e5' }}
               />
               <Chip 
                 label={`Provider: ${profileUser.providerRating !== undefined ? Number(profileUser.providerRating).toFixed(1) : 'N/A'} ★`} 
-                color="secondary" 
-                variant="outlined" 
-                sx={{ fontWeight: 'bold' }}
+                sx={{ fontWeight: 800, borderRadius: 2, bgcolor: 'rgba(16, 185, 129, 0.1)', color: '#059669' }}
               />
           </Box>
         </Box>
         
         {/* Tabs */}
-        <Divider />
-        <Tabs value={tabValue} onChange={handleTabChange} centered sx={{ '& .MuiTab-root': { fontWeight: 'bold', fontSize: '1rem' } }}>
+        <Divider sx={{ borderColor: 'rgba(0,0,0,0.05)' }} />
+        <Tabs 
+          value={tabValue} 
+          onChange={handleTabChange} 
+          centered 
+          TabIndicatorProps={{ style: { height: 4, borderRadius: '4px 4px 0 0', backgroundColor: '#6366f1' } }}
+          sx={{ '& .MuiTab-root': { fontWeight: 800, fontSize: '1rem', textTransform: 'none', color: '#64748b' }, '& .Mui-selected': { color: '#0f172a !important' } }}
+        >
             <Tab label="Profile" />
             <Tab label={`Reviews (${reviews.length})`} />
         </Tabs>
@@ -140,61 +142,67 @@ const PublicProfile = () => {
 
       {/* Tab Panels */}
       {tabValue === 0 && (
-        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
             {/* About Section */}
-            <Paper elevation={0} sx={{ p: 3, borderRadius: 3, border: '1px solid #e0e0e0' }}>
-                <Typography variant="h6" fontWeight="bold" gutterBottom>About</Typography>
-                <Typography variant="body1" color="text.secondary" paragraph sx={{ whiteSpace: 'pre-wrap', lineHeight: 1.7 }}>
+            <Paper elevation={0} sx={{ p: 4, borderRadius: 4, border: '1px solid rgba(0,0,0,0.05)', bgcolor: '#ffffff' }}>
+                <Typography variant="h6" fontWeight="900" sx={{ color: '#0f172a', mb: 2 }}>About</Typography>
+                <Typography variant="body1" paragraph sx={{ color: '#475569', whiteSpace: 'pre-wrap', lineHeight: 1.8 }}>
                     {profileUser.about || "This user hasn't written a bio yet."}
                 </Typography>
             </Paper>
 
             {/* Skills Section */}
-            <Paper elevation={0} sx={{ p: 3, borderRadius: 3, border: '1px solid #e0e0e0' }}>
-                <Typography variant="h6" fontWeight="bold" gutterBottom>Skills</Typography>
-                <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
+            <Paper elevation={0} sx={{ p: 4, borderRadius: 4, border: '1px solid rgba(0,0,0,0.05)', bgcolor: '#ffffff' }}>
+                <Typography variant="h6" fontWeight="900" sx={{ color: '#0f172a', mb: 3 }}>Skills</Typography>
+                <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1.5 }}>
                     {profileUser.skills && profileUser.skills.length > 0 ? (
                         profileUser.skills.map((skill: string, index: number) => (
-                            <Chip key={index} label={skill} color="primary" variant="filled" sx={{ bgcolor: '#e3f2fd', color: '#1565c0', fontWeight: 600 }} />
+                            <Chip key={index} label={skill} sx={{ bgcolor: 'rgba(99, 102, 241, 0.1)', color: '#4f46e5', fontWeight: 800, borderRadius: 2, px: 1, py: 2.5 }} />
                         ))
                     ) : (
-                        <Typography color="text.secondary">No skills listed.</Typography>
+                        <Typography sx={{ color: '#94a3b8', fontStyle: 'italic' }}>No skills listed.</Typography>
                     )}
                 </Box>
             </Paper>
 
             {/* Preferences Section */}
-            <Paper elevation={0} sx={{ p: 3, borderRadius: 3, border: '1px solid #e0e0e0' }}>
-                <Typography variant="h6" fontWeight="bold" gutterBottom>Preferences</Typography>
+            <Paper elevation={0} sx={{ p: 4, borderRadius: 4, border: '1px solid rgba(0,0,0,0.05)', bgcolor: '#ffffff' }}>
+                <Typography variant="h6" fontWeight="900" sx={{ color: '#0f172a', mb: 3 }}>Preferences</Typography>
                 <Grid container spacing={3}>
                     <Grid size={{ xs: 12, sm: 4 }}>
-                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                            <AttachMoneyIcon color="action" />
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, p: 2, borderRadius: 3, bgcolor: '#f8fafc', border: '1px solid rgba(0,0,0,0.02)' }}>
+                            <Box sx={{ p: 1.5, borderRadius: 2, bgcolor: 'rgba(16, 185, 129, 0.1)', color: '#059669', display: 'flex' }}>
+                                <AttachMoneyIcon />
+                            </Box>
                             <Box>
-                                <Typography variant="caption" color="text.secondary">Min Pay</Typography>
-                                <Typography variant="body2" fontWeight="bold">
+                                <Typography variant="caption" sx={{ color: '#94a3b8', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.5px' }}>Min Pay</Typography>
+                                <Typography variant="subtitle1" fontWeight="800" sx={{ color: '#1e293b' }}>
                                     {profileUser.preferences?.minPay ? `$${profileUser.preferences.minPay}/hr` : 'Not specified'}
                                 </Typography>
                             </Box>
                         </Box>
                     </Grid>
                     <Grid size={{ xs: 12, sm: 4 }}>
-                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                            <LocationOnIcon color="action" />
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, p: 2, borderRadius: 3, bgcolor: '#f8fafc', border: '1px solid rgba(0,0,0,0.02)' }}>
+                            <Box sx={{ p: 1.5, borderRadius: 2, bgcolor: 'rgba(239, 68, 68, 0.1)', color: '#ef4444', display: 'flex' }}>
+                                <LocationOnIcon />
+                            </Box>
                             <Box>
-                                <Typography variant="caption" color="text.secondary">Preferred Location</Typography>
-                                <Typography variant="body2" fontWeight="bold">
+                                <Typography variant="caption" sx={{ color: '#94a3b8', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.5px' }}>Location</Typography>
+                                <Typography variant="subtitle1" fontWeight="800" sx={{ color: '#1e293b' }}>
                                     {profileUser.preferences?.location || 'Not specified'}
                                 </Typography>
                             </Box>
                         </Box>
                     </Grid>
                     <Grid size={{ xs: 12, sm: 4 }}>
-                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                            <CalendarTodayIcon color="action" />
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, p: 2, borderRadius: 3, bgcolor: '#f8fafc', border: '1px solid rgba(0,0,0,0.02)' }}>
+                            <Box sx={{ p: 1.5, borderRadius: 2, bgcolor: 'rgba(245, 158, 11, 0.1)', color: '#f59e0b', display: 'flex' }}>
+                                <CalendarTodayIcon />
+                            </Box>
                             <Box>
-                                <Typography variant="caption" color="text.secondary">Availability</Typography>
-                                <Typography variant="body2" fontWeight="bold">
+                                <Typography variant="caption" sx={{ color: '#94a3b8', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.5px' }}>Availability</Typography>
+                                <Typography variant="subtitle1" fontWeight="800" sx={{ color: '#1e293b' }}>
                                     {profileUser.availability || 'Not specified'}
                                 </Typography>
                             </Box>
@@ -204,22 +212,24 @@ const PublicProfile = () => {
             </Paper>
 
             {/* Portfolio Section */}
-            <Paper elevation={0} sx={{ p: 3, borderRadius: 3, border: '1px solid #e0e0e0' }}>
-                <Typography variant="h6" fontWeight="bold" gutterBottom>Portfolio</Typography>
-                <Grid container spacing={2}>
+            <Paper elevation={0} sx={{ p: 4, borderRadius: 4, border: '1px solid rgba(0,0,0,0.05)', bgcolor: '#ffffff' }}>
+                <Typography variant="h6" fontWeight="900" sx={{ color: '#0f172a', mb: 3 }}>Portfolio</Typography>
+                <Grid container spacing={3}>
                     {profileUser.portfolio && profileUser.portfolio.length > 0 ? (
                         profileUser.portfolio.map((item: any, index: number) => (
                             <Grid size={{ xs: 12, sm: 6, md: 4 }} key={index}>
-                                <Paper variant="outlined" sx={{ p: 2, height: '100%', transition: 'transform 0.2s', '&:hover': { transform: 'translateY(-4px)', boxShadow: 2 } }}>
-                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
-                                        <WorkIcon color="primary" fontSize="small" />
-                                        <Typography variant="subtitle2" fontWeight="bold" noWrap>
-                                            <a href={item.link} target="_blank" rel="noopener noreferrer" style={{ textDecoration: 'none', color: 'inherit' }}>
+                                <Paper elevation={0} sx={{ p: 3, height: '100%', borderRadius: 3, border: '1px solid rgba(0,0,0,0.05)', transition: 'all 0.3s', '&:hover': { transform: 'translateY(-4px)', boxShadow: '0 12px 24px rgba(0,0,0,0.06)' } }}>
+                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, mb: 1.5 }}>
+                                        <Box sx={{ p: 1, borderRadius: 2, bgcolor: 'rgba(99, 102, 241, 0.1)', color: '#4f46e5', display: 'flex' }}>
+                                            <WorkIcon fontSize="small" />
+                                        </Box>
+                                        <Typography variant="subtitle1" fontWeight="800" noWrap>
+                                            <a href={item.link} target="_blank" rel="noopener noreferrer" style={{ textDecoration: 'none', color: '#0f172a' }}>
                                                 {item.title}
                                             </a>
                                         </Typography>
                                     </Box>
-                                    <Typography variant="body2" color="text.secondary" sx={{ display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+                                    <Typography variant="body2" sx={{ color: '#64748b', lineHeight: 1.6, display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
                                         {item.description}
                                     </Typography>
                                 </Paper>
@@ -227,33 +237,33 @@ const PublicProfile = () => {
                         ))
                     ) : (
                         <Grid size={{ xs: 12 }}>
-                            <Typography color="text.secondary">No portfolio items.</Typography>
+                            <Typography sx={{ color: '#94a3b8', fontStyle: 'italic' }}>No portfolio items.</Typography>
                         </Grid>
                     )}
                 </Grid>
             </Paper>
 
             {/* Connect Section */}
-            <Paper elevation={0} sx={{ p: 3, borderRadius: 3, border: '1px solid #e0e0e0' }}>
-                <Typography variant="h6" fontWeight="bold" gutterBottom>Connect</Typography>
-                <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2 }}>
+            <Paper elevation={0} sx={{ p: 4, borderRadius: 4, border: '1px solid rgba(0,0,0,0.05)', bgcolor: '#ffffff' }}>
+                <Typography variant="h6" fontWeight="900" sx={{ color: '#0f172a', mb: 3 }}>Connect</Typography>
+                <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 3 }}>
                     {profileUser.socialLinks?.linkedin && (
-                        <Button variant="outlined" startIcon={<LinkedInIcon />} href={profileUser.socialLinks.linkedin} target="_blank" sx={{ minWidth: 120 }}>
+                        <Button variant="outlined" startIcon={<LinkedInIcon />} href={profileUser.socialLinks.linkedin} target="_blank" sx={{ borderRadius: 2, fontWeight: 800, color: '#0a66c2', borderColor: 'rgba(10, 102, 194, 0.3)', bgcolor: 'rgba(10, 102, 194, 0.05)', '&:hover': { bgcolor: 'rgba(10, 102, 194, 0.1)', borderColor: '#0a66c2' }, minWidth: 120 }}>
                             LinkedIn
                         </Button>
                     )}
                     {profileUser.socialLinks?.github && (
-                        <Button variant="outlined" startIcon={<GitHubIcon />} href={profileUser.socialLinks.github} target="_blank" sx={{ color: '#333', borderColor: '#333', minWidth: 120 }}>
+                        <Button variant="outlined" startIcon={<GitHubIcon />} href={profileUser.socialLinks.github} target="_blank" sx={{ borderRadius: 2, fontWeight: 800, color: '#24292e', borderColor: 'rgba(36, 41, 46, 0.3)', bgcolor: 'rgba(36, 41, 46, 0.05)', '&:hover': { bgcolor: 'rgba(36, 41, 46, 0.1)', borderColor: '#24292e' }, minWidth: 120 }}>
                             GitHub
                         </Button>
                     )}
                     {profileUser.socialLinks?.website && (
-                        <Button variant="outlined" startIcon={<LanguageIcon />} href={profileUser.socialLinks.website} target="_blank" color="secondary" sx={{ minWidth: 120 }}>
+                        <Button variant="outlined" startIcon={<LanguageIcon />} href={profileUser.socialLinks.website} target="_blank" sx={{ borderRadius: 2, fontWeight: 800, color: '#4f46e5', borderColor: 'rgba(79, 70, 229, 0.3)', bgcolor: 'rgba(79, 70, 229, 0.05)', '&:hover': { bgcolor: 'rgba(79, 70, 229, 0.1)', borderColor: '#4f46e5' }, minWidth: 120 }}>
                             Website
                         </Button>
                     )}
                     {(!profileUser.socialLinks?.linkedin && !profileUser.socialLinks?.github && !profileUser.socialLinks?.website) && (
-                        <Typography color="text.secondary" variant="body2">No social links provided.</Typography>
+                        <Typography sx={{ color: '#94a3b8', fontStyle: 'italic' }}>No social links provided.</Typography>
                     )}
                 </Box>
             </Paper>
@@ -263,60 +273,58 @@ const PublicProfile = () => {
       {tabValue === 1 && (
           <Box>
             {reviews.length === 0 ? (
-                <Paper elevation={0} sx={{ p: 6, textAlign: 'center', borderRadius: 3, border: '1px solid #e0e0e0' }}>
-                    <Typography variant="h6" color="text.secondary">No reviews yet.</Typography>
+                <Paper elevation={0} sx={{ p: 6, textAlign: 'center', borderRadius: 4, border: '1px dashed #e2e8f0', bgcolor: '#f8fafc' }}>
+                    <Typography variant="h6" sx={{ color: '#64748b', fontStyle: 'italic' }}>No reviews yet.</Typography>
                 </Paper>
             ) : (
-                <Grid container spacing={3}>
+                <Grid container spacing={4}>
                     {/* Reviews as Seeker */}
                     <Grid size={{ xs: 12, md: 6 }}>
-                        <Paper elevation={0} sx={{ p: 2, height: '100%', border: '1px solid #e0e0e0', borderRadius: 3 }}>
-                             <Box sx={{ p: 1, pb: 2, borderBottom: '1px solid #eee', mb: 2, position: 'sticky', top: 0, bgcolor: 'background.paper', zIndex: 1 }}>
-                                <Typography variant="h6" fontWeight="bold" sx={{ color: 'primary.main', display: 'flex', alignItems: 'center', gap: 1 }}>
-                                    <WorkIcon /> Reviews as Seeker
-                                </Typography>
-                                <Typography variant="caption" color="text.secondary">
-                                    {reviews.filter(r => r.job?.seekerId === id).length} reviews
-                                </Typography>
-                            </Box>
+                        <Paper elevation={0} sx={{ p: 3, height: '100%', border: '1px solid rgba(79, 70, 229, 0.2)', borderRadius: 4, bgcolor: '#eef2ff' }}>
+                             <Box sx={{ mb: 3, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                 <Typography variant="h6" fontWeight="800" sx={{ display: 'flex', alignItems: 'center', gap: 1, color: '#4338ca' }}>
+                                     <WorkIcon /> Reviews as Seeker
+                                 </Typography>
+                                 <Chip label={`${reviews.filter(r => r.job?.seekerId === id).length} reviews`} size="small" sx={{ bgcolor: '#6366f1', color: 'white', fontWeight: 800 }} />
+                             </Box>
                             
-                            <Box sx={{ maxHeight: '600px', overflowY: 'auto', pr: 1 }}>
+                            <Box sx={{ maxHeight: '600px', overflowY: 'auto', pr: 1, '&::-webkit-scrollbar': { width: 6 }, '&::-webkit-scrollbar-thumb': { bgcolor: 'rgba(99, 102, 241, 0.3)', borderRadius: 10 } }}>
                                 {reviews.filter(r => r.job?.seekerId === id).length === 0 ? (
                                     <Box py={4} textAlign="center">
-                                        <Typography color="text.secondary">No reviews received as Seeker.</Typography>
+                                        <Typography sx={{ color: '#4338ca', fontStyle: 'italic', fontSize: '0.95rem' }}>No reviews received as Seeker.</Typography>
                                     </Box>
                                 ) : (
                                     reviews.filter(r => r.job?.seekerId === id).map((review) => (
-                                        <Paper key={review._id} elevation={0} sx={{ p: 2, mb: 2, borderRadius: 2, bgcolor: '#f8f9fa' }}>
+                                        <Paper key={review._id} elevation={0} sx={{ p: 3, mb: 3, borderRadius: 3, bgcolor: '#ffffff', border: '1px solid rgba(99, 102, 241, 0.1)' }}>
                                             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 1 }}>
-                                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-                                                    <Avatar sx={{ width: 32, height: 32, bgcolor: 'secondary.main', fontSize: '0.9rem' }}>
+                                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                                                    <Avatar sx={{ width: 40, height: 40, bgcolor: '#4f46e5', fontWeight: 800 }}>
                                                         {review.reviewer?.name?.charAt(0).toUpperCase() || '?'}
                                                     </Avatar>
                                                     <Box>
-                                                        <Typography variant="subtitle2" fontWeight="bold">
+                                                        <Typography variant="subtitle2" fontWeight="800" sx={{ color: '#1e293b' }}>
                                                             {review.reviewer?.name || 'Unknown User'}
                                                         </Typography>
-                                                        <Typography variant="caption" color="text.secondary" sx={{ display: 'block', lineHeight: 1 }}>
+                                                        <Typography variant="caption" sx={{ color: '#94a3b8', fontWeight: 600 }}>
                                                             {format(new Date(review.createdAt), 'MMM d, yyyy')}
                                                         </Typography>
                                                     </Box>
                                                 </Box>
-                                                <Rating value={review.rating} readOnly size="small" />
+                                                <Rating value={review.rating} readOnly size="small" sx={{ color: '#f59e0b' }} />
                                             </Box>
-                                            <Typography variant="body2" sx={{ mt: 1, fontStyle: 'italic', color: 'text.primary' }}>"{review.comment}"</Typography>
+                                            <Typography variant="body2" sx={{ mt: 2, fontStyle: 'italic', color: '#475569', lineHeight: 1.6 }}>"{review.comment}"</Typography>
                                             {review.job && (
-                                                <Typography variant="caption" sx={{ display: 'block', mt: 1, color: 'text.disabled' }}>
-                                                    Job: {review.job.title}
+                                                <Typography variant="caption" sx={{ display: 'block', mt: 2, color: '#64748b', fontWeight: 700 }}>
+                                                    Job: <span style={{ color: '#4f46e5' }}>{review.job.title}</span>
                                                 </Typography>
                                             )}
                                             {review.response && (
-                                                <Paper variant="outlined" sx={{ p: 1.5, mt: 1.5, bgcolor: '#ffffff', display: 'flex', gap: 1.5, borderLeft: '3px solid #1976d2' }}>
-                                                    <ReplyIcon color="primary" fontSize="small" />
+                                                <Paper elevation={0} sx={{ p: 2, mt: 2, bgcolor: '#f8fafc', display: 'flex', gap: 1.5, borderLeft: '3px solid #6366f1', borderRadius: '0 12px 12px 0' }}>
+                                                    <ReplyIcon sx={{ color: '#6366f1' }} fontSize="small" />
                                                     <Box>
-                                                        <Typography variant="caption" fontWeight="bold" display="block">Reply from {profileUser?.name}</Typography>
-                                                        <Typography variant="body2" sx={{ fontSize: '0.85rem' }}>{review.response.message}</Typography>
-                                                        <Typography variant="caption" color="text.secondary" sx={{ fontSize: '0.7rem' }}>{format(new Date(review.response.createdAt), 'MMM d, yyyy')}</Typography>
+                                                        <Typography variant="caption" fontWeight="800" sx={{ color: '#475569', display: 'block', mb: 0.5 }}>Reply from {profileUser?.name}</Typography>
+                                                        <Typography variant="body2" sx={{ color: '#1e293b', fontSize: '0.9rem' }}>{review.response.message}</Typography>
+                                                        <Typography variant="caption" sx={{ color: '#94a3b8', fontSize: '0.75rem', fontWeight: 600, mt: 0.5, display: 'block' }}>{format(new Date(review.response.createdAt), 'MMM d, yyyy')}</Typography>
                                                     </Box>
                                                 </Paper>
                                             )}
@@ -329,45 +337,53 @@ const PublicProfile = () => {
 
                     {/* Reviews as Provider */}
                     <Grid size={{ xs: 12, md: 6 }}>
-                        <Paper elevation={0} sx={{ p: 2, height: '100%', border: '1px solid #e0e0e0', borderRadius: 3 }}>
-                            <Box sx={{ p: 1, pb: 2, borderBottom: '1px solid #eee', mb: 2, position: 'sticky', top: 0, bgcolor: 'background.paper', zIndex: 1 }}>
-                                <Typography variant="h6" fontWeight="bold" sx={{ color: 'secondary.main', display: 'flex', alignItems: 'center', gap: 1 }}>
-                                    <WorkIcon /> Reviews as Provider
-                                </Typography>
-                                <Typography variant="caption" color="text.secondary">
-                                    {reviews.filter(r => r.job?.providerId === id).length} reviews
-                                </Typography>
-                            </Box>
+                        <Paper elevation={0} sx={{ p: 3, height: '100%', border: '1px solid rgba(16, 185, 129, 0.2)', borderRadius: 4, bgcolor: '#f0fdf4' }}>
+                            <Box sx={{ mb: 3, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                 <Typography variant="h6" fontWeight="800" sx={{ display: 'flex', alignItems: 'center', gap: 1, color: '#047857' }}>
+                                     <WorkIcon /> Reviews as Provider
+                                 </Typography>
+                                 <Chip label={`${reviews.filter(r => r.job?.providerId === id).length} reviews`} size="small" sx={{ bgcolor: '#10b981', color: 'white', fontWeight: 800 }} />
+                             </Box>
 
-                            <Box sx={{ maxHeight: '600px', overflowY: 'auto', pr: 1 }}>
+                            <Box sx={{ maxHeight: '600px', overflowY: 'auto', pr: 1, '&::-webkit-scrollbar': { width: 6 }, '&::-webkit-scrollbar-thumb': { bgcolor: 'rgba(16, 185, 129, 0.3)', borderRadius: 10 } }}>
                                 {reviews.filter(r => r.job?.providerId === id).length === 0 ? (
                                     <Box py={4} textAlign="center">
-                                        <Typography color="text.secondary">No reviews received as Provider.</Typography>
+                                        <Typography sx={{ color: '#047857', fontStyle: 'italic', fontSize: '0.95rem' }}>No reviews received as Provider.</Typography>
                                     </Box>
                                 ) : (
                                     reviews.filter(r => r.job?.providerId === id).map((review) => (
-                                        <Paper key={review._id} elevation={0} sx={{ p: 2, mb: 2, borderRadius: 2, bgcolor: '#f8f9fa' }}>
+                                        <Paper key={review._id} elevation={0} sx={{ p: 3, mb: 3, borderRadius: 3, bgcolor: '#ffffff', border: '1px solid rgba(16, 185, 129, 0.1)' }}>
                                             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 1 }}>
-                                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
-                                                    <Avatar sx={{ width: 32, height: 32, bgcolor: 'primary.main', fontSize: '0.9rem' }}>
+                                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                                                    <Avatar sx={{ width: 40, height: 40, bgcolor: '#10b981', fontWeight: 800 }}>
                                                         {review.reviewer?.name?.charAt(0).toUpperCase() || '?'}
                                                     </Avatar>
                                                     <Box>
-                                                        <Typography variant="subtitle2" fontWeight="bold">
+                                                        <Typography variant="subtitle2" fontWeight="800" sx={{ color: '#1e293b' }}>
                                                             {review.reviewer?.name || 'Unknown User'}
                                                         </Typography>
-                                                        <Typography variant="caption" color="text.secondary" sx={{ display: 'block', lineHeight: 1 }}>
+                                                        <Typography variant="caption" sx={{ color: '#94a3b8', fontWeight: 600 }}>
                                                             {format(new Date(review.createdAt), 'MMM d, yyyy')}
                                                         </Typography>
                                                     </Box>
                                                 </Box>
-                                                <Rating value={review.rating} readOnly size="small" />
+                                                <Rating value={review.rating} readOnly size="small" sx={{ color: '#f59e0b' }} />
                                             </Box>
-                                            <Typography variant="body2" sx={{ mt: 1, fontStyle: 'italic', color: 'text.primary' }}>"{review.comment}"</Typography>
+                                            <Typography variant="body2" sx={{ mt: 2, fontStyle: 'italic', color: '#475569', lineHeight: 1.6 }}>"{review.comment}"</Typography>
                                             {review.job && (
-                                                <Typography variant="caption" sx={{ display: 'block', mt: 1, color: 'text.disabled' }}>
-                                                    Job: {review.job.title}
+                                                <Typography variant="caption" sx={{ display: 'block', mt: 2, color: '#64748b', fontWeight: 700 }}>
+                                                    Job: <span style={{ color: '#059669' }}>{review.job.title}</span>
                                                 </Typography>
+                                            )}
+                                            {review.response && (
+                                                <Paper elevation={0} sx={{ p: 2, mt: 2, bgcolor: '#f8fafc', display: 'flex', gap: 1.5, borderLeft: '3px solid #10b981', borderRadius: '0 12px 12px 0' }}>
+                                                    <ReplyIcon sx={{ color: '#10b981' }} fontSize="small" />
+                                                    <Box>
+                                                        <Typography variant="caption" fontWeight="800" sx={{ color: '#475569', display: 'block', mb: 0.5 }}>Reply from {profileUser?.name}</Typography>
+                                                        <Typography variant="body2" sx={{ color: '#1e293b', fontSize: '0.9rem' }}>{review.response.message}</Typography>
+                                                        <Typography variant="caption" sx={{ color: '#94a3b8', fontSize: '0.75rem', fontWeight: 600, mt: 0.5, display: 'block' }}>{format(new Date(review.response.createdAt), 'MMM d, yyyy')}</Typography>
+                                                    </Box>
+                                                </Paper>
                                             )}
                                         </Paper>
                                     ))

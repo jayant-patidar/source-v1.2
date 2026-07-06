@@ -88,10 +88,15 @@ const NotificationMenu = () => {
 
   return (
     <>
-      <Box onClick={handleOpen} sx={{ cursor: 'pointer', display: 'flex' }}>
+      <Box onClick={handleOpen} sx={{ 
+              width: 85, py: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', 
+              color: 'white', borderRadius: 3, opacity: 0.7, cursor: 'pointer',
+              transition: 'all 0.2s', '&:hover': { opacity: 1, bgcolor: 'rgba(255,255,255,0.05)' } 
+       }}>
         <Badge badgeContent={unreadCount} color="error">
-          <NotificationsIcon sx={{ fontSize: 28 }} />
+          <NotificationsIcon sx={{ fontSize: 26, mb: 0.5 }} />
         </Badge>
+        <Typography variant="caption" sx={{ fontSize: '0.65rem', fontWeight: 700, letterSpacing: '0.5px' }}>ALERTS</Typography>
       </Box>
       <Menu
         anchorEl={anchorEl}
