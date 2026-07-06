@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
-import { Container, Typography, TextField, Button, Box, Paper, Grid, CircularProgress, Autocomplete, Chip } from '@mui/material';
+import { Container, Typography, TextField, Button, Box, Paper, Grid, CircularProgress, Autocomplete, Chip, IconButton } from '@mui/material';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { useNavigate } from 'react-router-dom';
 import { useFormik } from 'formik';
 import * as yup from 'yup';
@@ -72,9 +73,14 @@ const CreateGig = () => {
   return (
     <Container maxWidth="md" sx={{ mt: 4, mb: 8 }}>
       <Paper elevation={0} sx={{ p: 4, borderRadius: 2, border: '1px solid #eee' }}>
-        <Typography variant="h4" fontWeight="bold" gutterBottom>
-          Create a New Gig
-        </Typography>
+        <Box display="flex" alignItems="center" mb={1}>
+          <IconButton onClick={() => navigate(-1)} sx={{ mr: 1, ml: -1 }}>
+            <ArrowBackIcon />
+          </IconButton>
+          <Typography variant="h4" fontWeight="bold">
+            Create a New Gig
+          </Typography>
+        </Box>
         <Typography variant="body1" color="text.secondary" sx={{ mb: 4 }}>
           Offer a pre-packaged service for a fixed price.
         </Typography>

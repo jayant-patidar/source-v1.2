@@ -5,6 +5,14 @@ export const getGigs = async (filters: any = {}) => {
   return data;
 };
 
+export const searchGigs = async (params: any = {}) => {
+  const cleanParams = Object.fromEntries(
+    Object.entries(params).filter(([_, v]) => v != null && v !== '')
+  );
+  const { data } = await api.get('/gigs', { params: cleanParams });
+  return data;
+};
+
 export const getMyGigs = async () => {
   const { data } = await api.get('/gigs/my');
   return data;

@@ -27,10 +27,19 @@ class GigService {
     if (filters.keyword) {
       query.$or = [
         { title: { $regex: filters.keyword, $options: 'i' } },
-        { description: { $regex: filters.keyword, $options: 'i' } }
+        { description: { $regex: filters.keyword, $options: 'i' } },
+        { tags: { $regex: filters.keyword, $options: 'i' } }
       ];
     }
-    return await this.gigDAL.getGigs(query);
+
+    // Price Range Filter
+    if (filters.minPrice || filters.maxPrice) {
+      query.price = {};
+      if (filters.minPrice) query.price.$gte = Number(filters.minPrice);
+      if (filters.maxPrice) query.price.$lte = Number(filters.maxPrice);
+    }
+
+    return await this.gigDAL.getGigs(query, filters.sortBy || 'newest', filters.limit ? Number(filters.limit) : undefined);
   }
 
   async getGigById(gigId: string): Promise<IGig | null> {

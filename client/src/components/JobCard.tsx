@@ -262,13 +262,13 @@ const JobCard = ({ job }: { job: any }) => {
             <Box sx={{ mt: 1 }}>
               <Divider sx={{ mb: 3, borderStyle: 'dashed', borderColor: '#e2e8f0' }} />
               
-              <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
+              <Box sx={{ display: 'flex', flexDirection: { xs: 'column', sm: 'row' }, gap: 2, alignItems: { xs: 'stretch', sm: 'center' } }}>
                 {/* Actions Icons Row */}
-                <Box sx={{ display: 'flex', gap: 1, flex: 1 }}>
+                <Box sx={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', gap: { xs: 0.5, sm: 1 }, flex: 1 }}>
                   
                   <Box 
                     sx={{ 
-                      display: 'flex', alignItems: 'center', gap: 1, p: 1, pr: 2,
+                      display: 'flex', alignItems: 'center', gap: { xs: 0.5, sm: 1 }, p: { xs: 0.5, sm: 1 }, pr: { xs: 1, sm: 2 },
                       borderRadius: 12, cursor: 'pointer', transition: 'all 0.2s',
                       color: '#64748b', '&:hover': { bgcolor: 'rgba(99, 102, 241, 0.1)', color: '#4f46e5' }
                     }} 
@@ -283,12 +283,12 @@ const JobCard = ({ job }: { job: any }) => {
                     <Box sx={{ bgcolor: 'white', p: 0.5, borderRadius: '50%', display: 'flex', boxShadow: '0 2px 4px rgba(0,0,0,0.05)' }}>
                       <LoopIcon sx={{ fontSize: 18, color: 'inherit' }} />
                     </Box>
-                    <Typography variant="caption" fontWeight="700">Negotiate</Typography>
+                    <Typography variant="caption" fontWeight="700" sx={{ display: { xs: 'none', sm: 'block', md: 'none', lg: 'block' } }}>Negotiate</Typography>
                   </Box>
 
                   <Box 
                     sx={{ 
-                      display: 'flex', alignItems: 'center', gap: 1, p: 1, pr: 2,
+                      display: 'flex', alignItems: 'center', gap: { xs: 0.5, sm: 1 }, p: { xs: 0.5, sm: 1 }, pr: { xs: 1, sm: 2 },
                       borderRadius: 12, cursor: 'pointer', transition: 'all 0.2s',
                       color: '#64748b', '&:hover': { bgcolor: 'rgba(16, 185, 129, 0.1)', color: '#059669' }
                     }} 
@@ -297,12 +297,12 @@ const JobCard = ({ job }: { job: any }) => {
                     <Box sx={{ bgcolor: 'white', p: 0.5, borderRadius: '50%', display: 'flex', boxShadow: '0 2px 4px rgba(0,0,0,0.05)' }}>
                       <ShareLocationIcon sx={{ fontSize: 18, color: 'inherit' }} />
                     </Box>
-                    <Typography variant="caption" fontWeight="700">Locate</Typography>
+                    <Typography variant="caption" fontWeight="700" sx={{ display: { xs: 'none', sm: 'block', md: 'none', lg: 'block' } }}>Locate</Typography>
                   </Box>
 
                   <Box 
                     sx={{ 
-                      display: 'flex', alignItems: 'center', gap: 1, p: 1, pr: 2,
+                      display: 'flex', alignItems: 'center', gap: { xs: 0.5, sm: 1 }, p: { xs: 0.5, sm: 1 }, pr: { xs: 1, sm: 2 },
                       borderRadius: 12, cursor: 'pointer', transition: 'all 0.2s',
                       color: '#64748b', '&:hover': { bgcolor: 'rgba(236, 72, 153, 0.1)', color: '#db2777' }
                     }} 
@@ -311,12 +311,12 @@ const JobCard = ({ job }: { job: any }) => {
                     <Box sx={{ bgcolor: 'white', p: 0.5, borderRadius: '50%', display: 'flex', boxShadow: '0 2px 4px rgba(0,0,0,0.05)' }}>
                       <SendIcon sx={{ fontSize: 18, color: 'inherit' }} />
                     </Box>
-                    <Typography variant="caption" fontWeight="700">Share</Typography>
+                    <Typography variant="caption" fontWeight="700" sx={{ display: { xs: 'none', sm: 'block', md: 'none', lg: 'block' } }}>Share</Typography>
                   </Box>
 
                   <Box 
                     sx={{ 
-                      display: 'flex', alignItems: 'center', gap: 1, p: 1, pr: 2,
+                      display: 'flex', alignItems: 'center', gap: { xs: 0.5, sm: 1 }, p: { xs: 0.5, sm: 1 }, pr: { xs: 1, sm: 2 },
                       borderRadius: 12, cursor: 'pointer', transition: 'all 0.2s',
                       color: isSaved ? '#eab308' : '#64748b', '&:hover': { bgcolor: 'rgba(234, 179, 8, 0.1)', color: '#eab308' }
                     }} 
@@ -325,7 +325,7 @@ const JobCard = ({ job }: { job: any }) => {
                     <Box sx={{ bgcolor: 'white', p: 0.5, borderRadius: '50%', display: 'flex', boxShadow: '0 2px 4px rgba(0,0,0,0.05)' }}>
                       {isSaved ? <BookmarkIcon sx={{ fontSize: 18, color: 'inherit' }} /> : <BookmarkBorderIcon sx={{ fontSize: 18, color: 'inherit' }} />}
                     </Box>
-                    <Typography variant="caption" fontWeight="700">{isSaved ? 'Saved' : 'Save'}</Typography>
+                    <Typography variant="caption" fontWeight="700" sx={{ display: { xs: 'none', sm: 'block', md: 'none', lg: 'block' } }}>{isSaved ? 'Saved' : 'Save'}</Typography>
                   </Box>
 
                 </Box>
@@ -345,6 +345,7 @@ const JobCard = ({ job }: { job: any }) => {
                       fontSize: '1rem',
                       boxShadow: '0 8px 20px rgba(15,23,42,0.2)',
                       transition: 'all 0.3s',
+                      width: { xs: '100%', sm: 'auto' },
                       '&:hover': { 
                         transform: 'translateY(-2px)',
                         boxShadow: '0 12px 25px rgba(15,23,42,0.3)',

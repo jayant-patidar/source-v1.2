@@ -14,6 +14,7 @@ import Profile from './pages/Profile';
 import PublicProfile from './pages/PublicProfile';
 import ActivityPage from './pages/ActivityPage';
 import Wallet from './pages/Wallet';
+import SearchResults from './pages/SearchResults';
 import GlobalToast from './components/GlobalToast';
 import { useAuthStore } from './store/authStore';
 import { Box, CircularProgress } from '@mui/material';
@@ -44,6 +45,7 @@ function App() {
         <Route path="/create-gig" element={<CreateGig />} />
         <Route path="/jobs/:id" element={<JobDetails />} />
         <Route path="/gigs/:id" element={<GigDetails />} />
+        <Route path="/search" element={<SearchResults />} />
         <Route path="/profile" element={user ? <Profile /> : <Navigate to="/login" />} />
         <Route path="/wallet" element={user ? <Wallet /> : <Navigate to="/login" />} />
         <Route path="/profile/:id" element={<PublicProfile />} />

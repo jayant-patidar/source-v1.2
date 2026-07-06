@@ -20,6 +20,21 @@ const Navbar = () => {
   const navigate = useNavigate();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+
+  const handleSearch = () => {
+    const trimmed = searchQuery.trim();
+    if (trimmed) {
+      navigate(`/search?q=${encodeURIComponent(trimmed)}`);
+      setSearchQuery('');
+    }
+  };
+
+  const handleSearchKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      handleSearch();
+    }
+  };
 
   const handleMenu = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
@@ -88,10 +103,13 @@ const Navbar = () => {
               boxShadow: '0 0 0 3px rgba(99, 102, 241, 0.2)'
             }
           }}>
-            <SearchIcon sx={{ color: 'rgba(255,255,255,0.6)', mr: 1 }} />
+            <SearchIcon sx={{ color: 'rgba(255,255,255,0.6)', mr: 1, cursor: 'pointer' }} onClick={handleSearch} />
             <InputBase
               placeholder="Search services, jobs, or users..."
               fullWidth
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              onKeyDown={handleSearchKeyDown}
               sx={{ 
                 fontSize: '0.95rem',
                 color: 'white',
