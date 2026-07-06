@@ -104,30 +104,32 @@ const ActivityLayout = ({ children, currentView, onViewChange }: ActivityLayoutP
           <Typography variant="h3" fontWeight="900" sx={{ mb: 4, letterSpacing: '-1px' }}>
             Activity Dashboard
           </Typography>
-
+          <Box sx={{ display: 'flex', justifyContent: 'center', px: { xs: 1, sm: 2 }, width: '100%' }}>
           <ToggleButtonGroup
             value={mode}
             exclusive
             onChange={handleModeChange}
-            aria-label="activity mode"
+            aria-label="dashboard mode"
             sx={{
-              bgcolor: 'rgba(255, 255, 255, 0.15)',
-              p: 0.5,
-              borderRadius: '16px',
-              backdropFilter: 'blur(10px)',
-              border: '1px solid rgba(255,255,255,0.2)',
+              bgcolor: 'rgba(255,255,255,0.08)',
+              p: 0.75,
+              borderRadius: '24px',
+              display: 'flex',
+              flexWrap: { xs: 'wrap', md: 'nowrap' },
+              justifyContent: 'center',
+              gap: { xs: 0.5, md: 1.5 },
               '& .MuiToggleButton-root': {
-                color: 'rgba(255,255,255,0.7)',
                 border: 'none',
-                borderRadius: '12px !important',
-                px: { xs: 2, md: 4 },
-                py: 1.5,
+                borderRadius: '20px !important',
+                px: { xs: 2, sm: 3 },
+                py: { xs: 0.5, sm: 1 },
+                color: 'rgba(255,255,255,0.7)',
                 textTransform: 'none',
-                fontSize: '1.1rem',
-                fontWeight: '600',
-                transition: 'all 0.3s ease',
+                fontWeight: 'bold',
+                fontSize: { xs: '0.85rem', sm: '1.05rem' },
                 display: 'flex',
-                gap: 1.5,
+                gap: { xs: 0.5, sm: 1.5 },
+                transition: 'all 0.3s ease',
                 '&:hover': {
                   bgcolor: 'rgba(255,255,255,0.1)',
                   color: '#fff',
@@ -156,6 +158,7 @@ const ActivityLayout = ({ children, currentView, onViewChange }: ActivityLayoutP
               <MoreHorizIcon /> More
             </ToggleButton>
           </ToggleButtonGroup>
+          </Box>
         </Container>
       </Box>
 
@@ -168,9 +171,9 @@ const ActivityLayout = ({ children, currentView, onViewChange }: ActivityLayoutP
           px: { xs: 0, sm: 2 },
           pt: 1,
           pb: 0,
-          display: 'flex',
-          justifyContent: 'center',
-          border: '1px solid #f0f0f0'
+          border: '1px solid #f0f0f0',
+          width: '100%',
+          overflow: 'hidden'
         }}>
           <Tabs
             value={currentView}

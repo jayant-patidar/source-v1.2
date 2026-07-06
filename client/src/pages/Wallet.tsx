@@ -9,8 +9,10 @@ import SearchIcon from '@mui/icons-material/Search';
 import SortIcon from '@mui/icons-material/Sort';
 import { useTransactionStore } from '../store/transactionStore';
 import { useToastStore } from '../store/toastStore';
+import { useAuthStore } from '../store/authStore';
 
 const Wallet = () => {
+  const { user } = useAuthStore();
   const { balance, transactions, isLoading, fetchBalance, fetchTransactions, purchaseCoins } = useTransactionStore();
   const { showToast } = useToastStore();
   
@@ -213,7 +215,10 @@ const Wallet = () => {
                 </Box>
               ) : paginatedTransactions.length > 0 ? (
                 <Box sx={{ display: 'flex', flexDirection: 'column' }}>
-                  {paginatedTransactions.map((tx: any, index: number) => (
+                  {paginatedTransactions.map((tx: any, index: number) => {
+                    const txPayeeId = typeof tx.payeeId === 'object' ? tx.payeeId?._id : tx.payeeId;
+                    const isIncome = tx.type === 'purchase' || (tx.type === 'transfer' && txPayeeId === user?._id);
+                    return (
                     <Box 
                       key={tx._id} 
                       sx={{ 
@@ -234,8 +239,8 @@ const Wallet = () => {
                           display: 'flex', 
                           justifyContent: 'center', 
                           alignItems: 'center',
-                          bgcolor: tx.type === 'purchase' ? 'success.50' : 'error.50',
-                          color: tx.type === 'purchase' ? 'success.main' : 'error.main'
+                          bgcolor: isIncome ? 'success.50' : 'error.50',
+                          color: isIncome ? 'success.main' : 'error.main'
                         }}>
                           <AvatarIcon type={tx.type} />
                         </Box>
@@ -248,11 +253,11 @@ const Wallet = () => {
                           </Typography>
                         </Box>
                       </Box>
-                      <Typography variant="h6" fontWeight="bold" color={tx.type === 'purchase' ? 'success.main' : 'text.primary'}>
-                        {tx.type === 'purchase' ? '+' : '-'}{tx.amount.toLocaleString()} SC
+                      <Typography variant="h6" fontWeight="bold" color={isIncome ? 'success.main' : 'text.primary'}>
+                        {isIncome ? '+' : '-'}{tx.amount.toLocaleString()} SC
                       </Typography>
                     </Box>
-                  ))}
+                  )})}
                 </Box>
               ) : (
                 <Box sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', height: 400, color: 'text.secondary' }}>

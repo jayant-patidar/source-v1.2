@@ -166,7 +166,7 @@ const Navbar = () => {
       </Container>
 
       {/* Mobile Drawer */}
-      <Drawer anchor="left" open={mobileOpen} onClose={handleMobileToggle}>
+      <Drawer anchor="left" open={mobileOpen} onClose={handleMobileToggle} sx={{ display: { xs: 'block', md: 'none' } }}>
         <Box sx={{ width: 250 }} role="presentation">
           <Box sx={{ p: 2, display: 'flex', alignItems: 'center', bgcolor: '#000' }}>
             <img src="/logo1.png" alt="Source" style={{ height: 30, objectFit: 'contain' }} />
