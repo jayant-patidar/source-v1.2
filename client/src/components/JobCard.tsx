@@ -86,126 +86,133 @@ const JobCard = ({ job }: { job: any }) => {
 
   return (
     <>
-      <Card sx={{ mb: 3, borderRadius: 3, boxShadow: 'none', border: '1px solid #e0e0e0', transition: '0.2s', '&:hover': { borderColor: '#000' } }}>
-        <CardContent sx={{ p: 3 }}>
+      <Card sx={{ 
+        mb: 4, 
+        borderRadius: 4, 
+        bgcolor: 'white',
+        boxShadow: '0 12px 40px rgba(0,0,0,0.06)', 
+        border: '1px solid #f1f5f9', 
+        transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)', 
+        overflow: 'visible',
+        '&:hover': { 
+          transform: 'translateY(-6px)',
+          boxShadow: '0 24px 60px rgba(0,0,0,0.12)',
+          borderColor: 'rgba(99, 102, 241, 0.2)'
+        } 
+      }}>
+        <CardContent sx={{ p: { xs: 3, sm: 4 } }}>
+          
           {/* Header: User Info & Actions */}
-          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 2 }}>
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 3 }}>
             <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
               <Link to={`/profile/${job.seekerId?._id}`} style={{ textDecoration: 'none', color: 'inherit' }}>
-                <Avatar 
-                  src={job.seekerId?.avatar} 
-                  alt={job.seekerId?.name}
-                  sx={{ width: 40, height: 40, border: '1px solid #eee' }}
-                >
-                  {job.seekerId?.name?.charAt(0).toUpperCase()}
-                </Avatar>
+                <Box sx={{ 
+                  p: '3px', 
+                  borderRadius: '50%', 
+                  background: 'linear-gradient(135deg, #6366f1 0%, #a855f7 100%)',
+                  boxShadow: '0 4px 10px rgba(99,102,241,0.2)'
+                }}>
+                  <Avatar 
+                    src={job.seekerId?.avatar} 
+                    alt={job.seekerId?.name}
+                    sx={{ width: 44, height: 44, border: '2px solid white', bgcolor: '#0f172a', fontWeight: 'bold' }}
+                  >
+                    {job.seekerId?.name?.charAt(0).toUpperCase()}
+                  </Avatar>
+                </Box>
               </Link>
               <Box>
                 <Link to={`/profile/${job.seekerId?._id}`} style={{ textDecoration: 'none', color: 'inherit' }}>
-                  <Typography variant="subtitle2" fontWeight="bold" sx={{ lineHeight: 1.2, '&:hover': { textDecoration: 'underline' } }}>
+                  <Typography variant="subtitle1" fontWeight="800" sx={{ lineHeight: 1.2, color: '#0f172a', '&:hover': { color: '#4f46e5' } }}>
                     {job.seekerId?.name || 'Unknown User'}
                   </Typography>
                 </Link>
-                <Typography variant="caption" color="text.secondary">
-                  {job.createdAt ? format(new Date(job.createdAt), 'MMM d, h:mm a') : 'Recently'} • {job.seekerId?.seekerRating || 'N/A'} ★
+                <Typography variant="caption" sx={{ color: '#64748b', fontWeight: 500, display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                  {job.createdAt ? format(new Date(job.createdAt), 'MMM d, h:mm a') : 'Recently'} 
+                  <span style={{ color: '#cbd5e1' }}>•</span> 
+                  <span style={{ color: '#eab308', display: 'flex', alignItems: 'center' }}>
+                    {job.seekerId?.seekerRating || 'N/A'} <span style={{ fontSize: '12px', marginLeft: '2px' }}>★</span>
+                  </span>
                 </Typography>
               </Box>
             </Box>
-            <IconButton size="small" onClick={handleMenuClick}>
-              <MoreVertIcon />
-            </IconButton>
-            <Menu
-              anchorEl={anchorEl}
-              open={menuOpen}
-              onClose={handleMenuClose}
-              transformOrigin={{ horizontal: 'right', vertical: 'top' }}
-              anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
-            >
-              <MenuItem onClick={() => handleMenuAction('report')}>
-                <ListItemIcon>
-                  <ReportProblemIcon fontSize="small" />
-                </ListItemIcon>
-                <ListItemText>Report Job</ListItemText>
-              </MenuItem>
-              <MenuItem onClick={() => handleMenuAction('not_interested')}>
-                <ListItemIcon>
-                  <NotInterestedIcon fontSize="small" />
-                </ListItemIcon>
-                <ListItemText>Not Interested</ListItemText>
-              </MenuItem>
-            </Menu>
+            
+            <Box>
+              <IconButton size="small" onClick={handleMenuClick} sx={{ color: '#94a3b8', '&:hover': { bgcolor: '#f1f5f9', color: '#0f172a' } }}>
+                <MoreVertIcon />
+              </IconButton>
+              <Menu
+                anchorEl={anchorEl}
+                open={menuOpen}
+                onClose={handleMenuClose}
+                transformOrigin={{ horizontal: 'right', vertical: 'top' }}
+                anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
+                PaperProps={{
+                  sx: { borderRadius: 3, boxShadow: '0 10px 25px rgba(0,0,0,0.1)', mt: 1, minWidth: 160 }
+                }}
+              >
+                <MenuItem onClick={() => handleMenuAction('report')} sx={{ color: '#ef4444' }}>
+                  <ListItemIcon><ReportProblemIcon fontSize="small" sx={{ color: 'inherit' }} /></ListItemIcon>
+                  <ListItemText primaryTypographyProps={{ fontWeight: 600 }}>Report Job</ListItemText>
+                </MenuItem>
+                <MenuItem onClick={() => handleMenuAction('not_interested')} sx={{ color: '#64748b' }}>
+                  <ListItemIcon><NotInterestedIcon fontSize="small" sx={{ color: 'inherit' }} /></ListItemIcon>
+                  <ListItemText primaryTypographyProps={{ fontWeight: 600 }}>Not Interested</ListItemText>
+                </MenuItem>
+              </Menu>
+            </Box>
           </Box>
 
           {/* Job Title & Pay Row */}
-          <Box sx={{ mb: 2, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+          <Box sx={{ mb: 2, display: 'flex', flexDirection: { xs: 'column', sm: 'row' }, justifyContent: 'space-between', alignItems: { xs: 'flex-start', sm: 'center' }, gap: 2 }}>
             <Link to={`/jobs/${job._id}`} style={{ textDecoration: 'none', color: 'inherit', flex: 1 }}>
-              <Typography variant="h6" fontWeight="900" sx={{ fontSize: '1.25rem', lineHeight: 1.2, '&:hover': { textDecoration: 'underline' } }}>
+              <Typography variant="h5" fontWeight="900" sx={{ letterSpacing: '-0.5px', color: '#0f172a', lineHeight: 1.3, '&:hover': { textDecoration: 'underline' } }}>
                 {job.title}
               </Typography>
             </Link>
             
-            <Box sx={{ display: 'flex', gap: 1, alignItems: 'center', ml: 2 }}>
+            <Box sx={{ display: 'flex', gap: 1.5, alignItems: 'center', flexWrap: 'wrap' }}>
               {job.currentPay && job.currentPay !== job.originalPay ? (
-                <>
-                  <Typography variant="caption" sx={{ textDecoration: 'line-through', color: 'text.secondary', fontWeight: 'bold' }}>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, bgcolor: '#f8fafc', p: 0.5, pr: 1.5, borderRadius: 3, border: '1px solid #e2e8f0' }}>
+                  <Typography variant="body1" sx={{ textDecoration: 'line-through', color: '#94a3b8', fontWeight: 700, ml: 1 }}>
                     ${job.originalPay}
                   </Typography>
                   <Chip 
                     label={`$${job.currentPay}`} 
-                    size="small"
-                    sx={{ 
-                      bgcolor: '#2e7d32', // Green for updated pay
-                      color: 'white', 
-                      fontWeight: 'bold', 
-                      borderRadius: '8px',
-                    }} 
+                    sx={{ bgcolor: '#10b981', color: 'white', fontWeight: 900, borderRadius: '8px', px: 1, py: 2.5, fontSize: '1.2rem' }} 
                   />
-                </>
+                </Box>
               ) : (
                 <Chip 
                   label={`$${job.originalPay}`} 
-                  size="small"
-                  sx={{ 
-                    bgcolor: '#2e7d32', 
-                    color: 'white', 
-                    fontWeight: 'bold', 
-                    borderRadius: '8px',
-                  }} 
+                  sx={{ bgcolor: 'rgba(16, 185, 129, 0.1)', color: '#059669', border: '1px solid rgba(16, 185, 129, 0.2)', fontWeight: 900, borderRadius: '8px', px: 1, py: 2.5, fontSize: '1.2rem' }} 
                 />
               )}
+              
               <Chip 
-                label={job.type === 'hourly' ? 'Hourly' : 'One-Time'} 
+                label={job.type === 'hourly' ? 'Hourly' : 'Fixed'} 
                 size="small"
-                sx={{ 
-                  bgcolor: '#f5f5f5', 
-                  color: '#616161', 
-                  fontWeight: 'bold', 
-                  borderRadius: '8px',
-                }} 
+                sx={{ bgcolor: '#f1f5f9', color: '#475569', fontWeight: 700, borderRadius: '8px' }} 
               />
+              
               {job.isNegotiable === false && (
                 <Chip 
-                  label="Non-Negotiable" 
+                  label="Fixed Price" 
                   size="small"
-                  sx={{ 
-                    bgcolor: '#ffebee', 
-                    color: '#c62828', 
-                    fontWeight: 'bold', 
-                    borderRadius: '8px',
-                  }} 
+                  sx={{ bgcolor: 'rgba(239, 68, 68, 0.1)', color: '#ef4444', fontWeight: 700, borderRadius: '8px' }} 
                 />
               )}
             </Box>
           </Box>
 
           {/* Description */}
-          <Typography variant="body2" color="text.secondary" sx={{ mb: 3, lineHeight: 1.6, display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+          <Typography variant="body1" sx={{ color: '#475569', mb: 3, lineHeight: 1.7, display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
             {job.description}
           </Typography>
 
           {job.requirements && job.requirements.length > 0 && (
-            <Box sx={{ mb: 2, display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
-                <Typography variant="caption" color="text.secondary" sx={{ mr: 1, fontWeight: 'bold' }}>
+            <Box sx={{ mb: 3, display: 'flex', flexWrap: 'wrap', gap: 1, alignItems: 'center' }}>
+                <Typography variant="caption" sx={{ color: '#94a3b8', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.5px' }}>
                     Requires:
                 </Typography>
                 {job.requirements.slice(0, 3).map((req: string, index: number) => (
@@ -213,12 +220,17 @@ const JobCard = ({ job }: { job: any }) => {
                         key={index}
                         label={req}
                         size="small"
-                        variant="outlined"
-                        sx={{ height: 20, fontSize: '0.7rem' }}
+                        sx={{ 
+                          bgcolor: 'rgba(99, 102, 241, 0.08)', 
+                          color: '#4f46e5', 
+                          fontWeight: 600,
+                          borderRadius: 2,
+                          height: 24
+                        }}
                     />
                 ))}
                 {job.requirements.length > 3 && (
-                    <Typography variant="caption" color="text.secondary">
+                    <Typography variant="caption" fontWeight="bold" color="#94a3b8" sx={{ ml: 0.5 }}>
                         +{job.requirements.length - 3} more
                     </Typography>
                 )}
@@ -226,73 +238,124 @@ const JobCard = ({ job }: { job: any }) => {
           )}
 
           {/* Details: Date, Location */}
-          <Box sx={{ display: 'flex', gap: 3, mb: 3, color: '#757575' }}>
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-              <AccessTimeIcon sx={{ fontSize: 16 }} />
-              <Typography variant="caption" fontWeight="500">
-                  {job.jobDate ? format(new Date(job.jobDate), 'MMM d') : 'Flexible'}
+          <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2, mb: 3, p: 2, bgcolor: '#f8fafc', borderRadius: 3, border: '1px solid #f1f5f9' }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+              <Box sx={{ p: 0.5, borderRadius: 1.5, bgcolor: 'rgba(14, 165, 233, 0.1)', color: '#0ea5e9', display: 'flex' }}>
+                <AccessTimeIcon sx={{ fontSize: 18 }} />
+              </Box>
+              <Typography variant="body2" fontWeight="600" color="#334155">
+                  {job.jobDate ? format(new Date(job.jobDate), 'MMM d, yyyy') : 'Flexible Timing'}
               </Typography>
             </Box>
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-              <LocationOnIcon sx={{ fontSize: 16 }} />
-              <Typography variant="caption" fontWeight="500">
-                  {job.location?.general || 'Remote'}
+            <Divider orientation="vertical" flexItem sx={{ borderColor: '#e2e8f0', display: { xs: 'none', sm: 'block' } }} />
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+              <Box sx={{ p: 0.5, borderRadius: 1.5, bgcolor: 'rgba(245, 158, 11, 0.1)', color: '#f59e0b', display: 'flex' }}>
+                <LocationOnIcon sx={{ fontSize: 18 }} />
+              </Box>
+              <Typography variant="body2" fontWeight="600" color="#334155">
+                  {job.location?.general || 'Remote Work'}
               </Typography>
             </Box>
           </Box>
 
-          <Divider sx={{ mb: 2 }} />
-
           {!isPoster && (
-            <>
-              {/* Actions Icons Row */}
-              <Box sx={{ display: 'flex', justifyContent: 'space-around', mb: 2 }}>
-                  <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', cursor: 'pointer', opacity: 0.7, '&:hover': { opacity: 1 } }} onClick={() => requireAuth(() => { 
-                    if (job.isNegotiable === false) {
-                      showToast('This job is non-negotiable. You can only express interest at the listed price.', 'warning');
-                      return;
-                    }
-                    setOfferMode('negotiate'); setOfferAmount(''); setOpen(true); 
-                  })}>
-                    <LoopIcon sx={{ fontSize: 24, color: 'black' }} />
-                    <Typography variant="caption" sx={{ fontSize: '0.7rem', mt: 0.5 }}>Negotiate</Typography>
-                  </Box>
-                  <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', cursor: 'pointer', opacity: 0.7, '&:hover': { opacity: 1 } }} onClick={() => requireAuth(() => showToast('Requesting exact location...', 'info'))}>
-                    <ShareLocationIcon sx={{ fontSize: 24, color: 'black' }} />
-                    <Typography variant="caption" sx={{ fontSize: '0.7rem', mt: 0.5 }}>Locate</Typography>
-                  </Box>
-                  <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', cursor: 'pointer', opacity: 0.7, '&:hover': { opacity: 1 } }} onClick={() => requireAuth(() => showToast('Share functionality coming soon!', 'info'))}>
-                    <SendIcon sx={{ fontSize: 24, color: 'black' }} />
-                    <Typography variant="caption" sx={{ fontSize: '0.7rem', mt: 0.5 }}>Share</Typography>
-                  </Box>
+            <Box sx={{ mt: 1 }}>
+              <Divider sx={{ mb: 3, borderStyle: 'dashed', borderColor: '#e2e8f0' }} />
+              
+              <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
+                {/* Actions Icons Row */}
+                <Box sx={{ display: 'flex', gap: 1, flex: 1 }}>
+                  
                   <Box 
-                    sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', cursor: 'pointer', opacity: isSaved ? 1 : 0.7, '&:hover': { opacity: 1 } }} 
+                    sx={{ 
+                      display: 'flex', alignItems: 'center', gap: 1, p: 1, pr: 2,
+                      borderRadius: 12, cursor: 'pointer', transition: 'all 0.2s',
+                      color: '#64748b', '&:hover': { bgcolor: 'rgba(99, 102, 241, 0.1)', color: '#4f46e5' }
+                    }} 
+                    onClick={() => requireAuth(() => { 
+                      if (job.isNegotiable === false) {
+                        showToast('This job is non-negotiable. You can only express interest at the listed price.', 'warning');
+                        return;
+                      }
+                      setOfferMode('negotiate'); setOfferAmount(''); setOpen(true); 
+                    })}
+                  >
+                    <Box sx={{ bgcolor: 'white', p: 0.5, borderRadius: '50%', display: 'flex', boxShadow: '0 2px 4px rgba(0,0,0,0.05)' }}>
+                      <LoopIcon sx={{ fontSize: 18, color: 'inherit' }} />
+                    </Box>
+                    <Typography variant="caption" fontWeight="700">Negotiate</Typography>
+                  </Box>
+
+                  <Box 
+                    sx={{ 
+                      display: 'flex', alignItems: 'center', gap: 1, p: 1, pr: 2,
+                      borderRadius: 12, cursor: 'pointer', transition: 'all 0.2s',
+                      color: '#64748b', '&:hover': { bgcolor: 'rgba(16, 185, 129, 0.1)', color: '#059669' }
+                    }} 
+                    onClick={() => requireAuth(() => showToast('Requesting exact location...', 'info'))}
+                  >
+                    <Box sx={{ bgcolor: 'white', p: 0.5, borderRadius: '50%', display: 'flex', boxShadow: '0 2px 4px rgba(0,0,0,0.05)' }}>
+                      <ShareLocationIcon sx={{ fontSize: 18, color: 'inherit' }} />
+                    </Box>
+                    <Typography variant="caption" fontWeight="700">Locate</Typography>
+                  </Box>
+
+                  <Box 
+                    sx={{ 
+                      display: 'flex', alignItems: 'center', gap: 1, p: 1, pr: 2,
+                      borderRadius: 12, cursor: 'pointer', transition: 'all 0.2s',
+                      color: '#64748b', '&:hover': { bgcolor: 'rgba(236, 72, 153, 0.1)', color: '#db2777' }
+                    }} 
+                    onClick={() => requireAuth(() => showToast('Share functionality coming soon!', 'info'))}
+                  >
+                    <Box sx={{ bgcolor: 'white', p: 0.5, borderRadius: '50%', display: 'flex', boxShadow: '0 2px 4px rgba(0,0,0,0.05)' }}>
+                      <SendIcon sx={{ fontSize: 18, color: 'inherit' }} />
+                    </Box>
+                    <Typography variant="caption" fontWeight="700">Share</Typography>
+                  </Box>
+
+                  <Box 
+                    sx={{ 
+                      display: 'flex', alignItems: 'center', gap: 1, p: 1, pr: 2,
+                      borderRadius: 12, cursor: 'pointer', transition: 'all 0.2s',
+                      color: isSaved ? '#eab308' : '#64748b', '&:hover': { bgcolor: 'rgba(234, 179, 8, 0.1)', color: '#eab308' }
+                    }} 
                     onClick={() => requireAuth(handleSave)}
                   >
-                    {isSaved ? <BookmarkIcon sx={{ fontSize: 24, color: 'black' }} /> : <BookmarkBorderIcon sx={{ fontSize: 24, color: 'black' }} />}
-                    <Typography variant="caption" sx={{ fontSize: '0.7rem', mt: 0.5 }}>{isSaved ? 'Saved' : 'Save'}</Typography>
+                    <Box sx={{ bgcolor: 'white', p: 0.5, borderRadius: '50%', display: 'flex', boxShadow: '0 2px 4px rgba(0,0,0,0.05)' }}>
+                      {isSaved ? <BookmarkIcon sx={{ fontSize: 18, color: 'inherit' }} /> : <BookmarkBorderIcon sx={{ fontSize: 18, color: 'inherit' }} />}
+                    </Box>
+                    <Typography variant="caption" fontWeight="700">{isSaved ? 'Saved' : 'Save'}</Typography>
                   </Box>
-              </Box>
 
-              {/* Interested Button */}
-              <Button 
-                  fullWidth
-                  variant="contained" 
-                  onClick={() => requireAuth(() => { setOfferMode('interested'); setOfferAmount(job.originalPay); setOpen(true); })}
-                  sx={{ 
-                    bgcolor: '#000000', 
-                    color: 'white', 
-                    fontWeight: 'bold',
-                    py: 1.2,
-                    borderRadius: 2,
-                    textTransform: 'none',
-                    fontSize: '1rem',
-                    '&:hover': { bgcolor: '#333' }
-                  }}
-                >
-                  INTERESTED
-              </Button>
-            </>
+                </Box>
+
+                {/* Interested Button */}
+                <Button 
+                    variant="contained" 
+                    onClick={() => requireAuth(() => { setOfferMode('interested'); setOfferAmount(job.originalPay); setOpen(true); })}
+                    sx={{ 
+                      background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)',
+                      color: 'white', 
+                      fontWeight: '800',
+                      px: { xs: 3, sm: 5 },
+                      py: 1.2,
+                      borderRadius: 3,
+                      textTransform: 'none',
+                      fontSize: '1rem',
+                      boxShadow: '0 8px 20px rgba(15,23,42,0.2)',
+                      transition: 'all 0.3s',
+                      '&:hover': { 
+                        transform: 'translateY(-2px)',
+                        boxShadow: '0 12px 25px rgba(15,23,42,0.3)',
+                        background: 'linear-gradient(135deg, #1e293b 0%, #334155 100%)'
+                      }
+                    }}
+                  >
+                    I'm Interested
+                </Button>
+              </Box>
+            </Box>
           )}
         </CardContent>
       </Card>

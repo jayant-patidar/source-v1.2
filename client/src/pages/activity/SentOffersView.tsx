@@ -17,6 +17,7 @@ interface Negotiation {
     title: string;
     status: string;
     originalPay: number;
+    isNegotiable?: boolean;
   };
   seeker: {
     _id: string;
