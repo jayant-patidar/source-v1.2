@@ -3,7 +3,6 @@ import { Box, Typography, Paper, Chip, Button, CircularProgress, Dialog, DialogT
 import { Link } from 'react-router-dom';
 import { jobService } from '../../services/job.service';
 import { format, formatDistanceToNow } from 'date-fns';
-import { formatLocalDate } from '../../utils/dateUtils';
 import { useToastStore } from '../../store/toastStore';
 import ReplayIcon from '@mui/icons-material/Replay';
 import ArchiveIcon from '@mui/icons-material/Archive';
