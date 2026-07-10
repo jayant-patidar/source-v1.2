@@ -178,3 +178,14 @@ To add a new feature component:
 4. **Validate in Controller** - Check request data before passing to Service
 5. **Use TypeScript interfaces** - Define types for all data structures
 6. **Export singleton instances** - Controllers and Services should be singletons
+
+---
+
+## Frontend Context (Client)
+
+While this document outlines the backend architecture, note that the full-stack repository includes a `client/` directory with a corresponding modern architecture:
+- **Framework**: React with Vite (`/client/src/`)
+- **Routing**: React Router DOM (`/client/src/App.tsx`, `/client/src/pages/`)
+- **State Management**: Zustand (`/client/src/store/`)
+- **UI Components**: Material UI (MUI v7) components isolated in `/client/src/components/`
+- **Styling**: Extensive use of CSS-in-JS via MUI's `sx` prop, allowing for premium gradients, glassmorphism, and dynamic visual layouts across all views.

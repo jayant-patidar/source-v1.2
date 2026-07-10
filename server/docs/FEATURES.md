@@ -561,3 +561,13 @@ All errors are caught and processed by global error handler.
 - `401` - Unauthorized
 - `404` - Not Found
 - `500` - Server Error
+
+---
+
+## Frontend Integration & UI Features
+
+While this document focuses on backend schema and APIs, note that the frontend implementation (React/MUI) includes advanced UI capabilities linked to these systems:
+- **Premium Onboarding:** Split-screen gradient login and registration flows capturing "For the People, By the People" vision.
+- **Unified Negotiation Modal:** "Make an Offer" modal used consistently across job details and feed cards.
+- **URL-Synced Search:** Search queries, category filters, and location are fully synchronized with the URL for shareability.
+- **Accordion Activity Dashboards:** Elegant folding lists for all user activity (active, completed, upcoming, archived).

@@ -15,7 +15,9 @@ UNIVERSAL USER JOURNEY (Everyone is both Seeker & Provider)
 (This replaces separate onboarding for seeker/provider)
 
 A. Onboarding & Account Setup (COMMON)
+  Premium Split-Screen Registration Flow [COMPLETED]
   Register Account (Email/Password) [COMPLETED]
+  Premium Split-Screen Login Flow [COMPLETED]
   Login (JWT Authentication) [COMPLETED]
   Email/Phone Verification [PLANNED]
   Complete Basic Profile [COMPLETED]
@@ -37,11 +39,11 @@ B. Explore & Browse Posts
       - Mixture of service listings & job requests posted by users.
       "Recommended for You" Feed [COMPLETED]
       "Recent Jobs" Feed [COMPLETED]
-  Filters for Discovery [IN PROGRESS]
+  Filters for Discovery (URL-Synced) [COMPLETED]
       Category [COMPLETED]
       Search (Title/Description) [COMPLETED]
+      Location / Distance [COMPLETED]
       Price range [COMPLETED]
-      Distance [COMPLETED]
       Ratings [PLANNED]
       Availability [PLANNED]
   View Post Details [COMPLETED]
@@ -50,7 +52,6 @@ B. Explore & Browse Posts
       Location (General vs Exact privacy) [COMPLETED]
   Save a Post (Functional) [COMPLETED]
   Share a Post [PLANNED]
-  Report a Post [PLANNED]
       - Wrong info, fraud, inappropriate, etc.
 
 C. Create & Manage Job Request
@@ -73,17 +74,16 @@ C. Create & Manage Job Request
 D. Interactions With Providers
   Receive Interests from Providers (View Offers on Job Details) [COMPLETED]
   View Providers Who Showed Interest [COMPLETED]
-  Negotiate with Providers [IN PROGRESS]
+  Negotiate with Providers (Unified Make an Offer Modal) [COMPLETED]
       Receive Offer Amount & Message [COMPLETED]
       Accept Offer [COMPLETED]
       Counter-offer [COMPLETED]
       Chat History [PLANNED]
   Choose & Confirm a Provider (Accept Offer) [COMPLETED]
   Cancel Engagement Before Service [COMPLETED]
-  Track Provider (live/approx) Before Arrival [IN PROGRESS]
 
 E. Payments & Service Management
-  Select Payment Option (Stripe Integration) [mock implemented]
+  Select Payment Option [mock implemented]
   Pay Deposit or Full Payment (Payment Page) [PLANNED]
   Receive Invoice (Contract View) [COMPLETED]
 
@@ -143,7 +143,7 @@ M. During the Service
 N. Payments & Earnings
   Receive Payment After Completion [COMPLETED]
   Wallet Balance Summary [PLANNED]
-  Withdraw Earnings to Bank/UPI [PLANNED]
+  Withdraw Earnings to Bank [PLANNED]
   View Earnings History [PLANNED]
   View Work History [COMPLETED]
 
@@ -180,6 +180,20 @@ General Features
       - Address verified
   In-app Support / Help Center [PLANNED]
 
+AI & Smart Assistance
+  AI Chatbot Widget for General Navigation & Assistance [COMPLETED]
+  AI Contextual Task Posting Assistance [PLANNED]
+  AI Dispute Arbitration [PLANNED]
+
+Trust Score & Gamification
+  Dynamic Trust Score System [COMPLETED]
+  Source Academy & Upskilling Badges [PLANNED]
+  Elite Provider Ranks (Zero-fee tiers) [PLANNED]
+
+Wallet & Ecosystem Economy
+  In-App Wallet System [COMPLETED]
+  Source Coin  Ecosystem [COMPLETED]
+
 --------------------------------------------------------------------------------
 
 SECTION 4 — ADMIN/PLATFORM TASKS
@@ -188,4 +202,5 @@ SECTION 4 — ADMIN/PLATFORM TASKS
   User Ban/Restriction Tools [PLANNED]
   Dispute Resolution Dashboard [PLANNED]
   Payment & Transaction Monitoring [PLANNED]
-  Analytics Dashboard [PLANNED]
+  Platform & User Analytics Dashboard [PLANNED]
+  Source Coin Ecosystem Management [PLANNED]
