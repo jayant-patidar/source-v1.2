@@ -16,6 +16,7 @@ import ActivityPage from './pages/ActivityPage';
 import Wallet from './pages/Wallet';
 import SearchResults from './pages/SearchResults';
 import GlobalToast from './components/GlobalToast';
+import ChatWidget from './components/ChatWidget';
 import { useAuthStore } from './store/authStore';
 import { Box, CircularProgress } from '@mui/material';
 
@@ -37,6 +38,7 @@ function App() {
   return (
     <Layout>
       <GlobalToast />
+      <ChatWidget />
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/login" element={!user ? <Login /> : <Navigate to="/" />} />

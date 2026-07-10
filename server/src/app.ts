@@ -14,6 +14,7 @@ import negotiationRoutes from './components/negotiation/negotiation.routes';
 import reviewRoutes from './components/review/review.routes';
 import notificationRoutes from './components/notification/notification.routes';
 import gigRoutes from './components/gig/gig.routes';
+import chatRoutes from './components/chat/chat.routes';
 
 dotenv.config();
 
@@ -57,6 +58,7 @@ app.use('/api/negotiations', negotiationRoutes);
 app.use('/api/reviews', reviewRoutes);
 app.use('/api/notifications', notificationRoutes);
 app.use('/api/gigs', gigRoutes);
+app.use('/api/chat', chatRoutes);
 
 // Error Handler
 app.use(errorHandler);
