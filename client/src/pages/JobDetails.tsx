@@ -672,7 +672,8 @@ const JobDetails = () => {
                         fontWeight: 800,
                         px: 4,
                         borderRadius: 2,
-                        '&:hover': { transform: 'translateY(-2px)', boxShadow: '0 6px 20px rgba(0,0,0,0.3)' } 
+                        '&:hover': { transform: 'translateY(-2px)', boxShadow: '0 6px 20px rgba(0,0,0,0.3)' },
+                        '&.Mui-disabled': { background: '#e2e8f0', color: '#94a3b8' }
                     }}
                 >
                     {offerMode === 'interested' ? 'Send Interest' : 'Send Offer'}
@@ -722,7 +723,8 @@ const JobDetails = () => {
                         fontWeight: 800,
                         px: 4,
                         borderRadius: 2,
-                        '&:hover': { transform: 'translateY(-2px)', boxShadow: '0 6px 20px rgba(99, 102, 241, 0.3)' } 
+                        '&:hover': { transform: 'translateY(-2px)', boxShadow: '0 6px 20px rgba(99, 102, 241, 0.3)' },
+                        '&.Mui-disabled': { background: '#e2e8f0', color: '#94a3b8' }
                     }}
                 >
                     Send Counter

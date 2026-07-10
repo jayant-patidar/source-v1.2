@@ -28,11 +28,11 @@ const SearchResults = () => {
   const [activeTab, setActiveTab] = useState(0); // 0=All, 1=Jobs, 2=Gigs
 
   // Filter state
-  const [category, setCategory] = useState('All');
+  const [category, setCategory] = useState(searchParams.get('category') || 'All');
   const [minPay, setMinPay] = useState('');
   const [maxPay, setMaxPay] = useState('');
   const [jobType, setJobType] = useState('all');
-  const [location, setLocation] = useState('');
+  const [location, setLocation] = useState(searchParams.get('location') || '');
   const [datePosted, setDatePosted] = useState('all');
   const [sortBy, setSortBy] = useState('newest');
 
@@ -102,15 +102,33 @@ const SearchResults = () => {
     return () => clearTimeout(timer);
   }, [fetchResults]);
 
-  // Sync search input when URL changes
+  // Sync search input and filters when URL changes (e.g. from chat widget)
+  const urlQ = searchParams.get('q');
+  const urlCategory = searchParams.get('category');
+  const urlLocation = searchParams.get('location');
+
   useEffect(() => {
-    setSearchInput(searchParams.get('q') || '');
-  }, [searchParams]);
+    setSearchInput(urlQ || '');
+  }, [urlQ]);
+
+  useEffect(() => {
+    if (urlCategory) {
+      setCategory(urlCategory);
+    }
+  }, [urlCategory]);
+
+  useEffect(() => {
+    if (urlLocation) {
+      setLocation(urlLocation);
+    }
+  }, [urlLocation]);
 
   const handleSearchSubmit = () => {
     const trimmed = searchInput.trim();
     if (trimmed) {
       setSearchParams({ q: trimmed });
+    } else {
+      setSearchParams({});
     }
   };
 

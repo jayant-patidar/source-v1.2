@@ -198,7 +198,7 @@ const JobCard = ({ job }: { job: any }) => {
               
               {job.isNegotiable === false && (
                 <Chip 
-                  label="Fixed Price" 
+                  label="Fixed Pay" 
                   size="small"
                   sx={{ bgcolor: 'rgba(239, 68, 68, 0.1)', color: '#ef4444', fontWeight: 700, borderRadius: '8px' }} 
                 />
@@ -265,7 +265,7 @@ const JobCard = ({ job }: { job: any }) => {
               
               <Box sx={{ display: 'flex', flexDirection: { xs: 'column', sm: 'row' }, gap: 2, alignItems: { xs: 'stretch', sm: 'center' } }}>
                 {/* Actions Icons Row */}
-                <Box sx={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', gap: { xs: 0.5, sm: 1 }, flex: 1 }}>
+                <Box sx={{ display: 'flex', flexWrap: 'nowrap', justifyContent: 'flex-start', gap: { xs: 0.5, sm: 1 }, flex: 1 }}>
                   
                   <Box 
                     sx={{ 
@@ -354,7 +354,7 @@ const JobCard = ({ job }: { job: any }) => {
                       }
                     }}
                   >
-                    I'm Interested
+                   Interested
                 </Button>
               </Box>
             </Box>
@@ -364,12 +364,12 @@ const JobCard = ({ job }: { job: any }) => {
 
       {/* Interested Modal */}
       {/* Offer Modal */}
-      <Dialog open={open} onClose={handleClose} maxWidth="sm" fullWidth>
-        <DialogTitle sx={{ fontWeight: 'bold' }}>
+      <Dialog open={open} onClose={handleClose} maxWidth="sm" fullWidth PaperProps={{ sx: { borderRadius: 4, p: 1 } }}>
+        <DialogTitle sx={{ fontWeight: '900', fontSize: '1.5rem', letterSpacing: '-0.5px' }}>
             {offerMode === 'interested' ? 'Express Interest' : 'Make an Offer'}
         </DialogTitle>
         <DialogContent>
-          <Typography variant="body2" color="text.secondary" gutterBottom>
+          <Typography variant="body1" sx={{ color: '#64748b', mb: 3 }}>
             {offerMode === 'interested' 
                 ? `Let ${job.seekerId?.name || 'the poster'} know you're interested in this job at the listed pay.` 
                 : `Send a proposal to ${job.seekerId?.name || 'the poster'} with your requested pay.`}
@@ -385,12 +385,15 @@ const JobCard = ({ job }: { job: any }) => {
                 variant="outlined"
                 value={offerAmount}
                 onChange={(e) => setOfferAmount(e.target.value)}
-                sx={{ mb: 2, mt: 2 }}
+                sx={{ mb: 3 }}
               />
           ) : (
-              <Box sx={{ my: 2, p: 2, bgcolor: '#f5f5f5', borderRadius: 1 }}>
-                  <Typography variant="subtitle2" fontWeight="bold">
-                      Proposing to work for: <span style={{ color: '#2e7d32' }}>${job.originalPay}</span>
+              <Box sx={{ mb: 3, p: 2.5, bgcolor: 'rgba(16, 185, 129, 0.1)', borderRadius: 3, display: 'flex', alignItems: 'center', gap: 2 }}>
+                  <Typography variant="subtitle1" fontWeight="800" sx={{ color: '#0f172a' }}>
+                      Proposing to work for:
+                  </Typography>
+                  <Typography variant="h5" fontWeight="900" sx={{ color: '#10b981' }}>
+                      ${job.originalPay}
                   </Typography>
               </Box>
           )}
@@ -408,12 +411,20 @@ const JobCard = ({ job }: { job: any }) => {
           />
         </DialogContent>
         <DialogActions sx={{ px: 3, pb: 3 }}>
-          <Button onClick={handleClose} sx={{ color: 'text.secondary' }}>Cancel</Button>
+          <Button onClick={handleClose} sx={{ color: '#64748b', fontWeight: 800 }}>Cancel</Button>
           <Button 
             onClick={handleSend} 
             variant="contained" 
             disabled={!offerAmount}
-            sx={{ bgcolor: 'black', color: 'white', '&:hover': { bgcolor: '#333' } }}
+            sx={{ 
+                background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)', 
+                color: 'white', 
+                fontWeight: 800,
+                px: 4,
+                borderRadius: 2,
+                '&:hover': { transform: 'translateY(-2px)', boxShadow: '0 6px 20px rgba(0,0,0,0.3)' },
+                '&.Mui-disabled': { background: '#e2e8f0', color: '#94a3b8' }
+            }}
           >
             {offerMode === 'interested' ? 'Send Interest' : 'Send Offer'}
           </Button>

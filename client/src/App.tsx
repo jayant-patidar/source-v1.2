@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { Routes, Route, Navigate } from 'react-router-dom';
+import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import Layout from './components/Layout';
 import Login from './pages/Login';
 import Register from './pages/Register';
@@ -22,6 +22,9 @@ import { Box, CircularProgress } from '@mui/material';
 
 function App() {
   const { checkAuth, isCheckingAuth, user } = useAuthStore();
+  const location = useLocation();
+
+  const hideChatWidget = location.pathname === '/login' || location.pathname === '/register';
 
   useEffect(() => {
     checkAuth();
@@ -38,7 +41,7 @@ function App() {
   return (
     <Layout>
       <GlobalToast />
-      <ChatWidget />
+      {!hideChatWidget && <ChatWidget />}
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/login" element={!user ? <Login /> : <Navigate to="/" />} />
