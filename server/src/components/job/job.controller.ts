@@ -10,6 +10,13 @@ class JobController {
 
   async createJob(req: any, res: Response, next: NextFunction) {
     try {
+      const jobDT = new Date(`${req.body.jobDate}T${req.body.jobTime}`);
+      const expDT = new Date(req.body.expirationDate);
+      
+      if (expDT > jobDT) {
+        return res.status(400).json({ error: 'Expiration date and time must be on or before the job date and time.' });
+      }
+
       const jobData = {
         ...req.body,
         seekerId: req.user._id, // Authenticated user is the seeker (poster)
@@ -319,6 +326,16 @@ class JobController {
       const { expirationDate, jobDate, jobTime } = req.body;
       if (!expirationDate || new Date(expirationDate) <= new Date()) {
         return res.status(400).json({ error: 'Expiration date must be in the future' });
+      }
+
+      const finalJobDate = jobDate || job.jobDate;
+      const finalJobTime = jobTime || job.jobTime;
+      const jobDateStr = typeof finalJobDate === 'string' ? finalJobDate.split('T')[0] : new Date(finalJobDate).toISOString().split('T')[0];
+      const jobDT = new Date(`${jobDateStr}T${finalJobTime}`);
+      const expDT = new Date(expirationDate);
+      
+      if (expDT > jobDT) {
+        return res.status(400).json({ error: 'Expiration date and time must be on or before the job date and time. Please update the Job Date/Time as well.' });
       }
 
       const updatePayload: any = {

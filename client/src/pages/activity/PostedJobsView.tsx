@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { 
     Box, 
     Typography, 
-    Paper, 
+
     Chip, 
     Button, 
     CircularProgress, 
@@ -10,9 +10,14 @@ import {
     Menu,
     MenuItem,
     ListItemIcon,
-    ListItemText
+    ListItemText,
+    Accordion,
+    AccordionSummary,
+    AccordionDetails,
+    Divider
 } from '@mui/material';
-import { Link } from 'react-router-dom';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import { useNavigate, Link } from 'react-router-dom';
 import { jobService } from '../../services/job.service';
 import { formatDistanceToNow } from 'date-fns';
 import { useToastStore } from '../../store/toastStore';
@@ -24,6 +29,7 @@ import EditIcon from '@mui/icons-material/Edit';
 import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
 import CancelIcon from '@mui/icons-material/Cancel';
 import ArchiveIcon from '@mui/icons-material/Archive';
+import ReplayIcon from '@mui/icons-material/Replay';
 
 import EditJobDialog from '../../components/jobs/EditJobDialog';
 import UpdatePayDialog from '../../components/jobs/UpdatePayDialog';
@@ -47,6 +53,7 @@ interface Job {
 }
 
 const PostedJobsView = () => {
+  const navigate = useNavigate();
   const [jobs, setJobs] = useState<Job[]>([]);
   const [loading, setLoading] = useState(true);
   const { showToast } = useToastStore();
@@ -62,10 +69,17 @@ const PostedJobsView = () => {
   const fetchJobs = async () => {
     try {
       const data = await jobService.getPostedJobs();
-      // Filter out non-active jobs if needed, but endpoint usually returns all posted by user
-      // Assuming endpoint returns all, we filter on frontend or rely on backend
-      // Filter out canceled jobs (they have their own view now)
-      setJobs(data.filter((j: any) => j.status !== 'canceled'));
+      // Filter out non-active jobs
+      // Active jobs are either 'open' or 'in_progress'. 
+      // If 'open', it must not be expired. If 'in_progress', it remains active regardless of expiration date.
+      const now = new Date();
+      const activeJobs = data.filter((j: any) => {
+        if (j.status === 'completed' || j.status === 'canceled') return false;
+        if (j.status === 'open' && new Date(j.expirationDate) < now) return false;
+        return true;
+      });
+      
+      setJobs(activeJobs);
     } catch (error) {
       console.error('Error fetching posted jobs:', error);
     } finally {
@@ -163,6 +177,13 @@ const PostedJobsView = () => {
       }
   };
 
+  const handleRepostClick = () => {
+      if (selectedJob) {
+          navigate('/post-job', { state: { repostJob: selectedJob } });
+      }
+      handleMenuClose();
+  };
+
   if (loading) return <Box display="flex" justifyContent="center" p={4}><CircularProgress /></Box>;
 
   if (jobs.length === 0) {
@@ -193,82 +214,114 @@ const PostedJobsView = () => {
             </Button>
         </Box>
 
-        <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: '1fr 1fr' }, gap: 3 }}>
+        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
             {jobs.map((job) => (
-                <Box key={job._id}>
-                    <Paper variant="outlined" sx={{ p: 3, borderRadius: 2, height: '100%', display: 'flex', flexDirection: 'column', position: 'relative' }}>
-                        <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
-                            <Box sx={{ display: 'flex', gap: 1 }}>
+                <Accordion key={job._id} sx={{ borderRadius: 2, '&:before': { display: 'none' }, border: '1px solid #e2e8f0', overflow: 'hidden', boxShadow: '0 2px 8px rgba(0,0,0,0.02)' }}>
+                    <AccordionSummary
+                        expandIcon={<ExpandMoreIcon />}
+                        sx={{ bgcolor: '#ffffff', '&:hover': { bgcolor: '#f8fafc' }, transition: 'background-color 0.2s' }}
+                    >
+                        <Box sx={{ display: 'flex', alignItems: 'center', width: '100%', gap: 2, pr: 1 }}>
+                            <Chip 
+                                label={job.status.toUpperCase()} 
+                                color={job.status === 'open' ? 'success' : job.status === 'canceled' ? 'error' : 'default'} 
+                                size="small" 
+                                sx={{ fontWeight: 'bold' }}
+                            />
+                            {!job.visibility && (
                                 <Chip 
-                                    label={job.status.toUpperCase()} 
-                                    color={job.status === 'open' ? 'success' : job.status === 'canceled' ? 'error' : 'default'} 
+                                    icon={<VisibilityOffIcon sx={{ fontSize: '14px !important' }} />} 
+                                    label="HIDDEN" 
                                     size="small" 
-                                    sx={{ fontWeight: 'bold' }}
+                                    variant="outlined"
+                                    sx={{ display: { xs: 'none', sm: 'inline-flex' } }}
                                 />
-                                {!job.visibility && (
-                                    <Chip 
-                                        icon={<VisibilityOffIcon />} 
-                                        label="HIDDEN" 
-                                        size="small" 
-                                        variant="outlined"
-                                    />
-                                )}
-                            </Box>
-                            <Box>
-                                <Typography variant="caption" color="text.secondary" sx={{ mr: 1 }}>
-                                    {formatDistanceToNow(new Date(job.createdAt))} ago
+                            )}
+                            
+                            <Box sx={{ display: 'flex', alignItems: 'center', flex: 1, minWidth: 0 }}>
+                                <Typography variant="subtitle2" noWrap sx={{ fontWeight: 'bold', color: '#0f172a' }}>
+                                    {job.title}
                                 </Typography>
-                                <IconButton 
-                                    size="small" 
-                                    onClick={(e) => handleMenuOpen(e, job)}
-                                >
-                                    <MoreVertIcon />
-                                </IconButton>
                             </Box>
-                        </Box>
 
-                        <Typography variant="h6" fontWeight="bold" gutterBottom sx={{ flexGrow: 1 }}>
-                            <Link to={`/jobs/${job._id}`} style={{ textDecoration: 'none', color: 'inherit' }}>
-                                {job.title}
-                            </Link>
-                        </Typography>
-                        
-                        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-                            <Typography variant="body2" color="text.secondary">
-                                {job.location?.general || 'Location not specified'}
-                            </Typography>
-                            <Box sx={{ textAlign: 'right' }}>
+                            <Box sx={{ display: { xs: 'none', sm: 'block' }, textAlign: 'right' }}>
                                 {job.currentPay && job.currentPay !== job.originalPay ? (
                                     <>
                                         <Typography variant="caption" sx={{ textDecoration: 'line-through', color: 'text.secondary', mr: 1 }}>
                                             ${job.originalPay}
                                         </Typography>
-                                        <Typography variant="h6" fontWeight="bold" color="success.main" component="span">
+                                        <Typography variant="subtitle2" fontWeight="bold" color="success.main" component="span">
                                             ${job.currentPay}
                                         </Typography>
                                     </>
                                 ) : (
-                                    <Typography variant="h6" fontWeight="bold" color="success.main">
+                                    <Typography variant="subtitle2" fontWeight="bold" color="success.main">
                                         ${job.originalPay}
                                     </Typography>
                                 )}
                             </Box>
+                            
+                            <Typography variant="caption" color="text.secondary" sx={{ ml: 'auto', whiteSpace: 'nowrap', display: { xs: 'none', md: 'block' } }}>
+                                {formatDistanceToNow(new Date(job.createdAt))} ago
+                            </Typography>
+                            
+                            <IconButton 
+                                size="small" 
+                                onClick={(e) => { e.stopPropagation(); handleMenuOpen(e, job); }}
+                            >
+                                <MoreVertIcon />
+                            </IconButton>
                         </Box>
+                    </AccordionSummary>
+                    
+                    <AccordionDetails sx={{ p: 3, bgcolor: '#ffffff', borderTop: '1px solid #f1f5f9' }}>
+                        <Box sx={{ display: 'flex', flexDirection: { xs: 'column', sm: 'row' }, gap: 4 }}>
+                            {/* Left Side: Job Info */}
+                            <Box sx={{ flex: 1 }}>
+                                <Typography variant="caption" sx={{ color: '#64748b', fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: 0.5, mb: 1, display: 'block' }}>
+                                    Job Details
+                                </Typography>
+                                <Typography variant="body1" sx={{ fontWeight: 'bold', mb: 1 }}>
+                                    <Link to={`/jobs/${job._id}`} style={{ textDecoration: 'none', color: '#0f172a' }}>
+                                        {job.title}
+                                    </Link>
+                                </Typography>
+                                <Typography variant="body2" color="text.secondary" sx={{ mb: 0.5 }}>
+                                    Location: {job.location?.general || 'Location not specified'}
+                                </Typography>
+                                <Typography variant="body2" color="text.secondary" sx={{ mb: 0.5 }}>
+                                    Posted: {formatDistanceToNow(new Date(job.createdAt))} ago
+                                </Typography>
+                                {!job.visibility && (
+                                    <Typography variant="body2" color="error" sx={{ mt: 1, fontWeight: 'bold' }}>
+                                        This job is currently hidden from the public feed.
+                                    </Typography>
+                                )}
+                            </Box>
 
-                        <Button 
-                            component={Link} 
-                            to={`/jobs/${job._id}`}
-                            state={{ job }}
-                            variant="outlined" 
-                            size="small"
-                            startIcon={<VisibilityIcon />}
-                            fullWidth
-                            sx={{ mt: 'auto' }}
-                        >
-                            View Details
-                        </Button>
-                    </Paper>
-                </Box>
+                            <Divider orientation="vertical" flexItem sx={{ display: { xs: 'none', sm: 'block' } }} />
+                            <Divider sx={{ display: { xs: 'block', sm: 'none' } }} />
+
+                            {/* Right Side: Actions */}
+                            <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 1 }}>
+                                <Typography variant="caption" sx={{ color: '#64748b', fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: 0.5, mb: 0.5, display: 'block' }}>
+                                    Quick Actions
+                                </Typography>
+                                <Button 
+                                    component={Link} 
+                                    to={`/jobs/${job._id}`}
+                                    state={{ job }}
+                                    variant="outlined" 
+                                    size="small"
+                                    startIcon={<VisibilityIcon />}
+                                    sx={{ width: 'fit-content' }}
+                                >
+                                    View Full Details
+                                </Button>
+                            </Box>
+                        </Box>
+                    </AccordionDetails>
+                </Accordion>
             ))}
         </Box>
 
@@ -303,6 +356,10 @@ const PostedJobsView = () => {
             <MenuItem onClick={() => selectedJob && handleDeleteJob(selectedJob._id)} sx={{ color: 'error.main' }}>
                 <ListItemIcon><DeleteIcon fontSize="small" color="error" /></ListItemIcon>
                 <ListItemText>Delete Job</ListItemText>
+            </MenuItem>
+            <MenuItem onClick={handleRepostClick}>
+                <ListItemIcon><ReplayIcon fontSize="small" /></ListItemIcon>
+                <ListItemText>Repost Job</ListItemText>
             </MenuItem>
         </Menu>
 

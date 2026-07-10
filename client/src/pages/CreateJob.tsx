@@ -2,7 +2,7 @@ import { useFormik } from 'formik';
 import * as yup from 'yup';
 import { Box, Button, TextField, Typography, Container, MenuItem, Paper, FormControlLabel, Switch, Autocomplete, Chip, IconButton } from '@mui/material';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useJobStore } from '../store/jobStore';
 import { useToastStore } from '../store/toastStore';
 import { useAuthStore } from '../store/authStore';
@@ -19,7 +19,19 @@ const validationSchema = yup.object({
   jobDate: yup.date().required('Job Date is required'),
   jobTime: yup.string().required('Job Time is required'),
   expirationDate: yup.date().required('Expiration Date is required'),
-  expirationTime: yup.string().required('Expiration Time is required'),
+  expirationTime: yup.string().required('Expiration Time is required').test(
+    'is-before-job',
+    'Expiration must be before or on job date/time',
+    function(value) {
+      const { jobDate, jobTime, expirationDate } = this.parent;
+      if (!value || !jobDate || !jobTime || !expirationDate) return true;
+      
+      const jobDateTime = new Date(`${jobDate}T${jobTime}`);
+      const expDateTime = new Date(`${expirationDate}T${value}`);
+      
+      return expDateTime <= jobDateTime;
+    }
+  ),
   requirements: yup.array().of(yup.string()),
   estimatedHours: yup.number().when('type', {
     is: (val: string) => val === 'hourly',
@@ -30,9 +42,12 @@ const validationSchema = yup.object({
 
 const CreateJob = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { createJob, isLoading } = useJobStore();
   const { showToast } = useToastStore();
   const { user } = useAuthStore();
+  
+  const isRepost = !!location.state?.repostJob;
 
   useEffect(() => {
     if (!user) {
@@ -89,13 +104,38 @@ const CreateJob = () => {
         };
         // console.log('Submitting Job Payload:', payload);
         await createJob(payload);
-        showToast('Job Posted Successfully!', 'success');
+        showToast(isRepost ? 'Job Reposted Successfully!' : 'Job Posted Successfully!', 'success');
         navigate('/');
       } catch (err) {
         showToast('Failed to post job. Please try again.', 'error');
       }
     },
   });
+
+  useEffect(() => {
+    if (location.state?.repostJob) {
+      const job = location.state.repostJob;
+      formik.setValues({
+        title: job.title || '',
+        description: job.description || '',
+        pay: job.type === 'hourly' && job.estimatedHours ? (job.hourlyRate || job.originalPay / job.estimatedHours).toString() : (job.originalPay || job.currentPay || '').toString(),
+        type: job.type || 'fixed',
+        category: job.category || '',
+        generalLocation: job.location?.general || job.generalLocation || '',
+        exactLocation: job.location?.exact || job.exactLocation || '',
+        jobDate: '',
+        jobTime: '',
+        expirationDate: '',
+        expirationTime: '',
+        isNegotiable: job.isNegotiable ?? false,
+        visibility: job.visibility ?? true,
+        tags: job.tags ? job.tags.join(', ') : '',
+        requirements: job.requirements || [],
+        paymentMethod: job.paymentMethod || 'cash',
+        estimatedHours: job.estimatedHours ? job.estimatedHours.toString() : '',
+      });
+    }
+  }, [location.state?.repostJob]);
 
   return (
     <Container maxWidth="md">
@@ -105,7 +145,7 @@ const CreateJob = () => {
             <ArrowBackIcon />
           </IconButton>
           <Typography variant="h4" fontWeight="bold">
-            Post a Job
+            {isRepost ? 'Repost Job' : 'Post a Job'}
           </Typography>
         </Box>
         <form onSubmit={formik.handleSubmit}>
@@ -363,7 +403,7 @@ const CreateJob = () => {
             sx={{ mt: 3, bgcolor: 'black', '&:hover': { bgcolor: '#333' } }}
             disabled={isLoading}
           >
-            {isLoading ? 'Posting...' : 'Post Job'}
+            {isLoading ? 'Posting...' : (isRepost ? 'Repost Job' : 'Post Job')}
           </Button>
         </form>
       </Paper>

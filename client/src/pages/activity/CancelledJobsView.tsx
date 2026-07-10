@@ -7,8 +7,11 @@ import { useToastStore } from '../../store/toastStore';
 import ArchiveIcon from '@mui/icons-material/Archive';
 import DeleteIcon from '@mui/icons-material/Delete';
 import VisibilityIcon from '@mui/icons-material/Visibility';
+import ReplayIcon from '@mui/icons-material/Replay';
+import { useNavigate } from 'react-router-dom';
 
 const CancelledJobsView = () => {
+  const navigate = useNavigate();
   const [jobs, setJobs] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const { showToast } = useToastStore();
@@ -80,6 +83,9 @@ const CancelledJobsView = () => {
                 Cancelled {formatDistanceToNow(new Date(job.updatedAt))} ago
               </Typography>
               <Box sx={{ display: 'flex', gap: 1, mt: 'auto' }}>
+                <Button variant="outlined" size="small" startIcon={<ReplayIcon />} onClick={() => navigate('/post-job', { state: { repostJob: job } })} sx={{ flex: 1, color: '#6366f1', borderColor: '#6366f1' }}>
+                  Repost
+                </Button>
                 <Button variant="outlined" size="small" startIcon={<ArchiveIcon />} onClick={() => handleArchive(job._id)} sx={{ flex: 1 }}>
                   Archive
                 </Button>

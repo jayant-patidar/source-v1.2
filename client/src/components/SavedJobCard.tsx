@@ -1,6 +1,6 @@
 import { Card, CardContent, Typography, Box, Chip, Avatar, IconButton } from '@mui/material';
 import { Link } from 'react-router-dom';
-import { format } from 'date-fns';
+import { formatLocalDate } from '../utils/dateUtils';
 import { useState } from 'react';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
@@ -90,7 +90,7 @@ const SavedJobCard = ({ job, onUnsave }: SavedJobCardProps) => {
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
               <AccessTimeIcon sx={{ fontSize: 14 }} />
               <Typography variant="caption">
-                  {job.jobDate ? format(new Date(job.jobDate), 'MMM d') : 'Flexible'}
+                  {job.jobDate ? formatLocalDate(job.jobDate, 'MMM d') : 'Flexible'}
               </Typography>
             </Box>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>

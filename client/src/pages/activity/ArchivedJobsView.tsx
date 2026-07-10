@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
-import { Box, Typography, Paper, Chip, Button, CircularProgress } from '@mui/material';
+import { Box, Typography, Chip, Button, CircularProgress, Accordion, AccordionSummary, AccordionDetails, Divider } from '@mui/material';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { Link } from 'react-router-dom';
 import { jobService } from '../../services/job.service';
 import { formatDistanceToNow } from 'date-fns';
@@ -64,36 +65,97 @@ const ArchivedJobsView = () => {
           <Typography variant="body2" color="text.secondary">Jobs you archive will appear here.</Typography>
         </Box>
       ) : (
-        <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: '1fr 1fr' }, gap: 3 }}>
+        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
           {jobs.map((job) => (
-            <Paper key={job._id} variant="outlined" sx={{ p: 3, borderRadius: 2, display: 'flex', flexDirection: 'column' }}>
-              <Box sx={{ display: 'flex', gap: 1, mb: 2 }}>
-                <Chip label="ARCHIVED" size="small" sx={{ fontWeight: 'bold', bgcolor: '#616161', color: 'white' }} />
-                <Chip label={job.status.toUpperCase()} size="small" variant="outlined" sx={{ fontWeight: 'bold' }} />
-              </Box>
-              <Typography variant="h6" fontWeight="bold" gutterBottom sx={{ flexGrow: 1 }}>
-                <Link to={`/jobs/${job._id}`} style={{ textDecoration: 'none', color: 'inherit' }}>{job.title}</Link>
-              </Typography>
-              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-                <Typography variant="body2" color="text.secondary">{job.location?.general || 'Location not specified'}</Typography>
-                <Typography variant="h6" fontWeight="bold" color="success.main">${job.currentPay || job.originalPay}</Typography>
-              </Box>
-              <Typography variant="caption" color="text.secondary" sx={{ mb: 2, display: 'block' }}>
-                Archived {formatDistanceToNow(new Date(job.updatedAt))} ago
-              </Typography>
-              <Box sx={{ display: 'flex', gap: 1, mt: 'auto' }}>
-                <Button variant="contained" size="small" startIcon={<UnarchiveIcon />} onClick={() => handleUnarchive(job._id)}
-                  sx={{ flex: 1, bgcolor: 'black', '&:hover': { bgcolor: '#333' } }}>
-                  Unarchive
-                </Button>
-                <Button variant="outlined" size="small" startIcon={<VisibilityIcon />} component={Link} to={`/jobs/${job._id}`} sx={{ flex: 1 }}>
-                  View
-                </Button>
-                <Button variant="outlined" size="small" color="error" startIcon={<DeleteIcon />} onClick={() => handleDelete(job._id)}>
-                  Delete
-                </Button>
-              </Box>
-            </Paper>
+            <Accordion key={job._id} sx={{ borderRadius: 2, '&:before': { display: 'none' }, border: '1px solid #e2e8f0', overflow: 'hidden', boxShadow: '0 2px 8px rgba(0,0,0,0.02)' }}>
+              <AccordionSummary
+                  expandIcon={<ExpandMoreIcon />}
+                  sx={{ bgcolor: '#ffffff', '&:hover': { bgcolor: '#f8fafc' }, transition: 'background-color 0.2s' }}
+              >
+                  <Box sx={{ display: 'flex', alignItems: 'center', width: '100%', gap: 2, pr: 1 }}>
+                      <Chip label="ARCHIVED" size="small" sx={{ fontWeight: 'bold', bgcolor: '#616161', color: 'white' }} />
+                      <Chip label={job.status.toUpperCase()} size="small" variant="outlined" sx={{ fontWeight: 'bold', display: { xs: 'none', sm: 'inline-flex' } }} />
+                      
+                      <Box sx={{ display: 'flex', alignItems: 'center', flex: 1, minWidth: 0 }}>
+                          <Typography variant="subtitle2" noWrap sx={{ fontWeight: 'bold', color: '#0f172a' }}>
+                              {job.title}
+                          </Typography>
+                      </Box>
+
+                      <Box sx={{ display: { xs: 'none', sm: 'block' }, textAlign: 'right' }}>
+                          <Typography variant="subtitle2" fontWeight="bold" color="text.primary">
+                              ${job.currentPay || job.originalPay}
+                          </Typography>
+                      </Box>
+                      
+                      <Typography variant="caption" color="text.secondary" sx={{ ml: 'auto', whiteSpace: 'nowrap', display: { xs: 'none', md: 'block' } }}>
+                          {formatDistanceToNow(new Date(job.updatedAt))} ago
+                      </Typography>
+                  </Box>
+              </AccordionSummary>
+              
+              <AccordionDetails sx={{ p: 3, bgcolor: '#ffffff', borderTop: '1px solid #f1f5f9' }}>
+                  <Box sx={{ display: 'flex', flexDirection: { xs: 'column', sm: 'row' }, gap: 4 }}>
+                      {/* Left Side: Job Info */}
+                      <Box sx={{ flex: 1 }}>
+                          <Typography variant="caption" sx={{ color: '#64748b', fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: 0.5, mb: 1, display: 'block' }}>
+                              Job Details
+                          </Typography>
+                          <Typography variant="body1" sx={{ fontWeight: 'bold', mb: 1 }}>
+                              <Link to={`/jobs/${job._id}`} style={{ textDecoration: 'none', color: '#0f172a' }}>
+                                  {job.title}
+                              </Link>
+                          </Typography>
+                          <Typography variant="body2" color="text.secondary" sx={{ mb: 0.5 }}>
+                              Location: {job.location?.general || 'Location not specified'}
+                          </Typography>
+                          <Typography variant="body2" color="text.secondary">
+                              Archived: {formatDistanceToNow(new Date(job.updatedAt))} ago
+                          </Typography>
+                      </Box>
+
+                      <Divider orientation="vertical" flexItem sx={{ display: { xs: 'none', sm: 'block' } }} />
+                      <Divider sx={{ display: { xs: 'block', sm: 'none' } }} />
+
+                      {/* Right Side: Actions */}
+                      <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 1 }}>
+                          <Typography variant="caption" sx={{ color: '#64748b', fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: 0.5, mb: 0.5, display: 'block' }}>
+                              Quick Actions
+                          </Typography>
+                          
+                          <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
+                              <Button 
+                                variant="contained" 
+                                size="small" 
+                                startIcon={<UnarchiveIcon />} 
+                                onClick={() => handleUnarchive(job._id)}
+                                sx={{ bgcolor: 'black', '&:hover': { bgcolor: '#333' } }}
+                              >
+                                Unarchive
+                              </Button>
+                              <Button 
+                                variant="outlined" 
+                                size="small" 
+                                startIcon={<VisibilityIcon />} 
+                                component={Link} 
+                                to={`/jobs/${job._id}`}
+                              >
+                                View
+                              </Button>
+                              <Button 
+                                variant="outlined" 
+                                size="small" 
+                                color="error" 
+                                startIcon={<DeleteIcon />} 
+                                onClick={() => handleDelete(job._id)}
+                              >
+                                Delete
+                              </Button>
+                          </Box>
+                      </Box>
+                  </Box>
+              </AccordionDetails>
+            </Accordion>
           ))}
         </Box>
       )}

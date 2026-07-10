@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
-import { Box, Typography, Paper, Chip, CircularProgress, Button, Dialog, DialogTitle, DialogContent, DialogActions, TextField } from '@mui/material';
+import { Box, Typography, Chip, CircularProgress, Button, Dialog, DialogTitle, DialogContent, DialogActions, TextField, Accordion, AccordionSummary, AccordionDetails, Divider } from '@mui/material';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { Link } from 'react-router-dom';
 import { formatDistanceToNow } from 'date-fns';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
@@ -118,54 +119,89 @@ const SentOffersView = () => {
         <Typography variant="h5" fontWeight="bold" gutterBottom>Sent Offers</Typography>
         <Typography variant="body2" color="text.secondary" paragraph>Track the status of offers you've made.</Typography>
 
-        <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: '1fr 1fr' }, gap: 3 }}>
+        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
             {sentOffers.map((offer) => (
-                <Box key={offer._id}>
-                    <Paper variant="outlined" sx={{ p: 3, borderRadius: 2 }}>
-                        <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
+                <Accordion key={offer._id} sx={{ borderRadius: 2, '&:before': { display: 'none' }, border: '1px solid #e2e8f0', overflow: 'hidden', boxShadow: '0 2px 8px rgba(0,0,0,0.02)' }}>
+                    <AccordionSummary
+                        expandIcon={<ExpandMoreIcon />}
+                        sx={{ bgcolor: '#ffffff', '&:hover': { bgcolor: '#f8fafc' }, transition: 'background-color 0.2s' }}
+                    >
+                        <Box sx={{ display: 'flex', alignItems: 'center', width: '100%', gap: 2, pr: 1 }}>
                             <Chip 
                                 label={offer.status.toUpperCase()} 
-                                color={offer.status === 'accepted' ? 'success' : offer.status === 'rejected' ? 'error' : 'warning'} 
+                                color={offer.status === 'accepted' ? 'success' : offer.status === 'rejected' ? 'error' : offer.status === 'countered' ? 'secondary' : 'warning'} 
                                 size="small" 
                                 sx={{ fontWeight: 'bold' }}
                             />
-                            <Typography variant="caption" color="text.secondary">
+                            
+                            <Box sx={{ display: 'flex', alignItems: 'center', flex: 1, minWidth: 0 }}>
+                                <Typography variant="subtitle2" noWrap sx={{ fontWeight: 'bold', color: '#0f172a' }}>
+                                    {offer.job.title}
+                                </Typography>
+                            </Box>
+
+                            <Box sx={{ display: { xs: 'none', sm: 'block' }, textAlign: 'right' }}>
+                                <Typography variant="subtitle2" fontWeight="bold" color="primary.main">
+                                    ${offer.amount}
+                                </Typography>
+                            </Box>
+                            
+                            <Typography variant="caption" color="text.secondary" sx={{ ml: 'auto', whiteSpace: 'nowrap', display: { xs: 'none', md: 'block' } }}>
                                 {formatDistanceToNow(new Date(offer.createdAt))} ago
                             </Typography>
                         </Box>
-
-                        <Typography variant="h6" fontWeight="bold" gutterBottom>
-                            <Link to={`/jobs/${offer.job._id}`} style={{ textDecoration: 'none', color: 'inherit' }}>
-                                {offer.job.title}
-                            </Link>
-                        </Typography>
-                        
-                        <Typography variant="body2" color="text.secondary" gutterBottom>
-                            Original Pay: ${offer.job.originalPay}
-                        </Typography>
-
-                        <Paper sx={{ p: 2, bgcolor: '#f5f5f5', borderRadius: 2, mt: 2 }} elevation={0}>
-                            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                <Typography variant="body2" fontWeight="bold">Current Amount:</Typography>
-                                <Typography variant="h6" color="primary.main" fontWeight="bold">${offer.amount}</Typography>
-                            </Box>
-                            {offer.message && (
-                                <Typography variant="body2" color="text.secondary" sx={{ fontStyle: 'italic', mt: 1 }}>
-                                    "{offer.message}"
+                    </AccordionSummary>
+                    
+                    <AccordionDetails sx={{ p: 3, bgcolor: '#ffffff', borderTop: '1px solid #f1f5f9' }}>
+                        <Box sx={{ display: 'flex', flexDirection: { xs: 'column', sm: 'row' }, gap: 4 }}>
+                            {/* Left Side: Job Info */}
+                            <Box sx={{ flex: 1 }}>
+                                <Typography variant="caption" sx={{ color: '#64748b', fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: 0.5, mb: 1, display: 'block' }}>
+                                    Job Details
                                 </Typography>
-                            )}
-                        </Paper>
+                                <Typography variant="body1" sx={{ fontWeight: 'bold', mb: 1 }}>
+                                    <Link to={`/jobs/${offer.job._id}`} style={{ textDecoration: 'none', color: '#0f172a' }}>
+                                        {offer.job.title}
+                                    </Link>
+                                </Typography>
+                                <Typography variant="body2" color="text.secondary" sx={{ mb: 0.5 }}>
+                                    Original Budget: ${offer.job.originalPay}
+                                </Typography>
+                                <Typography variant="body2" color="text.secondary" sx={{ mb: 0.5 }}>
+                                    Sent: {formatDistanceToNow(new Date(offer.createdAt))} ago
+                                </Typography>
+                                <Box sx={{ mt: 2, display: 'flex', gap: 2 }}>
+                                    <Typography variant="caption" color="text.secondary">Your Counters: {offer.providerCounterCount}/2</Typography>
+                                    <Typography variant="caption" color="text.secondary">Seeker Counters: {offer.seekerCounterCount}/2</Typography>
+                                </Box>
+                            </Box>
 
-                        <Box sx={{ mt: 2, mb: 1, display: 'flex', gap: 2 }}>
-                             <Typography variant="caption" color="text.secondary">Your Counters: {offer.providerCounterCount}/2</Typography>
-                             <Typography variant="caption" color="text.secondary">Seeker Counters: {offer.seekerCounterCount}/2</Typography>
-                        </Box>
+                            <Divider orientation="vertical" flexItem sx={{ display: { xs: 'none', sm: 'block' } }} />
+                            <Divider sx={{ display: { xs: 'block', sm: 'none' } }} />
 
-                        {/* Action Buttons for Provider if Seeker Countered */}
-                        {(offer.status === 'pending' || offer.status === 'countered') && (
-                            <Box sx={{ display: 'flex', gap: 1, justifyContent: 'flex-end', mt: 2 }}>
-                                {offer.lastActor === 'seeker' && (
-                                    <>
+                            {/* Right Side: Offer Info */}
+                            <Box sx={{ flex: 1 }}>
+                                <Typography variant="caption" sx={{ color: '#64748b', fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: 0.5, mb: 1, display: 'block' }}>
+                                    Current Offer
+                                </Typography>
+                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
+                                    <Typography variant="body1" sx={{ fontWeight: 'bold', color: '#0f172a' }}>
+                                        ${offer.amount}
+                                    </Typography>
+                                </Box>
+                                {offer.message ? (
+                                    <Typography variant="body2" color="text.secondary" sx={{ fontStyle: 'italic', bgcolor: '#f8fafc', p: 1.5, borderRadius: 1, mt: 1 }}>
+                                        "{offer.message}"
+                                    </Typography>
+                                ) : (
+                                    <Typography variant="body2" color="text.disabled" sx={{ mt: 1 }}>
+                                        No message provided.
+                                    </Typography>
+                                )}
+
+                                {/* Action Buttons for Provider if Seeker Countered */}
+                                {(offer.status === 'pending' || offer.status === 'countered') && offer.lastActor === 'seeker' && (
+                                    <Box sx={{ display: 'flex', gap: 1, mt: 2, flexWrap: 'wrap' }}>
                                         <Button 
                                             variant="contained" 
                                             color="success" 
@@ -182,7 +218,7 @@ const SentOffersView = () => {
                                                 size="small"
                                                 onClick={() => { setSelectedNegId(offer._id); setCounterAmount(''); setCounterOpen(true); }}
                                             >
-                                                Counter ({offer.providerCounterCount}/2)
+                                                Counter
                                             </Button>
                                         )}
                                         <Button 
@@ -193,12 +229,12 @@ const SentOffersView = () => {
                                         >
                                             Reject
                                         </Button>
-                                    </>
+                                    </Box>
                                 )}
                             </Box>
-                        )}
-                    </Paper>
-                </Box>
+                        </Box>
+                    </AccordionDetails>
+                </Accordion>
             ))}
         </Box>
 

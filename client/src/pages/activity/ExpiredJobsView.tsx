@@ -3,6 +3,7 @@ import { Box, Typography, Paper, Chip, Button, CircularProgress, Dialog, DialogT
 import { Link } from 'react-router-dom';
 import { jobService } from '../../services/job.service';
 import { format, formatDistanceToNow } from 'date-fns';
+import { formatLocalDate } from '../../utils/dateUtils';
 import { useToastStore } from '../../store/toastStore';
 import ReplayIcon from '@mui/icons-material/Replay';
 import ArchiveIcon from '@mui/icons-material/Archive';
@@ -18,6 +19,7 @@ const ExpiredJobsView = () => {
   const [repostOpen, setRepostOpen] = useState(false);
   const [repostJobId, setRepostJobId] = useState('');
   const [newExpirationDate, setNewExpirationDate] = useState('');
+  const [newExpirationTime, setNewExpirationTime] = useState('');
   const [repostJobDate, setRepostJobDate] = useState('');
   const [repostJobTime, setRepostJobTime] = useState('');
 
@@ -38,21 +40,22 @@ const ExpiredJobsView = () => {
     setRepostJobId(jobId);
     const job = jobs.find(j => j._id === jobId);
     if (job) {
-      setRepostJobDate(job.jobDate ? format(new Date(job.jobDate), 'yyyy-MM-dd') : '');
-      setRepostJobTime(job.jobTime || '');
+      setRepostJobDate('');
+      setRepostJobTime('');
     }
     setNewExpirationDate('');
+    setNewExpirationTime('');
     setRepostOpen(true);
   };
 
   const handleRepostSubmit = async () => {
-    if (!newExpirationDate) {
-      showToast('Please select a new expiration date', 'warning');
+    if (!newExpirationDate || !newExpirationTime || !repostJobDate || !repostJobTime) {
+      showToast('Please fill out all date and time fields', 'warning');
       return;
     }
     try {
       await jobService.repostJob(repostJobId, {
-        expirationDate: newExpirationDate,
+        expirationDate: `${newExpirationDate}T${newExpirationTime}`,
         jobDate: repostJobDate,
         jobTime: repostJobTime
       });
@@ -166,26 +169,37 @@ const ExpiredJobsView = () => {
             sx={{ mt: 1, mb: 2 }}
           />
           <TextField
-            label="Job Date (Optional)"
-            type="date"
+            label="New Expiration Time"
+            type="time"
             fullWidth
-            value={repostJobDate}
-            onChange={(e) => setRepostJobDate(e.target.value)}
+            value={newExpirationTime}
+            onChange={(e) => setNewExpirationTime(e.target.value)}
             slotProps={{ inputLabel: { shrink: true } }}
             sx={{ mb: 2 }}
           />
           <TextField
-            label="Job Time (Optional)"
+            label="Job Date"
+            type="date"
+            fullWidth
+            value={repostJobDate}
+            onChange={(e) => setRepostJobDate(e.target.value)}
+            slotProps={{ inputLabel: { shrink: true }, htmlInput: { min: newExpirationDate || minDate } }}
+            sx={{ mb: 2 }}
+            required
+          />
+          <TextField
+            label="Job Time"
             type="time"
             fullWidth
             value={repostJobTime}
             onChange={(e) => setRepostJobTime(e.target.value)}
             slotProps={{ inputLabel: { shrink: true } }}
+            required
           />
         </DialogContent>
         <DialogActions sx={{ px: 3, pb: 3 }}>
           <Button onClick={() => setRepostOpen(false)} sx={{ color: 'text.secondary' }}>Cancel</Button>
-          <Button variant="contained" onClick={handleRepostSubmit} disabled={!newExpirationDate}
+          <Button variant="contained" onClick={handleRepostSubmit} disabled={!newExpirationDate || !newExpirationTime || !repostJobDate || !repostJobTime}
             sx={{ bgcolor: '#2e7d32', '&:hover': { bgcolor: '#1b5e20' } }}>
             Repost Job
           </Button>

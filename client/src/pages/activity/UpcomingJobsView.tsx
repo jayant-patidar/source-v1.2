@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react';
-import { Box, Typography, CircularProgress, Paper, Chip, Stack, Button, Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions } from '@mui/material';
+import { Box, Typography, CircularProgress, Paper, Chip, Button, Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, Accordion, AccordionSummary, AccordionDetails, Divider } from '@mui/material';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { Link } from 'react-router-dom';
 import { jobService } from '../../services/job.service';
-import { format } from 'date-fns';
+import { formatLocalDate } from '../../utils/dateUtils';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
@@ -91,55 +92,92 @@ const UpcomingJobsView = () => {
           <Typography color="text.secondary">No upcoming jobs found.</Typography>
         </Paper>
       ) : (
-        <Stack spacing={2}>
+        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
           {jobs.map((job) => (
-            <Paper key={job._id} sx={{ p: 3, border: '1px solid #e0e0e0', borderRadius: 2 }}>
-              <Box display="flex" justifyContent="space-between" alignItems="flex-start">
-                  <Box>
-                      <Typography variant="h6" fontWeight="bold">
-                          <Link to={`/jobs/${job._id}`} style={{ textDecoration: 'none', color: 'inherit' }}>
-                              {job.title}
-                          </Link>
-                      </Typography>
-                      <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
-                          Posted by <Link to={`/profile/${job.seekerId?._id}`} style={{ textDecoration: 'none', color: 'inherit', fontWeight: 'bold' }}>{job.seekerId?.name}</Link>
-                      </Typography>
-                      <Box display="flex" gap={2} mt={1}>
-                          <Box display="flex" alignItems="center" gap={0.5}>
-                              <AccessTimeIcon sx={{ fontSize: 16, color: 'text.secondary' }} />
-                              <Typography variant="caption">{format(new Date(job.jobDate), 'MMM d, yyyy')} at {job.jobTime}</Typography>
-                          </Box>
-                          <Box display="flex" alignItems="center" gap={0.5}>
-                              <LocationOnIcon sx={{ fontSize: 16, color: 'text.secondary' }} />
-                              <Typography variant="caption">{job.location.general}</Typography>
-                          </Box>
-                      </Box>
-                  </Box>
-                  <Box textAlign="right">
-                      <Typography variant="h6" color="primary.main" fontWeight="bold">
-                          ${job.currentPay || job.originalPay}
-                      </Typography>
+            <Accordion key={job._id} sx={{ borderRadius: 2, '&:before': { display: 'none' }, border: '1px solid #e2e8f0', overflow: 'hidden', boxShadow: '0 2px 8px rgba(0,0,0,0.02)' }}>
+              <AccordionSummary
+                  expandIcon={<ExpandMoreIcon />}
+                  sx={{ bgcolor: '#ffffff', '&:hover': { bgcolor: '#f8fafc' }, transition: 'background-color 0.2s' }}
+              >
+                  <Box sx={{ display: 'flex', alignItems: 'center', width: '100%', gap: 2, pr: 1 }}>
                       <Chip 
-                        label={job.status === 'pending_start_approval' ? "Pending Approval" : "Upcoming"} 
+                        label={job.status === 'pending_start_approval' ? "PENDING" : "UPCOMING"} 
                         color={job.status === 'pending_start_approval' ? "warning" : "info"} 
                         size="small" 
-                        sx={{ mt: 1, mb: 1, display: 'block' }} 
+                        sx={{ fontWeight: 'bold' }} 
                       />
-                      <Button 
-                        variant="contained" 
-                        size="small" 
-                        color="primary" 
-                        startIcon={<PlayArrowIcon />}
-                        onClick={() => handleStartClick(job)}
-                        disabled={job.status === 'pending_start_approval'}
-                      >
-                        {job.status === 'pending_start_approval' ? "Waiting..." : "Start Job"}
-                      </Button>
+                      
+                      <Box sx={{ display: 'flex', alignItems: 'center', flex: 1, minWidth: 0 }}>
+                          <Typography variant="subtitle2" noWrap sx={{ fontWeight: 'bold', color: '#0f172a' }}>
+                              {job.title}
+                          </Typography>
+                      </Box>
+
+                      <Box sx={{ display: { xs: 'none', sm: 'block' }, textAlign: 'right' }}>
+                          <Typography variant="subtitle2" fontWeight="bold" color="primary.main">
+                              ${job.currentPay || job.originalPay}
+                          </Typography>
+                      </Box>
+                      
+                      <Box display={{ xs: 'none', md: 'flex' }} alignItems="center" gap={0.5} ml="auto">
+                          <AccessTimeIcon sx={{ fontSize: 16, color: 'text.secondary' }} />
+                          <Typography variant="caption" color="text.secondary" sx={{ whiteSpace: 'nowrap' }}>
+                              {formatLocalDate(job.jobDate, 'MMM d')} at {job.jobTime}
+                          </Typography>
+                      </Box>
                   </Box>
-              </Box>
-            </Paper>
+              </AccordionSummary>
+              
+              <AccordionDetails sx={{ p: 3, bgcolor: '#ffffff', borderTop: '1px solid #f1f5f9' }}>
+                  <Box sx={{ display: 'flex', flexDirection: { xs: 'column', sm: 'row' }, gap: 4 }}>
+                      {/* Left Side: Job Info */}
+                      <Box sx={{ flex: 1 }}>
+                          <Typography variant="caption" sx={{ color: '#64748b', fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: 0.5, mb: 1, display: 'block' }}>
+                              Job Details
+                          </Typography>
+                          <Typography variant="body1" sx={{ fontWeight: 'bold', mb: 1 }}>
+                              <Link to={`/jobs/${job._id}`} style={{ textDecoration: 'none', color: '#0f172a' }}>
+                                  {job.title}
+                              </Link>
+                          </Typography>
+                          <Typography variant="body2" color="text.secondary" sx={{ mb: 0.5 }}>
+                              Client: <Link to={`/profile/${job.seekerId?._id}`} style={{ textDecoration: 'none', color: '#4f46e5', fontWeight: 'bold' }}>{job.seekerId?.name}</Link>
+                          </Typography>
+                          <Typography variant="body2" color="text.secondary" sx={{ mb: 0.5 }}>
+                              When: {formatLocalDate(job.jobDate, 'MMM d, yyyy')} at {job.jobTime}
+                          </Typography>
+                          <Box display="flex" alignItems="center" gap={0.5} mt={1}>
+                              <LocationOnIcon sx={{ fontSize: 16, color: 'text.secondary' }} />
+                              <Typography variant="body2" color="text.secondary">{job.location.general}</Typography>
+                          </Box>
+                      </Box>
+
+                      <Divider orientation="vertical" flexItem sx={{ display: { xs: 'none', sm: 'block' } }} />
+                      <Divider sx={{ display: { xs: 'block', sm: 'none' } }} />
+
+                      {/* Right Side: Actions */}
+                      <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 1 }}>
+                          <Typography variant="caption" sx={{ color: '#64748b', fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: 0.5, mb: 0.5, display: 'block' }}>
+                              Quick Actions
+                          </Typography>
+                          
+                          <Button 
+                            variant="contained" 
+                            size="small" 
+                            color="primary" 
+                            startIcon={<PlayArrowIcon />}
+                            onClick={() => handleStartClick(job)}
+                            disabled={job.status === 'pending_start_approval'}
+                            sx={{ width: 'fit-content' }}
+                          >
+                            {job.status === 'pending_start_approval' ? "Waiting for Approval..." : "Start Job Now"}
+                          </Button>
+                      </Box>
+                  </Box>
+              </AccordionDetails>
+            </Accordion>
           ))}
-        </Stack>
+        </Box>
       )}
 
       {/* Confirmation Dialog */}

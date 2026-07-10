@@ -3,6 +3,7 @@ import { Box, Typography, CircularProgress, Paper, Chip, Button, Stack, Dialog, 
 import { Link } from 'react-router-dom';
 import { jobService } from '../../services/job.service';
 import { format } from 'date-fns';
+import { formatLocalDate } from '../../utils/dateUtils';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
@@ -119,7 +120,7 @@ const SeekerOngoingJobsView = () => {
                       <Box display="flex" gap={2} mt={1}>
                         <Box display="flex" alignItems="center" gap={0.5}>
                               <AccessTimeIcon sx={{ fontSize: 16, color: 'text.secondary' }} />
-                              <Typography variant="caption">{format(new Date(job.jobDate), 'MMM d, yyyy')} at {job.jobTime}</Typography>
+                              <Typography variant="caption">{formatLocalDate(job.jobDate, 'MMM d, yyyy')} at {job.jobTime}</Typography>
                           </Box>
                            <Box display="flex" alignItems="center" gap={0.5}>
                               <LocationOnIcon sx={{ fontSize: 16, color: 'text.secondary' }} />

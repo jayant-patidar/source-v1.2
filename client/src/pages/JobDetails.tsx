@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import { Container, Typography, Box, Button, TextField, Paper, Divider, Chip, CircularProgress, Avatar, Dialog, DialogTitle, DialogContent, DialogActions, Grid, Alert } from '@mui/material';
 import { offerService } from '../services/offer.service';
 import { jobService } from '../services/job.service';
@@ -17,12 +17,14 @@ import ShareLocationIcon from '@mui/icons-material/ShareLocation';
 import LoopIcon from '@mui/icons-material/Loop';
 import AccountBalanceWalletIcon from '@mui/icons-material/AccountBalanceWallet';
 import { format, formatDistanceToNow } from 'date-fns';
+import { formatLocalDate } from '../utils/dateUtils';
 import { useTransactionStore } from '../store/transactionStore';
 
 // Job interface removed as it was unused
 
 const JobDetails = () => {
   const { id } = useParams();
+  const navigate = useNavigate();
   const { user } = useAuthStore();
   const { showToast } = useToastStore();
 
@@ -162,6 +164,10 @@ const JobDetails = () => {
   // Correctly identify if current user is the poster
   const isPoster = user && (job.seekerId === user._id || (job.seekerId && job.seekerId._id === user._id));
   const poster = job.seekerId;
+
+  const handleRepost = () => {
+    navigate('/post-job', { state: { repostJob: job } });
+  };
 
   return (
     <Container maxWidth="lg" sx={{ mt: 4, mb: 8 }}>
@@ -325,7 +331,7 @@ const JobDetails = () => {
                 <Box>
                   <Typography variant="caption" sx={{ color: '#64748b', fontWeight: 700, display: 'block', mb: 0.5 }}>DATE</Typography>
                   <Typography variant="body1" fontWeight="800" sx={{ color: '#0f172a' }}>
-                    {job.jobDate ? format(new Date(job.jobDate), 'MMM d, yyyy') : 'Flexible'}
+                    {job.jobDate ? formatLocalDate(job.jobDate, 'MMM d, yyyy') : 'Flexible'}
                   </Typography>
                 </Box>
               </Paper>
@@ -530,6 +536,37 @@ const JobDetails = () => {
                         }}
                     >
                         INTERESTED
+                    </Button>
+                </Box>
+            )}
+
+            {isPoster && job.status !== 'open' && (
+                <Box sx={{ p: { xs: 2, md: 3 }, bgcolor: '#ffffff', mb: 1, borderRadius: 4, border: '1px solid rgba(0,0,0,0.05)', boxShadow: '0 10px 30px rgba(0,0,0,0.03)' }}>
+                    <Typography variant="h6" fontWeight="900" sx={{ mb: 2, letterSpacing: '-0.5px' }}>
+                        Need this done again?
+                    </Typography>
+                    <Typography variant="body2" sx={{ color: '#64748b', mb: 3 }}>
+                        You can quickly repost this job. We'll copy all the details over for you.
+                    </Typography>
+                    <Button 
+                        fullWidth
+                        variant="contained" 
+                        size="large"
+                        onClick={handleRepost}
+                        sx={{ 
+                            background: 'linear-gradient(135deg, #6366f1 0%, #4f46e5 100%)',
+                            color: 'white', 
+                            fontWeight: '900', 
+                            py: 1.5,
+                            borderRadius: 3,
+                            fontSize: '1rem',
+                            letterSpacing: '0.5px',
+                            boxShadow: '0 8px 20px rgba(99, 102, 241, 0.3)',
+                            '&:hover': { transform: 'translateY(-2px)', boxShadow: '0 12px 25px rgba(99, 102, 241, 0.4)' },
+                            transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)'
+                        }}
+                    >
+                        REPOST JOB
                     </Button>
                 </Box>
             )}

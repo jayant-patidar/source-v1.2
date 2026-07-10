@@ -12,6 +12,7 @@ import BookmarkBorderIcon from '@mui/icons-material/BookmarkBorder';
 import BookmarkIcon from '@mui/icons-material/Bookmark';
 import { Link } from 'react-router-dom';
 import { format } from 'date-fns';
+import { formatLocalDate } from '../utils/dateUtils';
 import { useState } from 'react';
 import { offerService } from '../services/offer.service';
 import { useToastStore } from '../store/toastStore';
@@ -244,7 +245,7 @@ const JobCard = ({ job }: { job: any }) => {
                 <AccessTimeIcon sx={{ fontSize: 18 }} />
               </Box>
               <Typography variant="body2" fontWeight="600" color="#334155">
-                  {job.jobDate ? format(new Date(job.jobDate), 'MMM d, yyyy') : 'Flexible Timing'}
+                  {job.jobDate ? formatLocalDate(job.jobDate, 'MMM d, yyyy') : 'Flexible Timing'}
               </Typography>
             </Box>
             <Divider orientation="vertical" flexItem sx={{ borderColor: '#e2e8f0', display: { xs: 'none', sm: 'block' } }} />
