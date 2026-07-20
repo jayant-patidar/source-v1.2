@@ -145,6 +145,7 @@ const CreateGig = () => {
                 onChange={formik.handleChange}
                 error={formik.touched.price && Boolean(formik.errors.price)}
                 helperText={formik.touched.price && formik.errors.price}
+                inputProps={{ min: 1 }}
               />
             </Grid>
 

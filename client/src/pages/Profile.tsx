@@ -192,7 +192,13 @@ const Profile = () => {
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    if (name === 'phone') {
+      const sanitized = value.replace(/\D/g, '').slice(0, 10);
+      setFormData({ ...formData, [name]: sanitized });
+      return;
+    }
+    setFormData({ ...formData, [name]: value });
   };
 
   const handleNestedChange = (section: string, field: string, value: any) => {
@@ -259,6 +265,29 @@ const Profile = () => {
             setSaving(false);
             return;
         }
+    }
+
+    // Basic validation for personal section
+    if (section === 'personal') {
+      if (formData.DOB) {
+        const dob = new Date(formData.DOB);
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        if (dob >= today) {
+          setError('Date of birth cannot be today or in the future');
+          setSaving(false);
+          return;
+        }
+      }
+    }
+
+    // Basic validation for social/contact section
+    if (section === 'social') {
+      if (formData.phone && formData.phone.replace(/\D/g, '').length !== 10 && formData.phone.length > 0) {
+        setError('Phone number must be exactly 10 digits');
+        setSaving(false);
+        return;
+      }
     }
 
     try {
@@ -483,7 +512,7 @@ const Profile = () => {
                   </Grid>
                   <Grid size={{ xs: 12, sm: 6 }}>
                      {editMode.personal ? (
-                       <TextField fullWidth label="Date of Birth" name="DOB" type="date" InputLabelProps={{ shrink: true }} value={formData.DOB} onChange={handleChange} sx={{ '& .MuiOutlinedInput-root': { borderRadius: 2, bgcolor: 'white' } }} />
+                       <TextField fullWidth label="Date of Birth" name="DOB" type="date" InputLabelProps={{ shrink: true }} value={formData.DOB} onChange={handleChange} inputProps={{ max: new Date().toISOString().split('T')[0] }} sx={{ '& .MuiOutlinedInput-root': { borderRadius: 2, bgcolor: 'white' } }} />
                     ) : (
                       <Box>
                         <Typography variant="caption" sx={{ color: '#94a3b8', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.5px' }}>Date of Birth</Typography>
@@ -801,7 +830,7 @@ const Profile = () => {
                   </Grid>
                   <Grid size={{ xs: 12, sm: 6 }}>
                      {editMode.social ? (
-                        <TextField fullWidth label="Phone" name="phone" value={formData.phone} onChange={handleChange} sx={{ '& .MuiOutlinedInput-root': { borderRadius: 2, bgcolor: 'white' } }} />
+                        <TextField fullWidth label="Phone" name="phone" value={formData.phone} onChange={handleChange} placeholder="1234567890" inputProps={{ inputMode: 'numeric', maxLength: 10 }} sx={{ '& .MuiOutlinedInput-root': { borderRadius: 2, bgcolor: 'white' } }} />
                      ) : (
                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
                           <Box sx={{ p: 1.5, borderRadius: 2, bgcolor: 'rgba(16, 185, 129, 0.1)', color: '#059669', display: 'flex' }}>

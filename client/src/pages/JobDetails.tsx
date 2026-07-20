@@ -635,6 +635,7 @@ const JobDetails = () => {
                         fullWidth
                         variant="outlined"
                         required
+                        inputProps={{ min: 1 }}
                         sx={{ mb: 3 }}
                     />
                 ) : (
@@ -665,7 +666,7 @@ const JobDetails = () => {
                 <Button 
                     variant="contained" 
                     onClick={handleNegotiate} 
-                    disabled={!negotiationAmount}
+                    disabled={!negotiationAmount || Number(negotiationAmount) <= 0}
                     sx={{ 
                         background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)', 
                         color: 'white', 
@@ -697,6 +698,7 @@ const JobDetails = () => {
                     value={counterAmount}
                     onChange={(e) => setCounterAmount(e.target.value)}
                     variant="outlined"
+                    inputProps={{ min: 1 }}
                     sx={{ mb: 3 }}
                 />
                 <TextField

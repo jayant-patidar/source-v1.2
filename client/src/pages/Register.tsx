@@ -49,21 +49,45 @@ const Register = () => {
   const validateStep = (step: number) => {
     const newErrors: any = {};
     let isValid = true;
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const postalCodeRegex = /^[A-Za-z]\d[A-Za-z]\s?\d[A-Za-z]\d$/;
 
     if (step === 0) {
-      if (!formData.name) newErrors.name = 'Name is required';
-      if (!formData.email) newErrors.email = 'Email is required';
+      if (!formData.name || formData.name.trim().length < 2) newErrors.name = 'Name must be at least 2 characters';
+      if (!formData.email) { newErrors.email = 'Email is required'; }
+      else if (!emailRegex.test(formData.email)) { newErrors.email = 'Enter a valid email address'; }
       if (!formData.password || formData.password.length < 6) newErrors.password = 'Password (min 6 chars) is required';
       if (formData.password !== formData.confirmPassword) newErrors.confirmPassword = 'Passwords must match';
-      if (!formData.DOB) newErrors.DOB = 'DOB is required';
-      if (!formData.phone) newErrors.phone = 'Phone is required';
+      if (!formData.DOB) {
+        newErrors.DOB = 'Date of birth is required';
+      } else {
+        const dob = new Date(formData.DOB);
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        if (dob >= today) {
+          newErrors.DOB = 'Date of birth cannot be today or in the future';
+        } else {
+          const age = today.getFullYear() - dob.getFullYear() - (today < new Date(today.getFullYear(), dob.getMonth(), dob.getDate()) ? 1 : 0);
+          if (age < 16) newErrors.DOB = 'You must be at least 16 years old';
+        }
+      }
+      if (!formData.phone) {
+        newErrors.phone = 'Phone number is required';
+      } else {
+        const digitsOnly = formData.phone.replace(/\D/g, '');
+        if (digitsOnly.length !== 10) newErrors.phone = 'Phone number must be exactly 10 digits';
+      }
     }
 
     if (step === 1) {
       if (!formData.address.street) newErrors.street = 'Street is required';
       if (!formData.address.city) newErrors.city = 'City is required';
       if (!formData.address.province) newErrors.province = 'Province is required';
-      if (!formData.address.postalCode) newErrors.postalCode = 'Postal Code is required';
+      if (!formData.address.postalCode) {
+        newErrors.postalCode = 'Postal Code is required';
+      } else if (!postalCodeRegex.test(formData.address.postalCode.trim())) {
+        newErrors.postalCode = 'Enter a valid postal code (e.g. A1A 1A1)';
+      }
     }
 
     if (Object.keys(newErrors).length > 0) {
@@ -117,6 +141,12 @@ const Register = () => {
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
+    if (name === 'phone') {
+      // Strip non-digit characters, allow only numbers
+      const sanitized = value.replace(/\D/g, '').slice(0, 10);
+      setFormData((prev) => ({ ...prev, [name]: sanitized }));
+      return;
+    }
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
@@ -241,8 +271,8 @@ const Register = () => {
                 <TextField fullWidth name="email" label="Email Address" type="email" value={formData.email} onChange={handleChange} error={!!errors.email} helperText={errors.email} />
                 <TextField fullWidth name="password" label="Password" type="password" value={formData.password} onChange={handleChange} error={!!errors.password} helperText={errors.password} />
                 <TextField fullWidth name="confirmPassword" label="Confirm Password" type="password" value={formData.confirmPassword} onChange={handleChange} error={!!errors.confirmPassword} helperText={errors.confirmPassword} />
-                <TextField fullWidth name="phone" label="Phone Number" value={formData.phone} onChange={handleChange} error={!!errors.phone} helperText={errors.phone} />
-                <TextField fullWidth name="DOB" label="Date of Birth" type="date" InputLabelProps={{ shrink: true }} value={formData.DOB} onChange={handleChange} error={!!errors.DOB} helperText={errors.DOB} />
+                <TextField fullWidth name="phone" label="Phone Number" value={formData.phone} onChange={handleChange} error={!!errors.phone} helperText={errors.phone} placeholder="1234567890" inputProps={{ inputMode: 'numeric', maxLength: 10 }} />
+                <TextField fullWidth name="DOB" label="Date of Birth" type="date" InputLabelProps={{ shrink: true }} value={formData.DOB} onChange={handleChange} error={!!errors.DOB} helperText={errors.DOB} inputProps={{ max: new Date().toISOString().split('T')[0] }} />
               </Box>
             )}
 
@@ -258,7 +288,7 @@ const Register = () => {
                     {PROVINCES.map(prov => <MenuItem key={prov} value={prov}>{prov}</MenuItem>)}
                   </Select>
                 </FormControl>
-                <TextField fullWidth name="postalCode" label="Postal Code" value={formData.address.postalCode} onChange={handleAddressChange as any} error={!!errors.postalCode} helperText={errors.postalCode} />
+                <TextField fullWidth name="postalCode" label="Postal Code" value={formData.address.postalCode} onChange={handleAddressChange as any} error={!!errors.postalCode} helperText={errors.postalCode} placeholder="A1A 1A1" inputProps={{ maxLength: 7 }} />
                 <TextField fullWidth name="county" label="County (Optional)" value={formData.address.county} onChange={handleAddressChange as any} />
               </Box>
             )}

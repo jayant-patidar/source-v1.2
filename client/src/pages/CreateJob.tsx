@@ -16,9 +16,9 @@ const validationSchema = yup.object({
   category: yup.string().required('Category is required'),
   generalLocation: yup.string().required('General Location is required'),
   exactLocation: yup.string().required('Exact Location is required'),
-  jobDate: yup.date().required('Job Date is required'),
+  jobDate: yup.date().required('Job Date is required').min(new Date(new Date().setHours(0,0,0,0)), 'Job date cannot be in the past'),
   jobTime: yup.string().required('Job Time is required'),
-  expirationDate: yup.date().required('Expiration Date is required'),
+  expirationDate: yup.date().required('Expiration Date is required').min(new Date(new Date().setHours(0,0,0,0)), 'Expiration date cannot be in the past'),
   expirationTime: yup.string().required('Expiration Time is required').test(
     'is-before-job',
     'Expiration must be before or on job date/time',
@@ -185,6 +185,7 @@ const CreateJob = () => {
               onChange={formik.handleChange}
               error={formik.touched.pay && Boolean(formik.errors.pay)}
               helperText={formik.touched.pay && formik.errors.pay}
+              inputProps={{ min: 1 }}
             />
             <TextField
               fullWidth
@@ -241,6 +242,7 @@ const CreateJob = () => {
               value={formik.values.estimatedHours}
               onChange={formik.handleChange}
               error={formik.touched.estimatedHours && Boolean(formik.errors.estimatedHours)}
+              inputProps={{ min: 1 }}
               helperText={
                 (formik.touched.estimatedHours && formik.errors.estimatedHours) || 
                 (formik.values.pay && formik.values.estimatedHours ? 
@@ -287,6 +289,7 @@ const CreateJob = () => {
                 onChange={formik.handleChange}
                 error={formik.touched.jobDate && Boolean(formik.errors.jobDate)}
                 helperText={formik.touched.jobDate && formik.errors.jobDate}
+                inputProps={{ min: new Date().toISOString().split('T')[0] }}
             />
             <TextField
                 fullWidth
@@ -315,6 +318,7 @@ const CreateJob = () => {
                 onChange={formik.handleChange}
                 error={formik.touched.expirationDate && Boolean(formik.errors.expirationDate)}
                 helperText={formik.touched.expirationDate && formik.errors.expirationDate}
+                inputProps={{ min: new Date().toISOString().split('T')[0] }}
             />
             <TextField
                 fullWidth

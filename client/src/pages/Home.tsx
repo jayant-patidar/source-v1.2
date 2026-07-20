@@ -353,6 +353,7 @@ const Home = () => {
                           type="number" 
                           value={minPay} 
                           onChange={(e) => setMinPay(e.target.value)} 
+                          inputProps={{ min: 0 }}
                         />
                         <TextField 
                           size="small" 
@@ -360,6 +361,7 @@ const Home = () => {
                           type="number" 
                           value={maxPay} 
                           onChange={(e) => setMaxPay(e.target.value)} 
+                          inputProps={{ min: 0 }}
                         />
                       </Box>
                     </Box>
