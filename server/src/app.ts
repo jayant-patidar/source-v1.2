@@ -31,7 +31,10 @@ app.use(cookieParser());
 app.use(helmet());
 app.use(cors({
     origin: process.env.NODE_ENV === 'development'
-      ? ['http://localhost:5173', 'http://localhost:3000']
+      ? (origin: string | undefined, callback: (err: Error | null, allow?: boolean) => void) => {
+          // Allow any origin in development (mobile devices on LAN, localhost variants)
+          callback(null, true);
+        }
       : [process.env.CLIENT_URL || 'https://your-production-domain.com'],
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],

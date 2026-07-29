@@ -77,7 +77,18 @@ export const useAuthStore = create<AuthState>((set) => ({
     try {
       const user = await authService.getProfile();
       set({ user, isCheckingAuth: false });
-    } catch (error) {
+    } catch (error: any) {
+      // If access token expired, try refreshing before giving up
+      if (error.response?.status === 401) {
+        try {
+          await authService.refreshToken();
+          const user = await authService.getProfile();
+          set({ user, isCheckingAuth: false });
+          return;
+        } catch {
+          // Refresh also failed — user is fully logged out
+        }
+      }
       set({ user: null, isCheckingAuth: false });
     }
   },

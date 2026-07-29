@@ -58,13 +58,13 @@ class UserController {
     res.cookie('jwt', '', {
       httpOnly: true,
       secure: isProduction,
-      sameSite: isProduction ? 'none' : 'strict',
+      sameSite: isProduction ? 'none' : 'lax',
       expires: new Date(0),
     });
     res.cookie('refresh_token', '', {
       httpOnly: true,
       secure: isProduction,
-      sameSite: isProduction ? 'none' : 'strict',
+      sameSite: isProduction ? 'none' : 'lax',
       expires: new Date(0),
     });
     res.status(200).json({ message: 'Logged out successfully' });
@@ -81,19 +81,8 @@ class UserController {
     try {
       const decoded: any = jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET || 'refresh_secret');
       
-      // Generate new access token
-      const accessToken = jwt.sign({ userId: decoded.userId }, process.env.JWT_SECRET || 'secret', {
-        expiresIn: '15m',
-      });
-
-      const isProduction = process.env.NODE_ENV !== 'development';
-
-      res.cookie('jwt', accessToken, {
-        httpOnly: true,
-        secure: isProduction,
-        sameSite: isProduction ? 'none' : 'strict',
-        maxAge: 15 * 60 * 1000, // 15 minutes
-      });
+      // Generate new access token AND new refresh token (sliding session)
+      const newAccessToken = generateToken(res, decoded.userId);
 
       res.status(200).json({ message: 'Token refreshed' });
     } catch (error) {

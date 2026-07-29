@@ -14,20 +14,20 @@ api.interceptors.response.use(
   async (error) => {
     const originalRequest = error.config;
 
-    if (error.response?.status === 401 && !originalRequest._retry) {
+    // Don't retry refresh or profile calls — checkAuth handles those explicitly
+    const isAuthFlow = originalRequest.url?.includes('/users/profile') || originalRequest.url?.includes('/users/refresh');
+
+    if (error.response?.status === 401 && !originalRequest._retry && !isAuthFlow) {
       originalRequest._retry = true;
 
       try {
         // Try to refresh token
-        // Important: Use a separate instance or specific path to avoid infinite loop if refresh also 401s
-        // Usually refresh endpoint is just /users/refresh with cookie
         await axios.post(`${API_URL}/users/refresh`, {}, { withCredentials: true });
         
         // Retry original request
         return api(originalRequest);
       } catch (refreshError) {
         // If refresh fails, logout user
-        // We use getState() to access the store outside of a component
         useAuthStore.getState().logout();
         return Promise.reject(refreshError);
       }
