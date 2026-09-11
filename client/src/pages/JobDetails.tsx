@@ -162,8 +162,9 @@ const JobDetails = () => {
   if (!job) return <Container><Typography>Job not found</Typography></Container>;
 
   // Correctly identify if current user is the poster
-  const seekerIdStr = job.seekerId?._id || job.seekerId;
-  const isPoster = user && String(seekerIdStr) === String(user._id);
+  const seeker = job.seekerId;
+  const seekerIdStr = seeker?._id || seeker?.id || (typeof seeker === 'string' ? seeker : '');
+  const isPoster = user && Boolean(user._id) && (String(seekerIdStr) === String(user._id) || String(seekerIdStr) === String((user as any).id));
   const poster = job.seekerId;
 
   const handleRepost = () => {

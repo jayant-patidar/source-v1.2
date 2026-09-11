@@ -31,8 +31,9 @@ const JobCard = ({ job }: { job: any }) => {
   const { showToast } = useToastStore();
   const { user } = useAuthStore();
   
-  const seekerIdStr = job.seekerId?._id || job.seekerId;
-  const isPoster = user && String(seekerIdStr) === String(user._id);
+  const seeker = job.seekerId;
+  const seekerIdStr = seeker?._id || seeker?.id || (typeof seeker === 'string' ? seeker : '');
+  const isPoster = user && Boolean(user._id) && (String(seekerIdStr) === String(user._id) || String(seekerIdStr) === String((user as any).id));
 
   // Guard: show login prompt if user is not authenticated
   const requireAuth = (action: () => void) => {

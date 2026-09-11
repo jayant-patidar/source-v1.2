@@ -17,8 +17,8 @@ const GigCard = ({ gig }: GigCardProps) => {
   const navigate = useNavigate();
   const provider = gig.providerId;
 
-  const providerIdStr = provider?._id || provider;
-  const isPoster = user && String(providerIdStr) === String(user._id);
+  const providerIdStr = provider?._id || provider?.id || (typeof provider === 'string' ? provider : '');
+  const isPoster = user && Boolean(user._id) && (String(providerIdStr) === String(user._id) || String(providerIdStr) === String((user as any).id));
 
   const handleBookClick = () => {
     if (!user) {

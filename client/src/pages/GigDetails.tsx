@@ -57,8 +57,8 @@ const GigDetails = () => {
   if (!gig) return <Container><Typography>Gig not found</Typography></Container>;
 
   const provider = gig.providerId;
-  const providerIdStr = provider?._id || provider;
-  const isPoster = user && String(providerIdStr) === String(user._id);
+  const providerIdStr = provider?._id || provider?.id || (typeof provider === 'string' ? provider : '');
+  const isPoster = user && Boolean(user._id) && (String(providerIdStr) === String(user._id) || String(providerIdStr) === String((user as any).id));
 
   return (
     <Container maxWidth="lg" sx={{ mt: 4, mb: 8 }}>
