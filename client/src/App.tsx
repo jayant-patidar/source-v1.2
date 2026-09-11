@@ -48,6 +48,7 @@ function App() {
         <Route path="/register" element={!user ? <Register /> : <Navigate to="/" />} />
         <Route path="/post-job" element={<CreateJob />} />
         <Route path="/create-gig" element={<CreateGig />} />
+        <Route path="/edit-gig/:id" element={user ? <CreateGig /> : <Navigate to="/login" />} />
         <Route path="/jobs/:id" element={<JobDetails />} />
         <Route path="/gigs/:id" element={<GigDetails />} />
         <Route path="/search" element={<SearchResults />} />

@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import { Container, Typography, Box, Button, Paper, Divider, Chip, CircularProgress, Avatar, Alert, Grid } from '@mui/material';
 import { getGigById } from '../services/gig.service';
 import { useAuthStore } from '../store/authStore';
@@ -16,6 +16,7 @@ const GigDetails = () => {
   const { id } = useParams();
   const { user } = useAuthStore();
   const { showToast } = useToastStore();
+  const navigate = useNavigate();
 
   const requireAuth = (action: () => void) => {
     if (!user) {
@@ -165,7 +166,27 @@ const GigDetails = () => {
           <Box sx={{ position: 'sticky', top: 24, display: 'flex', flexDirection: 'column', gap: 3 }}>
             
             {/* Action Buttons & Book Button */}
-            {!isPoster && (
+            {isPoster ? (
+              <Box sx={{ p: { xs: 2, md: 3 }, bgcolor: '#ffffff', borderRadius: 4, border: '1px solid rgba(0,0,0,0.05)', boxShadow: '0 10px 30px rgba(0,0,0,0.03)' }}>
+                <Button 
+                    fullWidth
+                    variant="outlined" 
+                    size="large"
+                    onClick={() => navigate(`/edit-gig/${gig._id}`)}
+                    sx={{ 
+                        fontWeight: '800', 
+                        py: 1.5,
+                        borderRadius: 3,
+                        fontSize: '1.1rem',
+                        letterSpacing: '0.5px',
+                        borderWidth: 2,
+                        '&:hover': { borderWidth: 2 }
+                    }}
+                >
+                    Edit Gig
+                </Button>
+              </Box>
+            ) : (
             <Box sx={{ p: { xs: 2, md: 3 }, bgcolor: '#ffffff', borderRadius: 4, border: '1px solid rgba(0,0,0,0.05)', boxShadow: '0 10px 30px rgba(0,0,0,0.03)' }}>
                 {/* Actions Icons Row */}
                 <Box sx={{ display: 'flex', justifyContent: 'space-between', px: 2, mb: 4 }}>

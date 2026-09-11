@@ -7,6 +7,7 @@ export interface IGig extends Document {
   price: number;
   category: string;
   tags?: string[];
+  expirationDate?: Date;
   isActive: boolean;
   createdAt: Date;
   updatedAt: Date;
@@ -20,6 +21,7 @@ const GigSchema: Schema = new Schema(
     price: { type: Number, required: true },
     category: { type: String, required: true },
     tags: [{ type: String }],
+    expirationDate: { type: Date },
     isActive: { type: Boolean, default: true },
   },
   { timestamps: true }

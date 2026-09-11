@@ -20,7 +20,14 @@ class GigService {
   }
 
   async getGigs(filters: any): Promise<IGig[]> {
-    const query: any = { isActive: true };
+    const query: any = { 
+      isActive: true,
+      $or: [
+        { expirationDate: { $exists: false } },
+        { expirationDate: null },
+        { expirationDate: { $gte: new Date() } }
+      ]
+    };
     if (filters.category && filters.category !== 'All') {
       query.category = filters.category;
     }

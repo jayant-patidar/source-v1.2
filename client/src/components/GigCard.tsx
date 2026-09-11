@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Card, CardContent, Typography, Box, Avatar, Button, Chip } from '@mui/material';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import StarIcon from '@mui/icons-material/Star';
 import BookGigModal from './BookGigModal';
 import { useAuthStore } from '../store/authStore';
@@ -14,6 +14,7 @@ const GigCard = ({ gig }: GigCardProps) => {
   const [isBookModalOpen, setIsBookModalOpen] = useState(false);
   const { user } = useAuthStore();
   const { showToast } = useToastStore();
+  const navigate = useNavigate();
   const provider = gig.providerId;
 
   const providerIdStr = provider?._id || provider;
@@ -166,6 +167,33 @@ const GigCard = ({ gig }: GigCardProps) => {
                 }}
               >
                 Book Now
+              </Button>
+            )}
+            {isPoster && (
+              <Button 
+                variant="outlined" 
+                onClick={(e) => {
+                  e.stopPropagation();
+                  navigate(`/edit-gig/${gig._id}`);
+                }}
+                sx={{ 
+                  color: '#475569',
+                  borderColor: '#cbd5e1',
+                  px: { xs: 3, sm: 5 },
+                  py: 1.2,
+                  borderRadius: 3,
+                  textTransform: 'none',
+                  fontSize: '1rem',
+                  fontWeight: '800',
+                  transition: 'all 0.3s',
+                  width: { xs: '100%', sm: 'auto' },
+                  '&:hover': { 
+                    borderColor: '#94a3b8',
+                    backgroundColor: '#f8fafc'
+                  }
+                }}
+              >
+                Edit
               </Button>
             )}
           </Box>

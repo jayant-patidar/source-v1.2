@@ -1,12 +1,13 @@
 import { useState, useEffect } from 'react';
 import { Container, Typography, TextField, Button, Box, Paper, Grid, CircularProgress, Autocomplete, Chip, IconButton } from '@mui/material';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { useFormik } from 'formik';
 import * as yup from 'yup';
 import { useAuthStore } from '../store/authStore';
 import { useToastStore } from '../store/toastStore';
 import { useGigStore } from '../store/gigStore';
+import { getGigById } from '../services/gig.service';
 
 const validationSchema = yup.object({
   title: yup.string().required('Title is required').max(100, 'Title should be under 100 characters'),
@@ -14,6 +15,7 @@ const validationSchema = yup.object({
   category: yup.string().required('Category is required'),
   price: yup.number().required('Price is required').min(1, 'Price must be greater than 0'),
   tags: yup.array().of(yup.string()),
+  expirationDate: yup.date().min(new Date(new Date().setHours(0,0,0,0)), 'Expiration date cannot be in the past').nullable(),
 });
 
 const categories = [
@@ -28,9 +30,51 @@ const predefinedTags = [
 const CreateGig = () => {
   const { user } = useAuthStore();
   const { showToast } = useToastStore();
-  const { createGig } = useGigStore();
+  const { createGig, updateGig } = useGigStore();
   const navigate = useNavigate();
+  const { id } = useParams();
+  
+  const isEditMode = Boolean(id);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [initialLoading, setInitialLoading] = useState(isEditMode);
+
+  const formik = useFormik({
+    initialValues: {
+      title: '',
+      description: '',
+      category: '',
+      price: '',
+      tags: [] as string[],
+      expirationDate: '',
+    },
+    validationSchema: validationSchema,
+    onSubmit: async (values) => {
+      setIsSubmitting(true);
+      try {
+        const payload = {
+          title: values.title,
+          description: values.description,
+          category: values.category,
+          price: Number(values.price),
+          tags: values.tags,
+          expirationDate: values.expirationDate || undefined,
+        };
+
+        if (isEditMode && id) {
+          await updateGig(id, payload);
+          showToast('Gig updated successfully!', 'success');
+        } else {
+          await createGig(payload);
+          showToast('Gig created successfully!', 'success');
+        }
+        navigate('/activity');
+      } catch (error: any) {
+        showToast(error.message || `Failed to ${isEditMode ? 'update' : 'create'} gig`, 'error');
+      } finally {
+        setIsSubmitting(false);
+      }
+    },
+  });
 
   useEffect(() => {
     if (!user) {
@@ -39,36 +83,45 @@ const CreateGig = () => {
     }
   }, [user, navigate, showToast]);
 
-  const formik = useFormik({
-    initialValues: {
-      title: '',
-      description: '',
-      category: '',
-      price: '',
-      tags: [],
-    },
-    validationSchema: validationSchema,
-    onSubmit: async (values) => {
-      setIsSubmitting(true);
-      try {
-        await createGig({
-          title: values.title,
-          description: values.description,
-          category: values.category,
-          price: Number(values.price),
-          tags: values.tags,
-        });
-        showToast('Gig created successfully!', 'success');
-        navigate('/activity'); // Navigate to Activity where they can see "My Gigs"
-      } catch (error: any) {
-        showToast(error.message || 'Failed to create gig', 'error');
-      } finally {
-        setIsSubmitting(false);
+  useEffect(() => {
+    const fetchGig = async () => {
+      if (isEditMode && id) {
+        try {
+          const gigData = await getGigById(id);
+          if (gigData.providerId._id !== user?._id && gigData.providerId !== user?._id) {
+             showToast('Not authorized to edit this gig', 'error');
+             navigate('/activity');
+             return;
+          }
+          formik.setValues({
+            title: gigData.title || '',
+            description: gigData.description || '',
+            category: gigData.category || '',
+            price: gigData.price ? String(gigData.price) : '',
+            tags: gigData.tags || [],
+            expirationDate: gigData.expirationDate ? new Date(gigData.expirationDate).toISOString().split('T')[0] : '',
+          });
+        } catch (error) {
+          showToast('Failed to load gig data', 'error');
+          navigate('/activity');
+        } finally {
+          setInitialLoading(false);
+        }
       }
-    },
-  });
+    };
+    fetchGig();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isEditMode, id, user, navigate, showToast]);
 
   if (!user) return null;
+  
+  if (initialLoading) {
+    return (
+      <Box display="flex" justifyContent="center" mt={8}>
+        <CircularProgress />
+      </Box>
+    );
+  }
 
   return (
     <Container maxWidth="md" sx={{ mt: 4, mb: 8 }}>
@@ -78,11 +131,11 @@ const CreateGig = () => {
             <ArrowBackIcon />
           </IconButton>
           <Typography variant="h4" fontWeight="bold">
-            Create a New Gig
+            {isEditMode ? 'Edit Gig' : 'Create a New Gig'}
           </Typography>
         </Box>
         <Typography variant="body1" color="text.secondary" sx={{ mb: 4 }}>
-          Offer a pre-packaged service for a fixed price.
+          {isEditMode ? 'Update your service offering details below.' : 'Offer a pre-packaged service for a fixed price.'}
         </Typography>
 
         <form onSubmit={formik.handleSubmit}>
@@ -172,6 +225,20 @@ const CreateGig = () => {
                 )}
               />
             </Grid>
+            <Grid size={{ xs: 12 }}>
+              <TextField
+                fullWidth
+                id="expirationDate"
+                name="expirationDate"
+                label="Expiration Date (Optional)"
+                type="date"
+                InputLabelProps={{ shrink: true }}
+                value={formik.values.expirationDate}
+                onChange={formik.handleChange}
+                error={formik.touched.expirationDate && Boolean(formik.errors.expirationDate)}
+                helperText={(formik.touched.expirationDate && formik.errors.expirationDate) || "If set, the gig will hide from the public feed after this date."}
+              />
+            </Grid>
           </Grid>
 
           <Box sx={{ mt: 4, display: 'flex', justifyContent: 'flex-end', gap: 2 }}>
@@ -184,7 +251,7 @@ const CreateGig = () => {
               disabled={isSubmitting}
               sx={{ bgcolor: 'black', color: 'white', '&:hover': { bgcolor: '#333' } }}
             >
-              {isSubmitting ? <CircularProgress size={24} color="inherit" /> : 'Publish Gig'}
+              {isSubmitting ? <CircularProgress size={24} color="inherit" /> : (isEditMode ? 'Save Changes' : 'Publish Gig')}
             </Button>
           </Box>
         </form>
