@@ -35,6 +35,7 @@ class GigDAL {
 
   async getGigsByProvider(providerId: string): Promise<IGig[]> {
     return await Gig.find({ providerId })
+      .populate('providerId', 'name email avatar providerRating seekerRating')
       .sort({ createdAt: -1 });
   }
 

@@ -3,6 +3,8 @@ import { Card, CardContent, Typography, Box, Avatar, Button, Chip } from '@mui/m
 import { Link } from 'react-router-dom';
 import StarIcon from '@mui/icons-material/Star';
 import BookGigModal from './BookGigModal';
+import { useAuthStore } from '../store/authStore';
+import { useToastStore } from '../store/toastStore';
 
 interface GigCardProps {
   gig: any;
@@ -10,9 +12,18 @@ interface GigCardProps {
 
 const GigCard = ({ gig }: GigCardProps) => {
   const [isBookModalOpen, setIsBookModalOpen] = useState(false);
+  const { user } = useAuthStore();
+  const { showToast } = useToastStore();
   const provider = gig.providerId;
 
+  const providerIdStr = provider?._id || provider;
+  const isPoster = user && String(providerIdStr) === String(user._id);
+
   const handleBookClick = () => {
+    if (!user) {
+      showToast('Please login to book a gig', 'warning');
+      return;
+    }
     setIsBookModalOpen(true);
   };
 
@@ -131,31 +142,32 @@ const GigCard = ({ gig }: GigCardProps) => {
                 />
               ))}
             </Box>
-            
-            <Button 
-              variant="contained" 
-              onClick={handleBookClick}
-              sx={{ 
-                background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)',
-                color: 'white',
-                px: { xs: 3, sm: 5 },
-                py: 1.2,
-                borderRadius: 3,
-                textTransform: 'none',
-                fontSize: '1rem',
-                fontWeight: '800',
-                boxShadow: '0 8px 20px rgba(15,23,42,0.2)',
-                transition: 'all 0.3s',
-                width: { xs: '100%', sm: 'auto' },
-                '&:hover': { 
-                  transform: 'translateY(-2px)',
-                  boxShadow: '0 12px 25px rgba(15,23,42,0.3)',
-                  background: 'linear-gradient(135deg, #1e293b 0%, #334155 100%)'
-                }
-              }}
-            >
-              Book Now
-            </Button>
+            {!isPoster && (
+              <Button 
+                variant="contained" 
+                onClick={handleBookClick}
+                sx={{ 
+                  background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)',
+                  color: 'white',
+                  px: { xs: 3, sm: 5 },
+                  py: 1.2,
+                  borderRadius: 3,
+                  textTransform: 'none',
+                  fontSize: '1rem',
+                  fontWeight: '800',
+                  boxShadow: '0 8px 20px rgba(15,23,42,0.2)',
+                  transition: 'all 0.3s',
+                  width: { xs: '100%', sm: 'auto' },
+                  '&:hover': { 
+                    transform: 'translateY(-2px)',
+                    boxShadow: '0 12px 25px rgba(15,23,42,0.3)',
+                    background: 'linear-gradient(135deg, #1e293b 0%, #334155 100%)'
+                  }
+                }}
+              >
+                Book Now
+              </Button>
+            )}
           </Box>
         </CardContent>
       </Card>

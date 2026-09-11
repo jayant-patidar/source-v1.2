@@ -55,8 +55,9 @@ const GigDetails = () => {
   if (error) return <Container><Alert severity="error">{error}</Alert></Container>;
   if (!gig) return <Container><Typography>Gig not found</Typography></Container>;
 
-  const isPoster = user && (gig.providerId === user._id || (gig.providerId && gig.providerId._id === user._id));
   const provider = gig.providerId;
+  const providerIdStr = provider?._id || provider;
+  const isPoster = user && String(providerIdStr) === String(user._id);
 
   return (
     <Container maxWidth="lg" sx={{ mt: 4, mb: 8 }}>
