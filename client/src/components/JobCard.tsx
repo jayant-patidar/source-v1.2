@@ -267,11 +267,12 @@ const JobCard = ({ job }: { job: any }) => {
               
               <Box sx={{ display: 'flex', flexDirection: { xs: 'column', sm: 'row' }, gap: 2, alignItems: { xs: 'stretch', sm: 'center' } }}>
                 {/* Actions Icons Row */}
-                <Box sx={{ display: 'flex', flexWrap: 'nowrap', justifyContent: 'flex-start', gap: { xs: 0.5, sm: 1 }, flex: 1 }}>
+                <Box sx={{ display: 'flex', flexWrap: 'nowrap', justifyContent: 'space-between', gap: { xs: 0.5, sm: 1 }, flex: 1 }}>
                   
                   <Box 
                     sx={{ 
-                      display: 'flex', alignItems: 'center', gap: { xs: 0.5, sm: 1 }, p: { xs: 0.5, sm: 1 }, pr: { xs: 1, sm: 2 },
+                      flex: 1, justifyContent: 'center',
+                      display: 'flex', alignItems: 'center', gap: { xs: 0.5, sm: 1 }, py: { xs: 0.5, sm: 1 }, px: { xs: 1, sm: 2 },
                       borderRadius: 12, cursor: 'pointer', transition: 'all 0.2s',
                       color: '#64748b', '&:hover': { bgcolor: 'rgba(99, 102, 241, 0.1)', color: '#4f46e5' }
                     }} 
@@ -291,7 +292,8 @@ const JobCard = ({ job }: { job: any }) => {
 
                   <Box 
                     sx={{ 
-                      display: 'flex', alignItems: 'center', gap: { xs: 0.5, sm: 1 }, p: { xs: 0.5, sm: 1 }, pr: { xs: 1, sm: 2 },
+                      flex: 1, justifyContent: 'center',
+                      display: 'flex', alignItems: 'center', gap: { xs: 0.5, sm: 1 }, py: { xs: 0.5, sm: 1 }, px: { xs: 1, sm: 2 },
                       borderRadius: 12, cursor: 'pointer', transition: 'all 0.2s',
                       color: '#64748b', '&:hover': { bgcolor: 'rgba(16, 185, 129, 0.1)', color: '#059669' }
                     }} 
@@ -305,7 +307,8 @@ const JobCard = ({ job }: { job: any }) => {
 
                   <Box 
                     sx={{ 
-                      display: 'flex', alignItems: 'center', gap: { xs: 0.5, sm: 1 }, p: { xs: 0.5, sm: 1 }, pr: { xs: 1, sm: 2 },
+                      flex: 1, justifyContent: 'center',
+                      display: 'flex', alignItems: 'center', gap: { xs: 0.5, sm: 1 }, py: { xs: 0.5, sm: 1 }, px: { xs: 1, sm: 2 },
                       borderRadius: 12, cursor: 'pointer', transition: 'all 0.2s',
                       color: '#64748b', '&:hover': { bgcolor: 'rgba(236, 72, 153, 0.1)', color: '#db2777' }
                     }} 
@@ -319,7 +322,8 @@ const JobCard = ({ job }: { job: any }) => {
 
                   <Box 
                     sx={{ 
-                      display: 'flex', alignItems: 'center', gap: { xs: 0.5, sm: 1 }, p: { xs: 0.5, sm: 1 }, pr: { xs: 1, sm: 2 },
+                      flex: 1, justifyContent: 'center',
+                      display: 'flex', alignItems: 'center', gap: { xs: 0.5, sm: 1 }, py: { xs: 0.5, sm: 1 }, px: { xs: 1, sm: 2 },
                       borderRadius: 12, cursor: 'pointer', transition: 'all 0.2s',
                       color: isSaved ? '#eab308' : '#64748b', '&:hover': { bgcolor: 'rgba(234, 179, 8, 0.1)', color: '#eab308' }
                     }} 

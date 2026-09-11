@@ -1,7 +1,7 @@
 import { createTheme } from '@mui/material/styles';
 
 const theme = createTheme({
-  spacing: 6, // Reduced from default 8px to 6px
+  spacing: 4, // Reduced from 6px to 4px for denser layout
   palette: {
     mode: 'light',
     primary: {
@@ -67,9 +67,9 @@ const theme = createTheme({
     MuiCardContent: {
       styleOverrides: {
         root: {
-          padding: '16px',
+          padding: '12px',
           '&:last-child': {
-            paddingBottom: '16px', // Prevents the default 24px bottom padding
+            paddingBottom: '12px', // Prevents the default 24px bottom padding
           },
         },
       },

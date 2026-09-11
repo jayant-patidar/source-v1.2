@@ -64,7 +64,7 @@ const Navbar = () => {
       backdropFilter: 'blur(12px)'
     }}>
       <Container maxWidth={false} sx={{ px: { xs: 2, sm: 4, md: 6, lg: 8 } }}>
-        <Toolbar disableGutters sx={{ height: 72, display: 'flex', justifyContent: 'space-between' }}>
+        <Toolbar disableGutters sx={{ height: 54, display: 'flex', justifyContent: 'space-between' }}>
           {/* Logo */}
           <Box
             component={RouterLink}
@@ -80,7 +80,7 @@ const Navbar = () => {
             <img
               src="/logo1.png"
               alt="Source"
-              style={{ height: 66, objectFit: 'contain' }}
+              style={{ height: 40, objectFit: 'contain' }}
             />
           </Box>
 
@@ -150,7 +150,7 @@ const Navbar = () => {
               <Typography variant="caption" sx={{ fontSize: '0.65rem', fontWeight: 700, letterSpacing: '0.5px' }}>ACTIVITY</Typography>
             </Box>
 
-            <NotificationMenu />
+            {user && <NotificationMenu />}
             
             {user ? (
               <Box 

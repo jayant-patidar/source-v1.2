@@ -101,8 +101,8 @@ const Home = () => {
         <Grid size={{ xs: 12, md: 6 }}>
           {/* Enhanced Premium Hero Section */}
           <Box sx={{ 
-            p: { xs: 4, md: 6 }, 
-            mb: 4, 
+            p: { xs: 2, md: 3 }, 
+            mb: 2, 
             borderRadius: 4, 
             bgcolor: '#0a0a0a', 
             color: 'white',
@@ -128,13 +128,13 @@ const Home = () => {
                   background: 'linear-gradient(to right, #ffffff, #a5b4fc)',
                   WebkitBackgroundClip: 'text',
                   WebkitTextFillColor: 'transparent',
-                  mb: 2,
-                  fontSize: { xs: '2rem', md: '3rem' }
+                  mb: 1,
+                  fontSize: { xs: '1.5rem', md: '2rem' }
                 }}
               >
                 Welcome {user ? user.name.split(' ')[0] : 'Back'}.
               </Typography>
-              <Typography variant="body1" sx={{ mb: 4, color: '#94a3b8', fontSize: '1.2rem', maxWidth: '80%', lineHeight: 1.6 }}>
+              <Typography variant="body1" sx={{ mb: 2, color: '#94a3b8', fontSize: '1rem', maxWidth: '80%', lineHeight: 1.4 }}>
                 Discover top-tier opportunities or source the perfect talent. The next big thing starts right here.
               </Typography>
               
@@ -152,10 +152,10 @@ const Home = () => {
                     color: 'black', 
                     fontWeight: '800', 
                     borderRadius: 3, 
-                    px: { xs: 3, md: 5 }, 
-                    py: 1.5,
+                    px: { xs: 2, md: 3 }, 
+                    py: 1,
                     textTransform: 'none',
-                    fontSize: '1.1rem',
+                    fontSize: '0.9rem',
                     transition: 'all 0.2s',
                     boxShadow: '0 4px 14px rgba(255,255,255,0.2)',
                     '&:hover': { 
@@ -180,10 +180,10 @@ const Home = () => {
                     borderColor: 'rgba(255,255,255,0.2)', 
                     fontWeight: '700', 
                     borderRadius: 3, 
-                    px: { xs: 3, md: 4 }, 
-                    py: 1.5,
+                    px: { xs: 2, md: 3 }, 
+                    py: 1,
                     textTransform: 'none',
-                    fontSize: '1.1rem',
+                    fontSize: '0.9rem',
                     transition: 'all 0.2s',
                     '&:hover': { 
                       borderColor: 'rgba(255,255,255,0.5)',
