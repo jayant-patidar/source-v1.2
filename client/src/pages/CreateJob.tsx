@@ -26,10 +26,15 @@ const validationSchema = yup.object({
       const { jobDate, jobTime, expirationDate } = this.parent;
       if (!value || !jobDate || !jobTime || !expirationDate) return true;
       
-      const jobDateTime = new Date(`${jobDate}T${jobTime}`);
-      const expDateTime = new Date(`${expirationDate}T${value}`);
+      const job = new Date(jobDate);
+      const [jobH, jobM] = jobTime.split(':');
+      job.setHours(Number(jobH), Number(jobM), 0, 0);
+
+      const exp = new Date(expirationDate);
+      const [expH, expM] = value.split(':');
+      exp.setHours(Number(expH), Number(expM), 0, 0);
       
-      return expDateTime <= jobDateTime;
+      return exp <= job;
     }
   ),
   requirements: yup.array().of(yup.string()),
