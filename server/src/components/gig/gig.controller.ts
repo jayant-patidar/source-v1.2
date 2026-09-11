@@ -29,7 +29,7 @@ class GigController {
 
   async getGigById(req: Request, res: Response, next: NextFunction) {
     try {
-      const gig = await this.gigService.getGigById(req.params.id);
+      const gig = await this.gigService.getGigById(req.params.id as string);
       if (gig) {
         res.status(200).json(gig);
       } else {

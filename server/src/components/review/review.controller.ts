@@ -19,7 +19,7 @@ class ReviewController {
 
   async getUserReviews(req: Request, res: Response, next: NextFunction) {
     try {
-      const reviews = await this.reviewService.getUserReviews(req.params.userId);
+      const reviews = await this.reviewService.getUserReviews(req.params.userId as string);
       res.json(reviews);
     } catch (error) {
       next(error);
@@ -44,7 +44,7 @@ class ReviewController {
 
   async getReviewsByJob(req: Request, res: Response, next: NextFunction) {
       try {
-          const reviews = await this.reviewService.getReviewsByJob(req.params.jobId);
+          const reviews = await this.reviewService.getReviewsByJob(req.params.jobId as string);
           res.json(reviews);
       } catch (error) {
           next(error);

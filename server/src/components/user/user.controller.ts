@@ -102,7 +102,7 @@ class UserController {
 
   async getUserById(req: Request, res: Response, next: NextFunction) {
     try {
-      const user = await this.userService.getUserById(req.params.id);
+      const user = await this.userService.getUserById(req.params.id as string);
       if (user) {
         res.status(200).json(user);
       } else {
@@ -115,7 +115,7 @@ class UserController {
 
   async getPublicUserById(req: Request, res: Response, next: NextFunction) {
     try {
-      const user = await this.userService.getPublicUserById(req.params.id);
+      const user = await this.userService.getPublicUserById(req.params.id as string);
       if (user) {
         res.status(200).json(user);
       } else {

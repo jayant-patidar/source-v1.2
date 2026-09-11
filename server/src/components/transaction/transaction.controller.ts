@@ -57,7 +57,7 @@ class TransactionController {
   getTransactionsByJob = async (req: Request, res: Response) => {
     try {
       const { jobId } = req.params;
-      const transactions = await this.transactionService.getTransactionsByJob(jobId);
+      const transactions = await this.transactionService.getTransactionsByJob(jobId as string);
       res.status(200).json(transactions);
     } catch (error) {
       console.error('Get Job Transactions Error:', error);

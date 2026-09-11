@@ -72,7 +72,7 @@ class JobController {
 
   async getJobById(req: Request, res: Response, next: NextFunction) {
     try {
-      const job = await this.jobService.getJobById(req.params.id);
+      const job = await this.jobService.getJobById(req.params.id as string);
       if (job) {
         console.log('getJobById returning:', JSON.stringify(job));
         res.status(200).json(job);
@@ -86,7 +86,7 @@ class JobController {
 
   async updateJob(req: Request, res: Response, next: NextFunction) {
       try {
-          const jobId = req.params.id;
+          const jobId = req.params.id as string;
           const updateData = { ...req.body };
 
           if (updateData.requirements && typeof updateData.requirements === 'string') {
@@ -150,7 +150,7 @@ class JobController {
 
   async deleteJob(req: Request, res: Response, next: NextFunction) {
       try {
-          const deletedJob = await this.jobService.deleteJob(req.params.id);
+          const deletedJob = await this.jobService.deleteJob(req.params.id as string);
           if (deletedJob) {
               res.status(200).json({ message: 'Job removed' });
           } else {

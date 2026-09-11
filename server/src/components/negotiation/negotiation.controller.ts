@@ -41,7 +41,7 @@ class NegotiationController {
 
   async getNegotiations(req: Request, res: Response, next: NextFunction) {
     try {
-      const negotiations = await this.negotiationService.getNegotiationsByJobId(req.params.jobId);
+      const negotiations = await this.negotiationService.getNegotiationsByJobId(req.params.jobId as string);
       res.json(negotiations);
     } catch (error) {
       next(error);
